@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+
+# https://projecteuler.net/problem=69
+import itertools
+
+
+def make_primes(n):
+    ret = set(range(3, n + 1, 2))
+    ret.add(2)
+    for i in range(3, int(math.sqrt(n)) + 2):
+        if i in ret:
+            ret -= set(range(i * 2, n + 1, i))
+    return sorted(ret), ret
+
+
+primes, primes_set = make_primes(10 ** 7)
+
+
+def getdivz(n):
+    global primes
+
+    if n in primes_set:
+        return set((n,))
+
+    maxp = int(math.sqrt(n) + 2)
+
+    divz = set()
+    for p in primes:
+        while n % p == 0:
+            divz.add(p)
+            n //= p
+            if n in primes_set:
+                divz.add(n)
+                return divz
+        if p > n or p > maxp:
+            break
+    return divz
+
+
+def phi(n):
+    divz = getdivz(n)
+
+    for p in divz:
+        n = n * (p - 1) // p
+    return n
+
+
+print(sum(phi(n) for n in range(2, 10**6 + 1)))
