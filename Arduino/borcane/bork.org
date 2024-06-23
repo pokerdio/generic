@@ -1,0 +1,87 @@
+* elemental transitions
+  | item    | fire      | earth     | water            |
+  |---------+-----------+-----------+------------------|
+  | fire    |           | tool      | bug              |
+  | earth   |           |           | plant            |
+  | tool    | gear      | diamond   | faucet           |
+  | bug     | firebug   | mouse     | fish             |
+  | plant   | cactus    | tree      | flower           |
+  | tree    | log       | house     | apple            |
+  | screw   | engine    | robot     | wheel            |
+  | diamond | lightbulb | magpie    | magnifying_glass |
+  | faucet  | -         | hydrant   | fountain         |
+  | mouse   |           | cat       | xxx              |
+  | apple   |           | pig       |                  |
+  | pig     | roast     | mushroom  | hippo            |
+  | fish    | roast     | cat       | xxx              |
+  | roast   | xxx       | dog       | shark            |
+  | flower  | seeds     | POT_PLANT | ananas           |
+  | seeds   | bread     | bird      | flower           |
+  | cactus  | xxx       | hedgehog  | -                |
+
+
+#+BEGIN_SRC elisp
+  (defun my/process-fix (x) 
+    (upcase (if (symbolp x) (symbol-name x) x)))
+
+  (defun my/process-item (res src transf)
+    "result item, source item, transformation"
+    (when (and res src transf
+	       (not (string= "" res))
+	       (not (string= "" src))
+	       (not (string= "" transf)))
+      (let ((res (my/process-fix res))
+	    (src (my/process-fix  src))
+	    (transf (my/process-fix  transf)))
+	(cond
+	 ((string= res "XXX")
+	  (insert (format "    {SPRITE_NONE, {-1, SPRITE_%s, -1, SPRITE_%s}},\n" src transf)))
+	 ((string= res "-")
+	  (insert (format "    {SPRITE_NONE, {1, SPRITE_%s, -1, SPRITE_%s}},\n" src transf)))
+	 (t (insert (format "    {SPRITE_%s, {-1, SPRITE_%s, -1, SPRITE_%s}},\n" 
+			    res src transf)))))))
+
+  (defun my/process-line (item fire earth water)
+    (my/process-item fire item "fire")
+    (my/process-item earth item "earth")
+    (my/process-item water item "water"))
+
+  (defun my/process-table () 
+    (let ((table (org-table-to-lisp))
+	  (output-buffer (get-buffer-create "**")))
+      (let ((row1 (car table))
+	    (data (cddr table)))
+	(with-current-buffer output-buffer
+	  (erase-buffer)
+	  (insert "const rule_t ruleset[] = {\n")
+	  (dolist (row data)
+	    (my/process-line (car row) (cadr row) (caddr row) (cadddr row)))
+	  (insert "};\n")
+
+	  (goto-char (point-min))	 
+	  (set-mark (point))	 
+	  (goto-char (point-max))
+
+	  (global-set-key (kbd "C-c C-a") 'mark-whole-buffer)
+
+	  (display-buffer output-buffer)))))
+
+
+#+END_SRC	  
+* categories
+** destroyers
+*** cactus
+  * fire
+  * water
+  * 
+  
+* custom transitions
+  | car | wheel(4) | engine |
+  |     |          |        |
+
+
+* meanings, associations
+  * fire triangle light energy smith
+  * water circle nourish growth
+  * earth square stone bait place
+    
