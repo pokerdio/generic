@@ -1,0 +1,35 @@
+let img; // Declare variable 'img'.
+let diameter = 200;
+
+function preload() {
+  // Load the image
+  //img = loadImage('https://upload.wikimedia.org/wikipedia/commons/f/f5/Missolonghi.jpg');
+}
+
+function setup() {
+  // Draw the ellipse with the texture
+  createCanvas(700, 700, WEBGL);
+
+  img = createGraphics(50, 50);
+  img.fill("red");
+  img.rect(0, 0, 20, 50);
+  img.fill("yellow");
+  img.rect(20, 0, 30, 50);
+  img.fill("blue");
+  img.rect(30, 0, 50, 50);
+
+  img.fill(255);
+  img.ellipse(25, 25, 5, 5);
+  texture(img);
+}
+
+function draw() {
+  background(0);
+  push();
+  ellipse(sin(frameCount * 0.051) * 60, 0, 150 , 50);      
+
+  translate(sin(frameCount * 0.049) * 120, -250)
+  rotate(frameCount * 0.015)  
+  ellipse(0, 0, 50 , 150);        
+  pop();
+}

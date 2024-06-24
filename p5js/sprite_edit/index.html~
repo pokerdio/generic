@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script src="sprite.js"></script>
+    <script src="sketch.js"></script>
+<p>
+    <div id="allContainer">
+      <div id="checkboxContainer">
+	<label>	
+	  <input type="radio" name="cow" onclick="buttonClicked(1)" checked />
+	  <div class="color-square" style="background-color: white;"></div>
+	</label>
+	<label>
+	  <input type="radio" name="cow" onclick="buttonClicked(2)" />
+	  <div class="color-square" style="background-color: black;"></div>	
+	</label>
+	<label>	
+	  <input type="radio" name="cow" onclick="buttonClicked(3)" />
+	  <div class="color-square" style="background-color: gray;"></div>
+	</label>
+      <button class="button-28" role="button" onclick="buttonClicked(4)">Export</button>
+      <button class="button-28" role="button" onclick="buttonClicked(6)">Import</button>
+      <button class="button-28" onclick="buttonClicked(5)">Clear</button><p>
+
+      </div>
+      <div id="canvasContainer"></div>
+    </div>
+    <div class="bottomContainer">
+      <div class="bottomChildContainer">
+	<label class="bottomLabel" type="text" id="sliderText1">Slider:</label>
+	<input type="range" min="1" max="20" value="10" class="slider" id="myRange1">
+
+	<label class="bottomLabel" type="text" id="sliderText2">Slider:</label>
+	<input type="range" min="1" max="20" value="10" class="slider" id="myRange2">
+      </div>
+      <div class="bottomChildContainer">
+	<label class="bottomLabel" type="text">Hello:</label>
+	<input id="textInput" type="text" placeholder="Type something" oninput="handleTextChange()">
+      </div>
+    </div>
+  </body>
+</html>

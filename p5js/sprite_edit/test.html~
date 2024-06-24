@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .my-element {
+      color: blue; /* This is the first style */
+    }
+
+    .red-text {
+      color: red; /* This is the second style */
+    }
+  </style>
+  <title>Conflict Resolution</title>
+</head>
+<body>
+
+  <p class="my-element red-text">This is a paragraph with conflicting styles.</p>
+
+</body>
+</html>
