@@ -1,3 +1,0 @@
-foobar
-$bbaba
-wa.py
