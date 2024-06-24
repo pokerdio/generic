@@ -1,4 +1,3 @@
-# project euler problem 139
 
 from itertools import count, islice
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=66
 # this is actually called the pell equation
 # http://www.math.leidenuniv.nl/~psh/ANTproc/01lenstra.pdf
 

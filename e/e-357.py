@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=357
 
 
 # observation: a number fitting the given condition cannot have

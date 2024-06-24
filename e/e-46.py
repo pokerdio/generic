@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=46 goldbach false conjecture: every
 # odd composite number can be written as the sum of a prime and twice
 # a square
 

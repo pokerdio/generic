@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=82
 
 
 m = [[int(s) for s in line.split(",")] for line in open("p082_matrix.txt").readlines()]

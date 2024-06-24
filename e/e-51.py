@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# problem 51 https://projecteuler.net/problem=51
 
 
 from bitarray import bitarray as ba

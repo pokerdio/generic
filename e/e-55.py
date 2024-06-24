@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=55 sum a number with the digit
 # reversed version of itself, check if its a palindrome, etc.
 
 

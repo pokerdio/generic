@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=75
 import math
 
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=60
 #
 
 from bitarray import bitarray as ba

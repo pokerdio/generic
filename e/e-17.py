@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https:/projecteuler.net
 
 teens = (" one two three four five six seven eight "
          "nine ten eleven twelve thirteen fourteen fifteen "

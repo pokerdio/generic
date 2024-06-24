@@ -1,4 +1,3 @@
-# solution to problems 114 and 115 on projecteuler.net
 
 
 def memoize2(f):

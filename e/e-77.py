@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=77
 
 from primez import isprime
 from primez import iterate_primez as ip

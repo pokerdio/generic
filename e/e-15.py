@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https:/projecteuler.net
 
 data = {(0, 0): 1}
 

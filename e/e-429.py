@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=429
 
 
 # the prime divisors of a number appear in its unitary divisors with

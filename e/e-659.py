@@ -184,7 +184,6 @@ def isresidue(a, p):
     return pow(a, p // 2, p) == 1
 
 
-def euler_list(p):
     return [(i, pow(i, p // 2, p)) for i in range(1, p)]
 
 

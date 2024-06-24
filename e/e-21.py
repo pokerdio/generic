@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https:/projecteuler.net sum amicable numbers (ones equal to the sum
 # of all the proper divisors of the sum of their own sum of proper
 # divisors)
 

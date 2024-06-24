@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=93
 
 
 from fractions import Fraction as Fr

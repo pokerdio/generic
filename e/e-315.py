@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=315
 # clockz, ez
 
 from bitarray import bitarray as ba

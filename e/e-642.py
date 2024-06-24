@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=642
 
 # f(n) = largest prime factor of n
 # WORK IN PROGRESS

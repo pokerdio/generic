@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=577 counting hexagons inside
 # triangular grid
 
 

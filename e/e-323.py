@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-#  https://projecteuler.net/problem=323
 #
 
 max_entries = 100

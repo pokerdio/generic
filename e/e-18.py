@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https:/projecteuler.net
 
 triangle_str = """75
 95 64

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# https://projecteuler.net/problem=22
 # read csv names from p022_names.txt
 
 

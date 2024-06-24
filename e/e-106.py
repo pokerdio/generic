@@ -1,4 +1,3 @@
-# project euler problem 106
 from itertools import combinations
 from math import factorial as f
 

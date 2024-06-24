@@ -1,4 +1,3 @@
-# project euler problem 107
 
 
 def load(fname):
