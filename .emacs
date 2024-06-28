@@ -330,6 +330,17 @@
 
 (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
 
-; test
+
+(setq backup-by-copying t)
+
+(require 'dired)
+(define-key dired-mode-map (kbd "% /") 'dired-mark-directories)
+(define-key dired-mode-map (kbd "% *") 'dired-mark-executables)
+(define-key dired-mode-map (kbd "% .") 'dired-mark-extension)
+
+
+;(setq dired-listing-switches "-al") ; if you want to include the hidden files from dired
+(setq dired-listing-switches "-l") ; if you want to remove the hidden files from dired
+
 
 
