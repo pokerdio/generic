@@ -1,0 +1,1603 @@
+gif_list = [
+    "Adam_Sandler.gif",
+    "Adrien_Brody.gif",
+    "Aidan_Gillen.gif",
+    "Alain_Delon.gif",
+    "Alan_Rickman.gif",
+    "Alan_Tudyk.gif",
+    "Alec_Baldwin.gif",
+    "Alicia_Vikander.gif",
+    "Al_Pacino.gif",
+    "Amanda_Plummer.gif",
+    "Amy_Adams.gif",
+    "Andre_Braugher.gif",
+    "Angelina_Jolie.gif",
+    "Anne_Bancroft.gif",
+    "Anne_Hathaway.gif",
+    "Anne_Heche.gif",
+    "Annette_Bening.gif",
+    "Anthony_Hopkins.gif",
+    "Anthony_Quinn.gif",
+    "Antonio_Banderas.gif",
+    "Arnold_Schwartzenegger.gif",
+    "Asia_Carrera.gif",
+    "Audrey_Hepburn.gif",
+    "Audrey_Tautou.gif",
+    "Bae_Doona.gif",
+    "Ben_Affleck.gif",
+    "Benedict_Cumberbatch.gif",
+    "Benicio_del_Toro.gif",
+    "Ben_Kingsley.gif",
+    "Ben_Mendelsohn.gif",
+    "Ben_Stiller.gif",
+    "Bette_Davis.gif",
+    "Bill_Murray.gif",
+    "Billy_Crystal.gif",
+    "Bradley_Cooper.gif",
+    "Brad_Pitt.gif",
+    "Brendan_Fraser.gif",
+    "Brendan_Gleeson.gif",
+    "Brent_Spiner.gif",
+    "Brian_Cox.gif",
+    "Brian_Dennehy.gif",
+    "Bridget_Fonda.gif",
+    "Brittany_Murphy.gif",
+    "Bruce_Campbell.gif",
+    "Bruce_Lee.gif",
+    "Bruce_Willis.gif",
+    "Bruno_Ganz.gif",
+    "Burt_Lancaster.gif",
+    "Buster_Keaton.gif",
+    "Cameron_Diaz.gif",
+    "Carey_Mulligan.gif",
+    "Carice_van_Houten.gif",
+    "Carrie-Anne_Moss.gif",
+    "Carrie_Fisher.gif",
+    "Cary_Grant.gif",
+    "Cate_Blanchett.gif",
+    "Catherine_O'Hara.gif",
+    "Catherine_Zeta-Jones.gif",
+    "Charles_Bronson.gif",
+    "Charles_Dance.gif",
+    "Charlie_Sheen.gif",
+    "Charlize_Theron.gif",
+    "Charlotte_Gainsbourg.gif",
+    "Charlotte_Rampling.gif",
+    "Charlton_Heston.gif",
+    "Chiwetel_Ejiofor.gif",
+    "Chris_Evans.gif",
+    "Chris_Farley.gif",
+    "Christian_Bale.gif",
+    "Christian_Slater.gif",
+    "Christina_Hendricks.gif",
+    "Christopher_Lee.gif",
+    "Christopher_MacDonald.gif",
+    "Christopher_Plummer.gif",
+    "Christopher_Walken.gif",
+    "Chris_Tucker.gif",
+    "Ciarán_Hinds.gif",
+    "Cillian_Murphy.gif",
+    "Clancy_Brown.gif",
+    "Clint_Eastwood.gif",
+    "Clive_Owen.gif",
+    "Colin_Farrel.gif",
+    "Colin_Firth.gif",
+    "Connie_Nielsen.gif",
+    "Dana_Delany.gif",
+    "Dan_Hedaya.gif",
+    "Daniel_Craig.gif",
+    "Daniel_Day-Lewis.gif",
+    "Daniel_Radcliffe.gif",
+    "Danny_DeVito.gif",
+    "Danny_Trejo.gif",
+    "Daryl_Hannah.gif",
+    "David_Bowie.gif",
+    "David_Carradine.gif",
+    "David_Duchovny.gif",
+    "David_Proval.gif",
+    "Deborah_Kara_Unger.gif",
+    "Demi_Moore.gif",
+    "Dennis_Hopper.gif",
+    "Denzel_Washington.gif",
+    "Diane_Keaton.gif",
+    "Dolph_Lundgren.gif",
+    "Dominic_West.gif",
+    "Donald_Sutherland.gif",
+    "Don_Cheadle.gif",
+    "Drea_de_Matteo.gif",
+    "Drew_Barrymore.gif",
+    "Dustin_Hoffman.gif",
+    "Dwayne_Johnson.gif",
+    "Eddie_Murphy.gif",
+    "Eddie_Redmayne.gif",
+    "Ed_Harris.gif",
+    "Edie_Falco.gif",
+    "Edward_G._Robinson.gif",
+    "Edward_Norton.gif",
+    "Elijah_Wood.gif",
+    "Elisabeth_Shue.gif",
+    "Eli_Wallach.gif",
+    "Elizabeth_Taylor.gif",
+    "Ellen_Page.gif",
+    "Emilia_Clarke.gif",
+    "Emily_Blunt.gif",
+    "Emily_Watson.gif",
+    "Emma_Stone.gif",
+    "Emma_Thompson.gif",
+    "Emma_Watson.gif",
+    "Eric_Bana.gif",
+    "Ethan_Hawke.gif",
+    "Eva_Green.gif",
+    "Eva_Longoria.gif",
+    "Famke_Jannsen.gif",
+    "Faye_Dunaway.gif",
+    "Forest_Whitaker.gif",
+    "Frances_McDormand.gif",
+    "Franka_Potente.gif",
+    "Frank_Langella.gif",
+    "Frank_Sinatra.gif",
+    "Frank_Vincent.gif",
+    "Fred_Astaire.gif",
+    "Gabriel_Byrne.gif",
+    "Gary_Busey.gif",
+    "Gary_Cooper.gif",
+    "Gary_Oldman.gif",
+    "Gary_Sinise.gif",
+    "Geena_Davis.gif",
+    "Gene_Hackman.gif",
+    "George_Clooney.gif",
+    "George_C._Scott.gif",
+    "George_Kennedy.gif",
+    "Gérard_Depardieu.gif",
+    "Gilbert_Gottfried.gif",
+    "Gillian_Anderson.gif",
+    "Gina_Torres.gif",
+    "Gregg_Henry.gif",
+    "Greta_Garbo.gif",
+    "Guy_Pearce.gif",
+    "Gwyneth_Paltrow.gif",
+    "Halle_Berry.gif",
+    "Harrison_Ford.gif",
+    "Harry_Dean_Stanton.gif",
+    "Harvey_Keitel.gif",
+    "Heath_Ledger.gif",
+    "Helena_Bonham_Carter.gif",
+    "Helen_Hunt.gif",
+    "Helen_Mirren.gif",
+    "Henry_Fonda.gif",
+    "Hillary_Swank.gif",
+    "Hugh_Grant.gif",
+    "Hugh_Jackman.gif",
+    "Hugh_Laurie.gif",
+    "Hugo_Weaving.gif",
+    "Humphrey_Bogart.gif",
+    "Ian_Holm.gif",
+    "Ian_McKellen.gif",
+    "Idris_Elba.gif",
+    "Ingrid_Bergman.gif",
+    "Isaach_de_Bankolé.gif",
+    "Jack_Black.gif",
+    "Jackie_Chan.gif",
+    "Jack_Lemmon.gif",
+    "Jack_Nicholson.gif",
+    "Jaime_Murray.gif",
+    "Jake_Gyllenhaal.gif",
+    "James_Cagney.gif",
+    "James_D'Arcy.gif",
+    "James_Dean.gif",
+    "James_Gandolfini.gif",
+    "James_Stewart.gif",
+    "Jamie_Lee_Curtis.gif",
+    "Jane_Fonda.gif",
+    "Jason_Clarke.gif",
+    "Jason_Statham.gif",
+    "Javier_Bardem.gif",
+    "Jean_Paul_Belmondo.gif",
+    "Jean_Reno.gif",
+    "Jeff_Bridges.gif",
+    "Jennifer_Carpenter.gif",
+    "Jennifer_Connelly.gif",
+    "Jennifer_Lawrence.gif",
+    "Jennifer_Love_Hewitt.gif",
+    "Jeremy_Irons.gif",
+    "Jessica_Biel.gif",
+    "Jessica_Chastain.gif",
+    "Jessica_Lange.gif",
+    "Jim_Broadbent.gif",
+    "Jim_Carrey.gif",
+    "Joaquin_Phoenix.gif",
+    "Jodie_Foster.gif",
+    "Joe_Pantoliano.gif",
+    "Joe_Pesci.gif",
+    "John_C._Reilly.gif",
+    "John_Cusack.gif",
+    "John_Goodman.gif",
+    "John_Hurt.gif",
+    "John_Lithgow.gif",
+    "John_Malkovich.gif",
+    "Johnny_Depp.gif",
+    "John_Travolta.gif",
+    "John_Turturro.gif",
+    "Jon_Voight.gif",
+    "Joseph_Gordon-Levitt.gif",
+    "Josh_Brolin.gif",
+    "Jude_Law.gif",
+    "Judi_Dench.gif",
+    "Julianne_Moore.gif",
+    "Julia_Ormond.gif",
+    "Julia_Roberts.gif",
+    "Juliette_Binoche.gif",
+    "Juliette_Lewis.gif",
+    "Jürgen_Prochnow.gif",
+    "Justin_Theroux.gif",
+    "Karl_Urban.gif",
+    "Kate_Winslett.gif",
+    "Katharine_Hepburn.gif",
+    "Kathy_Bates.gif",
+    "Keanu_Reeves.gif",
+    "Keira_Knightley.gif",
+    "Keith_David.gif",
+    "Kelly_Macdonald.gif",
+    "Ken_Watanabe.gif",
+    "Kevin_McKidd.gif",
+    "Kevin_Spacey.gif",
+    "Kiefer_Sutherland.gif",
+    "Kim_Bassinger.gif",
+    "Kirk_Douglas.gif",
+    "Kirsten_Dunst.gif",
+    "Kirstie_Alley.gif",
+    "Kit_Harrington.gif",
+    "Kris_Kristofferson.gif",
+    "Kristin_Scott_Thomas.gif",
+    "Kurt_Russel.gif",
+    "Kyle_MacLachlan.gif",
+    "Lara_Flynn_Boyle.gif",
+    "Larry_Hagman.gif",
+    "Laura_Dern.gif",
+    "Laura_Harring.gif",
+    "Laurence_Fishburne.gif",
+    "Lauren_Holly.gif",
+    "Leelee_Sobiesky.gif",
+    "Lee_Van_Cleef.gif",
+    "Lena_Headey.gif",
+    "Leonardo_DiCaprio.gif",
+    "Leslie_Nielsen.gif",
+    "Liam_Cunningham.gif",
+    "Liam_Neeson.gif",
+    "Linda_Gray.gif",
+    "Linda_Hamilton.gif",
+    "Linda_Hunt.gif",
+    "Liv_Tyler.gif",
+    "Louis_Theroux.gif",
+    "Lucy_Liu.gif",
+    "Luis_Guzmán.gif",
+    "Mädchen_Amick.gif",
+    "Madeleine_Stowe.gif",
+    "Mads_Mikkelsen.gif",
+    "Maggie_Gyllenhaal.gif",
+    "Maggie_Smith.gif",
+    "Maisie_Williams.gif",
+    "Malcolm_McDowell.gif",
+    "Marcel_Iureș.gif",
+    "Marcia_Cross.gif",
+    "Maria_Bello.gif",
+    "Marina_Sirtis.gif",
+    "Marion_Cotillard.gif",
+    "Marisa_Tomei.gif",
+    "Marlene_Dietrich.gif",
+    "Marlon_Brando.gif",
+    "Martin_Sheen.gif",
+    "Mary-Louise_Parker.gif",
+    "Matt_Damon.gif",
+    "Max_Von_Sydow.gif",
+    "Meg_Ryan.gif",
+    "Mel_Gibson.gif",
+    "Meryl_Streep.gif",
+    "Michael_Caine.gif",
+    "Michael_Douglas.gif",
+    "Michael_Gambon.gif",
+    "Michael_Imperioli.gif",
+    "Michael_Ironside.gif",
+    "Michael_Keaton.gif",
+    "Michael_K._Williams.gif",
+    "Michael_Madsen.gif",
+    "Michelle_Fairley.gif",
+    "Michelle_Forbes.gif",
+    "Michelle_Pfeiffer.gif",
+    "Mickey_Rourke.gif",
+    "Mila_Jovovich.gif",
+    "Mila_Kunis.gif",
+    "Milla_Jovovich.gif",
+    "Monica_Bârlădeanu.gif",
+    "Monica_Bellucci.gif",
+    "Morgan_Freeman.gif",
+    "Naomi_Watts.gif",
+    "Natalia_Tena.gif",
+    "Natalie_Dormer.gif",
+    "Natalie_Portman.gif",
+    "Nathalie_Emmanuel.gif",
+    "Nathan_Fillion.gif",
+    "Neal_McDonough.gif",
+    "Nicholas_Cage.gif",
+    "Nick_Nolte.gif",
+    "Nicole_Kidman.gif",
+    "Nikolaj_Coster-Waldau.gif",
+    "Nina_Hartley.gif",
+    "Noomi_Rapace.gif",
+    "Omar_Sharif.gif",
+    "Owen_Wilson.gif",
+    "Patricia_Arquette.gif",
+    "Patricia_Clarkson.gif",
+    "Patrick_Duffy.gif",
+    "Patrick_Fischler.gif",
+    "Patrick_Stewart.gif",
+    "Patrick_Swayze.gif",
+    "Paul_Newman.gif",
+    "Paul_Walker.gif",
+    "Paz_de_la_Huerta.gif",
+    "Penélope_Cruz.gif",
+    "Peta_Wilson.gif",
+    "Peter_Dinklage.gif",
+    "Peter_Greene.gif",
+    "Peter_O'Toole.gif",
+    "Philip_Seymour_Hoffman.gif",
+    "Priscilla_Presley.gif",
+    "Rachel_McAdams.gif",
+    "Rachel_Weisz.gif",
+    "Ralf_Möller.gif",
+    "Ralph_Fiennes.gif",
+    "Ray_Liotta.gif",
+    "Ray_Stevenson.gif",
+    "Ray_Wise.gif",
+    "Rebecca_Romijn.gif",
+    "Renée_Zellweger.gif",
+    "Richard_Belzer.gif",
+    "Richard_Burton.gif",
+    "Richard_Dreyfuss.gif",
+    "Richard_Gere.gif",
+    "Richard_Harris.gif",
+    "Rita_Hayworth.gif",
+    "Robert_De_Niro.gif",
+    "Robert_Downey_Jr..gif",
+    "Robert_Duvall.gif",
+    "Roberto_Benigni.gif",
+    "Ron_Perlman.gif",
+    "Rory McCann.gif",
+    "Roy_Dupuis.gif",
+    "Roy_Scheider.gif",
+    "Russel_Crowe.gif",
+    "Rutger_Hauer.gif",
+    "Ryan_Gosling.gif",
+    "Salma_Hayek.gif",
+    "Sam_Rockwell.gif",
+    "Samuel_Jackson.gif",
+    "Saoirse_Ronan.gif",
+    "Sarah_Jessica_Parker.gif",
+    "Sarah_Michelle_Gellar.gif",
+    "William_Shatner.gif",
+    "Sasha_Grey.gif",
+    "Scarlett_Johansson.gif",
+    "Scott_Bakula.gif",
+    "Scott_Eastwood.gif",
+    "Sean_Bean.gif",
+    "Sharon_Stone.gif",
+    "Shelley_Duvall.gif",
+    "Sherilyn_Fenn.gif",
+    "Sheryl_Lee.gif",
+    "Sibel_Kekilli.gif",
+    "Sidney_Poitier.gif",
+    "Sidney_Pollack.gif",
+    "Sigourney_Weaver.gif",
+    "Sissy_Spacek.gif",
+    "Sophia_Loren.gif",
+    "Sophie_Turner.gif",
+    "Stellan_Skarsgård.gif",
+    "Stephen_Baldwin.gif",
+    "Stephen_Dillane.gif",
+    "Stephen_Lang.gif",
+    "Steve_Buscemi.gif",
+    "Steven_Segal.gif",
+    "Steven_Van_Zandt.gif",
+    "Stoya.gif",
+    "Susan_Sarandon.gif",
+    "Sylvester_Stallone.gif",
+    "Takashi_Shimura.gif",
+    "Thandie_Newton.gif",
+    "Thomas_Kretschmann.gif",
+    "Til_Schweiger.gif",
+    "Tim_Robbins.gif",
+    "Tim_Roth.gif",
+    "Tina_Fey.gif",
+    "Tobias_Menzies.gif",
+    "Tom_Cruise.gif",
+    "Tom_Hanks.gif",
+    "Tom_Hardy.gif",
+    "Tommy_Flanagan.gif",
+    "Tommy_Lee_Jones.gif",
+    "Toshiro_Mifune.gif",
+    "Travis_Fimmel.gif",
+    "Uma_Thurman.gif",
+    "Val_Kilmer.gif",
+    "Victor_Garber.gif",
+    "Victoria_Principal.gif",
+    "Vincent_D'Onofrio.gif",
+    "Vince_Vaughn.gif",
+    "Vin_Diesel.gif",
+    "Warren_Beatty.gif",
+    "Werner_Herzog.gif",
+    "Whoopi_Goldberg.gif",
+    "Willem_Dafoe.gif",
+    "William_Devane.gif",
+    "William_Hurt.gif",
+    "Will_Smith.gif",
+    "Winona_Ryder.gif",
+    "Woody_Allen.gif",
+    "Woody_Harrelson.gif",
+    "Yaphet_Kotto.gif",
+    "Zack_Galifianakis.gif",
+    "Zoe_Saldana.gif"]
+
+gif_list.append("Elizabeth_Perkins.gif")
+gif_list.append("Julie_Andrews.gif")
+gif_list.append("Mathew_Broderick.gif")
+gif_list.append("Christina_Applegate.gif")
+gif_list.append("Oscar_Isaac.gif")
+gif_list.append("Steve_Carrel.gif")
+gif_list.append("David_Faustino.gif")
+gif_list.append("Ed_O'Neill.gif")
+gif_list.append("Ava_Gardner.gif")
+gif_list.append("Alan_Alda.gif")
+gif_list.append("Paul_Giamatti.gif")
+gif_list.append("Alan_Arkin.gif")
+gif_list.append("Brad_Dourif.gif")
+gif_list.append("David_Strathairn.gif")
+gif_list.append("Gary_Cole.gif")
+gif_list.append("James_Cromwell.gif")
+gif_list.append("James_Rebhorn.gif")
+gif_list.append("J.K._Simmons.gif")
+gif_list.append("Michael_Peña.gif")
+gif_list.append("Paul_Dano.gif")
+gif_list.append("William_Fichtner.gif")
+gif_list.append("David_Morse.gif")
+gif_list.append("Mike_Starr.gif")
+gif_list.append("Stephen_Tobolowsky.gif")
+gif_list.append("Clark_Gable.gif")
+gif_list.append("Daisy_Ridley.gif")
+gif_list.append("Diego_Luna.gif")
+gif_list.append("Domhnall_Gleeson.gif")
+gif_list.append("Gwendoline_Christie.gif")
+gif_list.append("Jeremy_Renner.gif")
+gif_list.append("Mark_Ruffalo.gif")
+gif_list.append("Mark_Wahlberg.gif")
+gif_list.append("Robbie_Coltrane.gif")
+gif_list.append("Rowan_Atkinson.gif")
+gif_list.append("Rupert_Grint.gif")
+gif_list.append("Sean_Penn.gif")
+gif_list.append("Richard_Chamberlain.gif")
+gif_list.append("Wil_Wheaton.gif")
+gif_list.append("Ernest_Borgnine.gif")
+gif_list.append("James_Coburn.gif")
+gif_list.append("Sean_Connery.gif")
+gif_list.append("Maia_Morgenstern.gif")
+gif_list.append("Vincent_Cassel.gif")
+gif_list.append("Barbra_Streisand.gif")
+gif_list.append("Jennifer_Aniston.gif")
+gif_list.append("Paul_Sorvino.gif")
+gif_list.append("Reese_Witherspoon.gif")
+gif_list.append("Tony_Sirico.gif")
+gif_list.append("Marcello_Mastroianni.gif")
+gif_list.append("Sandra_Bullock.gif")
+gif_list.append("Casey_Affleck.gif")
+gif_list.append("Hayden_Christensen.gif")
+gif_list.append("Mary_McDonnell.gif")
+gif_list.append("Zooey_Deschanel.gif")
+gif_list.append("Christopher_Lambert.gif")
+gif_list.append("Christopher_Reeve.gif")
+gif_list.append("Telly_Savalas.gif")
+gif_list.append("Tom_Berenger.gif")
+gif_list.append("Tom_Sizemore.gif")
+gif_list.append("Karl-Otto_Alberty.gif")
+gif_list.append("Tom_Skerritt.gif")
+gif_list.append("Edward_Fox.gif")
+
+gif_list.append("Michelle_Rodriguez.gif")
+gif_list.append("Queen_Latifah.gif")
+gif_list.append("Ewan_McGregor.gif")
+gif_list.append("Asia_Argento.gif")
+gif_list.append("Jeffrey_Wright.gif")
+gif_list.append("Mandy_Patinkin.gif")
+gif_list.append("Nick_Offerman.gif")
+gif_list.append("Vera_Farmiga.gif")
+gif_list.append("Alexis_Bledel.gif")
+gif_list.append("Jessica_Alba.gif")
+gif_list.append("Powers_Boothe.gif")
+gif_list.append("Bette_Midler.gif")
+gif_list.append("Chevy_Chase.gif")
+gif_list.append("John_Candy.gif")
+gif_list.append("Steve_Martin.gif")
+gif_list.append("Terence_Stamp.gif")
+gif_list.append("Dan_Aykroyd.gif")
+gif_list.append("Claire_Danes.gif")
+gif_list.append("Glenn_Close.gif")
+gif_list.append("Ian_McShane.gif")
+gif_list.append("Nina_Hoss.gif")
+gif_list.append("Stephen_McHattie.gif")
+gif_list.append("Viggo_Mortensen.gif")
+gif_list.append("Mathieu_Kassovitz.gif")
+gif_list.append("Martin_Freeman.gif")
+gif_list.append("Sophie_Marceau.gif")
+gif_list.append("Stephen_Fry.gif")
+gif_list.append("John_Cleese.gif")
+gif_list.append("Dean_Stockwell.gif")
+gif_list.append("Isabella_Rossellini.gif")
+gif_list.append("Jessica_Harper.gif")
+gif_list.append("Lorraine_Bracco.gif")
+
+gif_list.append("Chad_Everett.gif")
+gif_list.append("Spencer_Tracy.gif")
+gif_list.append("Jeff_Daniels.gif")
+gif_list.append("Alexander_Siddig.gif")
+gif_list.append("Kevin_Costner.gif")
+gif_list.append("Lance_Henriksen.gif")
+gif_list.append("Pete_Postlethwaite.gif")
+
+gif_list.append("Isabelle_Adjani.gif")
+gif_list.append("James_Woods.gif")
+gif_list.append("Chazz_Palminteri.gif")
+gif_list.append("Chris_Pratt.gif")
+gif_list.append("Goldie_Hawn.gif")
+gif_list.append("Iain_Glen.gif")
+gif_list.append("James_Franco.gif")
+gif_list.append("Rene_Russo.gif")
+gif_list.append("Bill_Paxton.gif")
+gif_list.append("Kevin_Bacon.gif")
+gif_list.append("Gheorghe_Dinică.gif")
+gif_list.append("Dragoș_Bucur.gif")
+gif_list.append("Quentin_Tarantino.gif")
+gif_list.append("Keri_Russel.gif")
+gif_list.append("Robert_Loggia.gif")
+gif_list.append("Ann_Dvorak.gif")
+gif_list.append("John_Wayne.gif")
+gif_list.append("Noah_Emmerich.gif")
+gif_list.append("Morena_Baccarin.gif")
+gif_list.append("Steve_McQueen.gif")
+gif_list.append("Peter_Cushing.gif")
+gif_list.append("Chris_Pine.gif")
+gif_list.append("Robin_Wright.gif")
+gif_list.append("Ann_Dowd.gif")
+gif_list.append("Julie_Christie.gif")
+gif_list.append("Carrie_Coon.gif")
+gif_list.append("Christopher_Eccleston.gif")
+gif_list.append("Ian_McDiarmid.gif")
+gif_list.append("Kenneth_Branagh.gif")
+gif_list.append("Pilou Asbæk.gif")
+gif_list.append("Rick_Moranis.gif")
+gif_list.append("Sondra_Locke.gif")
+gif_list.append("Takeshi_Kitano.gif")
+gif_list.append("Jennifer_Tilly.gif")
+gif_list.append("Bill_Pullman.gif")
+gif_list.append("Mel_Brooks.gif")
+gif_list.append("Shia_LaBeuf.gif")
+gif_list.append("David_Thewlis.gif")
+gif_list.append("Ricky_Gervais.gif")
+gif_list.append("John_Heard.gif")
+gif_list.append("Elizabeth_Banks.gif")
+gif_list.append("Emily_Browning.gif")
+gif_list.append("Jennifer_Lopez.gif")
+
+gif_list.append("Jean_Dujardin.gif")
+gif_list.append("Michael_Cera.gif")
+
+gif_list.append("Pam_Grier.gif")
+gif_list.append("Robert_Foster.gif")
+gif_list.append("Jamie_Foxx.gif")
+gif_list.append("Christoph_Waltz.gif")
+gif_list.append("Christopher_Lloyd.gif")
+gif_list.append("Michael_J._Fox.gif")
+gif_list.append("Sebastian_Koch.gif")
+gif_list.append("Anna_Kendrick.gif")
+gif_list.append("Andy_Garcia.gif")
+gif_list.append("Anthony_Perkins.gif")
+gif_list.append("Daniel_Kaluuya.gif")
+gif_list.append("Mary_Elizabeth_Winstead.gif")
+gif_list.append("Robert_Mitchum.gif")
+gif_list.append("Ryan_Reynolds.gif")
+gif_list.append("Tony_Curtis.gif")
+gif_list.append("Julia_Stiles.gif")
+gif_list.append("Natascha_McElhone.gif")
+gif_list.append("Mark_Rylance.gif")
+gif_list.append("Sean_Young.gif")
+gif_list.append("Hillary_Swank0.gif")
+
+gif_list.append("Leelee_Sobiesky0.gif")
+gif_list.append("Leelee_Sobiesky1.gif")
+gif_list.append("Catherine_Zeta-Jones0.gif")
+gif_list.append("Catherine_Zeta-Jones1.gif")
+gif_list.append("Emily_Browning0.gif")
+gif_list.append("Emily_Browning1.gif")
+gif_list.append("Emily_Browning2.gif")
+gif_list.append("Rachel_McAdams1.gif")
+gif_list.append("Rachel_McAdams2.gif")
+
+gif_list.append("Jessica_Alba0.gif")
+gif_list.append("Jessica_Alba1.gif")
+gif_list.append("Jessica_Alba2.gif")
+gif_list.append("Franka_Potente0.gif")
+gif_list.append("Franka_Potente1.gif")
+gif_list.append("Franka_Potente2.gif")
+gif_list.append("Franka_Potente3.gif")
+gif_list.append("Bridget_Fonda0.gif")
+gif_list.append("Bridget_Fonda1.gif")
+gif_list.append("Bridget_Fonda2.gif")
+gif_list.append("Kelly_Macdonald0.gif")
+gif_list.append("Kelly_Macdonald1.gif")
+gif_list.append("Kelly_Macdonald2.gif")
+gif_list.append("Kelly_Macdonald3.gif")
+gif_list.append("Linda_Gray0.gif")
+gif_list.append("Barbra_Streisand0.gif")
+gif_list.append("Barbra_Streisand1.gif")
+gif_list.append("Emily_Browning3.gif")
+gif_list.append("Isaach_de_Bankolé0.gif")
+gif_list.append("Isaach_de_Bankolé1.gif")
+gif_list.append("Isaach_de_Bankolé2.gif")
+gif_list.append("Isaach_de_Bankolé3.gif")
+gif_list.append("Isaach_de_Bankolé4.gif")
+gif_list.append("Sigourney_Weaver0.gif")
+gif_list.append("Sigourney_Weaver1.gif")
+gif_list.append("Sigourney_Weaver2.gif")
+gif_list.append("Sigourney_Weaver3.gif")
+gif_list.append("Sigourney_Weaver4.gif")
+gif_list.append("Sigourney_Weaver5.gif")
+gif_list.append("Sigourney_Weaver6.gif")
+gif_list.append("Sigourney_Weaver7.gif")
+gif_list.append("Tim_Allen.gif")
+gif_list.append("Shelley_Duvall0.gif")
+gif_list.append("Shelley_Duvall1.gif")
+gif_list.append("Shelley_Duvall2.gif")
+gif_list.append("Shelley_Duvall3.gif")
+gif_list.append("Shelley_Duvall4.gif")
+gif_list.append("Sissy_Spacek0.gif")
+gif_list.append("Sissy_Spacek1.gif")
+gif_list.append("Sissy_Spacek2.gif")
+gif_list.append("Sissy_Spacek3.gif")
+gif_list.append("Jennifer_Love_Hewitt0.gif")
+gif_list.append("Jennifer_Love_Hewitt1.gif")
+gif_list.append("Jennifer_Love_Hewitt2.gif")
+gif_list.append("Paz_de_la_Huerta0.gif")
+gif_list.append("Paz_de_la_Huerta1.gif")
+gif_list.append("Paz_de_la_Huerta2.gif")
+gif_list.append("Paz_de_la_Huerta3.gif")
+gif_list.append("Paz_de_la_Huerta4.gif")
+gif_list.append("Michael_K._Williams0.gif")
+gif_list.append("Michael_K._Williams1.gif")
+gif_list.append("Michael_K._Williams2.gif")
+gif_list.append("Michael_K._Williams3.gif")
+gif_list.append("Mathieu_Kassovitz0.gif")
+gif_list.append("Mathieu_Kassovitz1.gif")
+gif_list.append("Mathieu_Kassovitz2.gif")
+gif_list.append("Mathieu_Kassovitz3.gif")
+gif_list.append("Travis_Fimmel0.gif")
+gif_list.append("Travis_Fimmel1.gif")
+gif_list.append("Travis_Fimmel2.gif")
+gif_list.append("Travis_Fimmel3.gif")
+gif_list.append("Travis_Fimmel4.gif")
+gif_list.append("Cybill_Shepherd0.gif")
+gif_list.append("Cybill_Shepherd1.gif")
+gif_list.append("Cybill_Shepherd2.gif")
+gif_list.append("Cybill_Shepherd.gif")
+gif_list.append("Pam_Grier0.gif")
+gif_list.append("Pam_Grier1.gif")
+gif_list.append("Pam_Grier2.gif")
+gif_list.append("Pam_Grier3.gif")
+gif_list.append("Pam_Grier4.gif")
+gif_list.append("Pam_Grier5.gif")
+gif_list.append("Ann_Dvorak0.gif")
+gif_list.append("Ann_Dvorak1.gif")
+gif_list.append("Ann_Dvorak2.gif")
+gif_list.append("Keira_Knightley0.gif")
+gif_list.append("Keira_Knightley10.gif")
+gif_list.append("Keira_Knightley1.gif")
+gif_list.append("Keira_Knightley2.gif")
+gif_list.append("Keira_Knightley3.gif")
+gif_list.append("Keira_Knightley4.gif")
+gif_list.append("Keira_Knightley5.gif")
+gif_list.append("Keira_Knightley6.gif")
+gif_list.append("Keira_Knightley7.gif")
+gif_list.append("Keira_Knightley8.gif")
+gif_list.append("Keira_Knightley9.gif")
+gif_list.append("Rachel_Weisz0.gif")
+gif_list.append("Rachel_Weisz1.gif")
+gif_list.append("Rachel_Weisz2.gif")
+gif_list.append("Rachel_Weisz3.gif")
+gif_list.append("Rachel_Weisz4.gif")
+gif_list.append("Rachel_Weisz5.gif")
+gif_list.append("Rachel_Weisz6.gif")
+gif_list.append("Harry_Dean_Stanton0.gif")
+gif_list.append("Harry_Dean_Stanton1.gif")
+gif_list.append("Harry_Dean_Stanton2.gif")
+gif_list.append("Harry_Dean_Stanton3.gif")
+gif_list.append("Chris_Hemsworth0.gif")
+gif_list.append("Chris_Hemsworth1.gif")
+gif_list.append("Chris_Hemsworth2.gif")
+gif_list.append("Chris_Hemsworth.gif")
+gif_list.append("Heath_Ledger0.gif")
+gif_list.append("Heath_Ledger1.gif")
+gif_list.append("Kenneth_Branagh0.gif")
+gif_list.append("Catherine_Zeta-Jones2.gif")
+gif_list.append("Catherine_Zeta-Jones3.gif")
+gif_list.append("Catherine_Zeta-Jones4.gif")
+gif_list.append("Catherine_Zeta-Jones5.gif")
+gif_list.append("Marina_Sirtis0.gif")
+gif_list.append("Marina_Sirtis1.gif")
+gif_list.append("Marina_Sirtis2.gif")
+gif_list.append("Brendan_Gleeson0.gif")
+gif_list.append("Brendan_Gleeson1.gif")
+gif_list.append("Brendan_Gleeson2.gif")
+gif_list.append("Brendan_Gleeson3.gif")
+gif_list.append("Sibel_Kekilli0.gif")
+gif_list.append("Sibel_Kekilli1.gif")
+gif_list.append("Sibel_Kekilli2.gif")
+gif_list.append("Drew_Barrymore0.gif")
+gif_list.append("Drew_Barrymore1.gif")
+gif_list.append("Drew_Barrymore2.gif")
+gif_list.append("Drew_Barrymore3.gif")
+gif_list.append("Drew_Barrymore4.gif")
+gif_list.append("Drew_Barrymore5.gif")
+gif_list.append("Drew_Barrymore6.gif")
+gif_list.append("Sheryl_Lee0.gif")
+gif_list.append("Sheryl_Lee1.gif")
+gif_list.append("Sheryl_Lee2.gif")
+gif_list.append("Robin_Wright0.gif")
+gif_list.append("Robin_Wright1.gif")
+gif_list.append("Robin_Wright2.gif")
+gif_list.append("Robin_Wright3.gif")
+gif_list.append("Robin_Wright4.gif")
+gif_list.append("Robin_Wright5.gif")
+gif_list.append("Robin_Wright6.gif")
+gif_list.append("Robin_Wright7.gif")
+gif_list.append("Robin_Wright8.gif")
+gif_list.append("Demi_Moore0.gif")
+gif_list.append("Julie_Christie0.gif")
+gif_list.append("Julie_Christie1.gif")
+gif_list.append("Julie_Christie2.gif")
+gif_list.append("Julie_Christie3.gif")
+gif_list.append("Kristen_Bell0.gif")
+gif_list.append("Kristen_Bell1.gif")
+gif_list.append("Kristen_Bell2.gif")
+gif_list.append("Kristen_Bell.gif")
+gif_list.append("Yaphet_Kotto0.gif")
+gif_list.append("Yaphet_Kotto1.gif")
+gif_list.append("Yaphet_Kotto2.gif")
+gif_list.append("Yaphet_Kotto3.gif")
+gif_list.append("Yaphet_Kotto4.gif")
+gif_list.append("Yaphet_Kotto5.gif")
+gif_list.append("Kirsten_Dunst0.gif")
+gif_list.append("Kirsten_Dunst1.gif")
+gif_list.append("Kirsten_Dunst2.gif")
+gif_list.append("Kirsten_Dunst3.gif")
+gif_list.append("Kirsten_Dunst4.gif")
+gif_list.append("Kirsten_Dunst5.gif")
+gif_list.append("Mandy_Patinkin0.gif")
+gif_list.append("Mandy_Patinkin1.gif")
+gif_list.append("Mandy_Patinkin2.gif")
+gif_list.append("Mandy_Patinkin3.gif")
+gif_list.append("Mandy_Patinkin4.gif")
+gif_list.append("Warren_Beatty0.gif")
+gif_list.append("Warren_Beatty1.gif")
+gif_list.append("Warren_Beatty2.gif")
+gif_list.append("Brian_Cox0.gif")
+gif_list.append("Brian_Cox1.gif")
+gif_list.append("Brian_Cox2.gif")
+gif_list.append("Brian_Cox3.gif")
+gif_list.append("Brian_Cox4.gif")
+gif_list.append("Brian_Cox5.gif")
+gif_list.append("Brian_Cox6.gif")
+gif_list.append("Helen_Mirren0.gif")
+gif_list.append("Helen_Mirren1.gif")
+gif_list.append("Helen_Mirren2.gif")
+gif_list.append("Daniel_Day-Lewis0.gif")
+gif_list.append("Daniel_Day-Lewis1.gif")
+gif_list.append("Daniel_Day-Lewis2.gif")
+gif_list.append("Daniel_Day-Lewis3.gif")
+gif_list.append("Daniel_Day-Lewis4.gif")
+gif_list.append("Daniel_Day-Lewis5.gif")
+gif_list.append("Daniel_Day-Lewis6.gif")
+gif_list.append("Daniel_Day-Lewis7.gif")
+gif_list.append("Daniel_Day-Lewis8.gif")
+gif_list.append("Helen_Mirren3.gif")
+gif_list.append("Helen_Mirren4.gif")
+gif_list.append("Helen_Mirren5.gif")
+gif_list.append("Helen_Mirren6.gif")
+gif_list.append("Helen_Mirren7.gif")
+gif_list.append("Helen_Mirren8.gif")
+gif_list.append("Helen_Mirren9.gif")
+gif_list.append("Marion_Cotillard0.gif")
+gif_list.append("Marion_Cotillard1.gif")
+gif_list.append("Marion_Cotillard2.gif")
+gif_list.append("Marion_Cotillard3.gif")
+gif_list.append("Marion_Cotillard4.gif")
+gif_list.append("Marion_Cotillard5.gif")
+gif_list.append("Marion_Cotillard6.gif")
+gif_list.append("Marion_Cotillard7.gif")
+gif_list.append("Marion_Cotillard8.gif")
+gif_list.append("Marion_Cotillard9.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Brad_Dourif1.gif")
+gif_list.append("Brad_Dourif2.gif")
+gif_list.append("Brad_Dourif3.gif")
+gif_list.append("Brad_Dourif4.gif")
+gif_list.append("Brad_Dourif5.gif")
+gif_list.append("Brad_Dourif6.gif")
+gif_list.append("Brad_Dourif7.gif")
+gif_list.append("Michael_Cera0.gif")
+gif_list.append("Michael_Cera1.gif")
+gif_list.append("Michael_Cera2.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Michelle_Pfeiffer0.gif")
+gif_list.append("Michelle_Pfeiffer10.gif")
+gif_list.append("Michelle_Pfeiffer11.gif")
+gif_list.append("Michelle_Pfeiffer12.gif")
+gif_list.append("Michelle_Pfeiffer13.gif")
+gif_list.append("Michelle_Pfeiffer14.gif")
+gif_list.append("Michelle_Pfeiffer15.gif")
+gif_list.append("Michelle_Pfeiffer1.gif")
+gif_list.append("Michelle_Pfeiffer2.gif")
+gif_list.append("Michelle_Pfeiffer3.gif")
+gif_list.append("Michelle_Pfeiffer4.gif")
+gif_list.append("Michelle_Pfeiffer5.gif")
+gif_list.append("Michelle_Pfeiffer6.gif")
+gif_list.append("Michelle_Pfeiffer7.gif")
+gif_list.append("Michelle_Pfeiffer8.gif")
+gif_list.append("Michelle_Pfeiffer9.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Daryl_Hannah0.gif")
+gif_list.append("Daryl_Hannah1.gif")
+gif_list.append("Daryl_Hannah2.gif")
+gif_list.append("Daryl_Hannah3.gif")
+gif_list.append("Daryl_Hannah4.gif")
+gif_list.append("Daryl_Hannah5.gif")
+gif_list.append("Daryl_Hannah6.gif")
+gif_list.append("Daryl_Hannah7.gif")
+gif_list.append("Jill_Hennessy0.gif")
+gif_list.append("Jill_Hennessy1.gif")
+gif_list.append("Jill_Hennessy2.gif")
+gif_list.append("Jill_Hennessy.gif")
+gif_list.append("Anne_Bancroft0.gif")
+gif_list.append("Anne_Bancroft1.gif")
+gif_list.append("Anne_Bancroft2.gif")
+gif_list.append("Anne_Bancroft3.gif")
+gif_list.append("Anne_Bancroft5.gif")
+gif_list.append("Anne_Heche0.gif")
+gif_list.append("Anne_Heche1.gif")
+gif_list.append("Anne_Heche2.gif")
+gif_list.append("Anne_Heche3.gif")
+gif_list.append("Anne_Heche4.gif")
+gif_list.append("Anne_Heche5.gif")
+gif_list.append("Anne_Heche6.gif")
+gif_list.append("Anthony_Perkins1.gif")
+gif_list.append("Anthony_Perkins2.gif")
+gif_list.append("Anthony_Perkins3.gif")
+gif_list.append("Anthony_Perkins4.gif")
+gif_list.append("Bae_Doona0.gif")
+gif_list.append("Bae_Doona1.gif")
+gif_list.append("Bae_Doona2.gif")
+gif_list.append("Bae_Doona3.gif")
+gif_list.append("Bae_Doona4.gif")
+gif_list.append("Bae_Doona5.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("BS_MichelleRodriguez4.gif")
+gif_list.append("Carice_van_Houten0.gif")
+gif_list.append("Carice_van_Houten1.gif")
+gif_list.append("Carice_van_Houten2.gif")
+gif_list.append("Carice_van_Houten3.gif")
+gif_list.append("Carice_van_Houten4.gif")
+gif_list.append("Casey_Affleck0.gif")
+gif_list.append("Casey_Affleck1.gif")
+gif_list.append("Casey_Affleck2.gif")
+gif_list.append("Casey_Affleck3.gif")
+gif_list.append("Casey_Affleck4.gif")
+gif_list.append("Christopher_Lee0.gif")
+gif_list.append("Christopher_Lee1.gif")
+gif_list.append("Christopher_Lee3.gif")
+gif_list.append("Christopher_Lee4.gif")
+gif_list.append("Christopher_Lee5.gif")
+gif_list.append("Christopher_Lee6.gif")
+gif_list.append("Dana_Delany0.gif")
+gif_list.append("Dana_Delany1.gif")
+gif_list.append("Dana_Delany2.gif")
+gif_list.append("Dana_Delany3.gif")
+gif_list.append("Daryl_Hannah5.gif")
+gif_list.append("David_Morse0.gif")
+gif_list.append("David_Morse1.gif")
+gif_list.append("David_Morse2.gif")
+gif_list.append("David_Morse3.gif")
+gif_list.append("David_Proval0.gif")
+gif_list.append("David_Proval1.gif")
+gif_list.append("David_Proval2.gif")
+gif_list.append("David_Thewlis0.gif")
+gif_list.append("David_Thewlis1.gif")
+gif_list.append("David_Thewlis2.gif")
+gif_list.append("David_Thewlis3.gif")
+gif_list.append("Diego_Luna0.gif")
+gif_list.append("Diego_Luna1.gif")
+gif_list.append("Diego_Luna2.gif")
+gif_list.append("Diego_Luna3.gif")
+gif_list.append("Dominic_West0.gif")
+gif_list.append("Dominic_West1.gif")
+gif_list.append("Dominic_West2.gif")
+gif_list.append("Eddie_Redmayne0.gif")
+gif_list.append("Eddie_Redmayne1.gif")
+gif_list.append("Eddie_Redmayne2.gif")
+gif_list.append("Elisabeth_Shue1.gif")
+gif_list.append("Elisabeth_Shue2.gif")
+gif_list.append("Elisabeth_Shue3.gif")
+gif_list.append("Elisabeth_Shue4.gif")
+gif_list.append("Elisabeth_Shue5.gif")
+gif_list.append("Elisabeth_Shue6.gif")
+gif_list.append("Elisabeth_Shue7.gif")
+gif_list.append("Emily_Watson0.gif")
+gif_list.append("Emily_Watson1.gif")
+gif_list.append("Emily_Watson2.gif")
+gif_list.append("Emily_Watson3.gif")
+gif_list.append("Emily_Watson4.gif")
+gif_list.append("Emily_Watson5.gif")
+gif_list.append("Emma_Watson0.gif")
+gif_list.append("Emma_Watson1.gif")
+gif_list.append("Emma_Watson2.gif")
+gif_list.append("Emma_Watson3.gif")
+gif_list.append("Frances_McDormand0.gif")
+gif_list.append("Frances_McDormand1.gif")
+gif_list.append("Frances_McDormand2.gif")
+gif_list.append("Frances_McDormand3.gif")
+gif_list.append("Frances_McDormand4.gif")
+gif_list.append("Frances_McDormand5.gif")
+gif_list.append("Frances_McDormand6.gif")
+gif_list.append("Frances_McDormand7.gif")
+gif_list.append("Frances_McDormand8.gif")
+gif_list.append("Geena_Davis0.gif")
+gif_list.append("Geena_Davis1.gif")
+gif_list.append("Geena_Davis2.gif")
+gif_list.append("Geena_Davis3.gif")
+gif_list.append("Geena_Davis4.gif")
+gif_list.append("Geena_Davis5.gif")
+gif_list.append("Gina_Torres0.gif")
+gif_list.append("Gina_Torres1.gif")
+gif_list.append("Gina_Torres2.gif")
+gif_list.append("Gina_Torres3.gif")
+gif_list.append("Gina_Torres4.gif")
+gif_list.append("Gina_Torres5.gif")
+gif_list.append("Gina_Torres6.gif")
+gif_list.append("Gina_Torres7.gif")
+gif_list.append("Gina_Torres8.gif")
+gif_list.append("Gregg_Henry1.gif")
+gif_list.append("Gregg_Henry2.gif")
+gif_list.append("Gregg_Henry3.gif")
+gif_list.append("Gregg_Henry4.gif")
+gif_list.append("Greta_Garbo0.gif")
+gif_list.append("Greta_Garbo1.gif")
+gif_list.append("Greta_Garbo2.gif")
+gif_list.append("Greta_Garbo3.gif")
+gif_list.append("Greta_Garbo4.gif")
+gif_list.append("Greta_Garbo5.gif")
+gif_list.append("Hillary_Swank2.gif")
+gif_list.append("Hillary_Swank3.gif")
+gif_list.append("Hillary_Swank4.gif")
+gif_list.append("Hillary_Swank5.gif")
+gif_list.append("Hillary_Swank6.gif")
+gif_list.append("Hillary_Swank7.gif")
+gif_list.append("Idris_Elba0.gif")
+gif_list.append("Idris_Elba1.gif")
+gif_list.append("Idris_Elba2.gif")
+gif_list.append("Ingrid_Bergman0.gif")
+gif_list.append("Ingrid_Bergman1.gif")
+gif_list.append("Ingrid_Bergman2.gif")
+gif_list.append("Ingrid_Bergman3.gif")
+gif_list.append("Ingrid_Bergman4.gif")
+gif_list.append("Ingrid_Bergman5.gif")
+gif_list.append("Ingrid_Bergman6.gif")
+gif_list.append("Ingrid_Bergman7.gif")
+gif_list.append("Ingrid_Bergman8.gif")
+gif_list.append("Ingrid_Bergman9.gif")
+gif_list.append("Isabella_Rossellini0.gif")
+gif_list.append("Isabella_Rossellini1.gif")
+gif_list.append("Isabella_Rossellini2.gif")
+gif_list.append("Isabella_Rossellini3.gif")
+gif_list.append("Isabella_Rossellini4.gif")
+gif_list.append("Isabella_Rossellini5.gif")
+gif_list.append("Isabella_Rossellini6.gif")
+gif_list.append("Isabella_Rossellini7.gif")
+gif_list.append("Isabella_Rossellini8.gif")
+gif_list.append("Isabella_Rossellini9.gif")
+gif_list.append("James_Purefoy1.gif")
+gif_list.append("James_Purefoy2.gif")
+gif_list.append("James_Purefoy3.gif")
+gif_list.append("James_Purefoy.gif")
+gif_list.append("Julie_Andrews0.gif")
+gif_list.append("Julie_Andrews1.gif")
+gif_list.append("Julie_Andrews2.gif")
+gif_list.append("Julie_Andrews3.gif")
+gif_list.append("Juliette_Binoche0.gif")
+gif_list.append("Katharine_Hepburn0.gif")
+gif_list.append("Kenneth_Branagh1.gif")
+gif_list.append("Kenneth_Branagh2.gif")
+gif_list.append("Kenneth_Branagh3.gif")
+gif_list.append("Kenneth_Branagh4.gif")
+gif_list.append("Kenneth_Branagh5.gif")
+gif_list.append("Kevin_Bacon0.gif")
+gif_list.append("Kevin_Bacon1.gif")
+gif_list.append("Kevin_Bacon2.gif")
+gif_list.append("Kevin_Bacon4.gif")
+gif_list.append("Kevin_McKidd0.gif")
+gif_list.append("Kevin_McKidd1.gif")
+gif_list.append("Kevin_McKidd2.gif")
+gif_list.append("Kristin_Scott_Thomas1.gif")
+gif_list.append("Kristin_Scott_Thomas2.gif")
+gif_list.append("Kristin_Scott_Thomas3.gif")
+gif_list.append("Kristin_Scott_Thomas4.gif")
+gif_list.append("Kristin_Scott_Thomas5.gif")
+gif_list.append("Kristin_Scott_Thomas6.gif")
+gif_list.append("Lauren_Bacall0.gif")
+gif_list.append("Lauren_Bacall1.gif")
+gif_list.append("Lauren_Bacall2.gif")
+gif_list.append("Lauren_Bacall3.gif")
+gif_list.append("Lauren_Bacall4.gif")
+gif_list.append("Lauren_Bacall5.gif")
+gif_list.append("Lauren_Bacall.gif")
+gif_list.append("Lucy_Liu0.gif")
+gif_list.append("Lucy_Liu1.gif")
+gif_list.append("Lucy_Liu2.gif")
+gif_list.append("Lucy_Liu3.gif")
+gif_list.append("Lucy_Liu4.gif")
+gif_list.append("Lucy_Liu5.gif")
+gif_list.append("Mary_McDonnel1.gif")
+gif_list.append("Mary_McDonnel2.gif")
+gif_list.append("Mary_McDonnel3.gif")
+gif_list.append("Mary_McDonnell0.gif")
+gif_list.append("Michelle_Rodriguez0.gif")
+gif_list.append("Michelle_Rodriguez1.gif")
+gif_list.append("Michelle_Rodriguez2.gif")
+gif_list.append("Michelle_Rodriguez3.gif")
+gif_list.append("Michelle_Rodriguez5.gif")
+gif_list.append("Michelle_Rodriguez6.gif")
+gif_list.append("Michelle_Rodriguez7.gif")
+gif_list.append("Nathan_Fillion0.gif")
+gif_list.append("Nathan_Fillion1.gif")
+gif_list.append("Nina_Hoss0.gif")
+gif_list.append("Nina_Hoss1.gif")
+gif_list.append("Nina_Hoss2.gif")
+gif_list.append("Nina_Hoss3.gif")
+gif_list.append("Nina_Hoss4.gif")
+gif_list.append("Nina_Hoss5.gif")
+gif_list.append("Nina_Hoss6.gif")
+gif_list.append("Pilou Asbæk0.gif")
+gif_list.append("Pilou Asbæk1.gif")
+gif_list.append("Pilou Asbæk2.gif")
+gif_list.append("Pilou Asbæk3.gif")
+gif_list.append("Pilou Asbæk4.gif")
+gif_list.append("Rachel_McAdams3.gif")
+gif_list.append("Rachel_McAdams4.gif")
+gif_list.append("Rachel_McAdams5.gif")
+gif_list.append("Rachel_McAdams9.gif")
+gif_list.append("Reese_Witherspoon0.gif")
+gif_list.append("Reese_Witherspoon1.gif")
+gif_list.append("Reese_Witherspoon2.gif")
+gif_list.append("Reese_Witherspoon3.gif")
+gif_list.append("Reese_Witherspoon4.gif")
+gif_list.append("Sherilyn_Fenn0.gif")
+gif_list.append("Sherilyn_Fenn1.gif")
+gif_list.append("Sherilyn_Fenn2.gif")
+gif_list.append("Sherilyn_Fenn3.gif")
+gif_list.append("Sherilyn_Fenn4.gif")
+gif_list.append("Sherilyn_Fenn5.gif")
+gif_list.append("Sherilyn_Fenn6.gif")
+gif_list.append("Sherilyn_Fenn7.gif")
+gif_list.append("Sherilyn_Fenn8.gif")
+gif_list.append("Shia_LaBeuf0.gif")
+gif_list.append("Shia_LaBeuf1.gif")
+gif_list.append("Shia_LaBeuf2.gif")
+gif_list.append("Shia_LaBeuf3.gif")
+gif_list.append("Sophie_Turner0.gif")
+gif_list.append("Sophie_Turner1.gif")
+gif_list.append("Sophie_Turner2.gif")
+gif_list.append("Sophie_Turner3.gif")
+gif_list.append("Sophie_Turner4.gif")
+gif_list.append("Stoya2.gif")
+gif_list.append("Thomas_Kretschmann0.gif")
+gif_list.append("Thomas_Kretschmann1.gif")
+gif_list.append("Thomas_Kretschmann2.gif")
+gif_list.append("Anne_Hathaway0.gif")
+gif_list.append("Anne_Hathaway1.gif")
+gif_list.append("Anne_Hathaway2.gif")
+gif_list.append("Anne_Hathaway3.gif")
+gif_list.append("Anne_Hathaway4.gif")
+gif_list.append("Anne_Hathaway5.gif")
+gif_list.append("Anne_Hathaway6.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Daryl_Hannah5.gif")
+gif_list.append("David_Morse0.gif")
+gif_list.append("Gregg_Henry1.gif")
+gif_list.append("James_Rebhorn0.gif")
+gif_list.append("James_Rebhorn1.gif")
+gif_list.append("James_Rebhorn2.gif")
+gif_list.append("James_Rebhorn3.gif")
+gif_list.append("James_Rebhorn4.gif")
+gif_list.append("Kristin_Scott_Thomas1.gif")
+gif_list.append("Linda_Gray1.gif")
+gif_list.append("Linda_Gray2.gif")
+gif_list.append("Linda_Gray3.gif")
+gif_list.append("Mark_Wahlberg1.gif")
+gif_list.append("Peter_Cushing1.gif")
+gif_list.append("Peter_Cushing2.gif")
+gif_list.append("Peter_Cushing3.gif")
+gif_list.append("Peter_Cushing4.gif")
+gif_list.append("Pilou Asbæk1.gif")
+gif_list.append("Reese_Witherspoon0.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Daryl_Hannah5.gif")
+gif_list.append("David_Morse0.gif")
+gif_list.append("Gregg_Henry1.gif")
+gif_list.append("Kristin_Scott_Thomas1.gif")
+gif_list.append("Mark_Wahlberg2.gif")
+gif_list.append("Mark_Wahlberg3.gif")
+gif_list.append("Mark_Wahlberg4.gif")
+gif_list.append("Pilou Asbæk1.gif")
+gif_list.append("Reese_Witherspoon0.gif")
+gif_list.append("Christopher_MacDonald0.gif")
+gif_list.append("Christopher_MacDonald1.gif")
+gif_list.append("Christopher_MacDonald2.gif")
+gif_list.append("Christopher_Plummer1.gif")
+gif_list.append("Buster_Keaton0.gif")
+gif_list.append("Buster_Keaton1.gif")
+gif_list.append("Buster_Keaton2.gif")
+gif_list.append("Buster_Keaton3.gif")
+gif_list.append("Buster_Keaton4.gif")
+gif_list.append("Chris_Evans0.gif")
+gif_list.append("Chris_Evans1.gif")
+gif_list.append("Chris_Evans2.gif")
+gif_list.append("Chris_Evans3.gif")
+gif_list.append("Chris_Evans4.gif")
+gif_list.append("Emma_Thompson0.gif")
+gif_list.append("Emma_Thompson1.gif")
+gif_list.append("Emma_Thompson2.gif")
+gif_list.append("Emma_Thompson3.gif")
+gif_list.append("Emma_Thompson4.gif")
+gif_list.append("Emma_Thompson5.gif")
+gif_list.append("Emma_Thompson6.gif")
+gif_list.append("Brad_Dourif0.gif")
+gif_list.append("Daryl_Hannah5.gif")
+gif_list.append("David_Morse0.gif")
+gif_list.append("Elizabeth_Perkins0.gif")
+gif_list.append("Elizabeth_Perkins1.gif")
+gif_list.append("Elizabeth_Perkins2.gif")
+gif_list.append("Elizabeth_Perkins3.gif")
+gif_list.append("Gregg_Henry1.gif")
+gif_list.append("Kristin_Scott_Thomas1.gif")
+gif_list.append("Reese_Witherspoon0.gif")
+gif_list.append("Elizabeth_Perkins10.gif")
+gif_list.append("Elizabeth_Perkins11.gif")
+gif_list.append("Peter_Greene0.gif")
+gif_list.append("Peter_Greene1.gif")
+gif_list.append("Peter_Greene2.gif")
+gif_list.append("Peter_Greene3.gif")
+gif_list.append("Peter_Greene4.gif")
+gif_list.append("Edward_Norton0.gif")
+gif_list.append("Edward_Norton1.gif")
+gif_list.append("Edward_Norton2.gif")
+gif_list.append("Edward_Norton3.gif")
+gif_list.append("Edward_Norton4.gif")
+gif_list.append("Edward_Norton5.gif")
+gif_list.append("Edward_Norton6.gif")
+gif_list.append("Gary_Oldman1.gif")
+gif_list.append("Gary_Oldman2.gif")
+gif_list.append("Gary_Oldman3.gif")
+gif_list.append("Gary_Oldman4.gif")
+gif_list.append("Gary_Oldman5.gif")
+gif_list.append("Gary_Oldman6.gif")
+gif_list.append("Luis_Guzmán1.gif")
+gif_list.append("Luis_Guzmán2.gif")
+gif_list.append("Luis_Guzmán3.gif")
+gif_list.append("Michael_Madsen1.gif")
+gif_list.append("Michael_Madsen2.gif")
+gif_list.append("Michael_Madsen3.gif")
+gif_list.append("Alec_Baldwin0.gif")
+gif_list.append("Alec_Baldwin1.gif")
+gif_list.append("Alec_Baldwin2.gif")
+gif_list.append("Alec_Baldwin3.gif")
+gif_list.append("Andre_Braugher0.gif")
+gif_list.append("Andre_Braugher1.gif")
+gif_list.append("Andre_Braugher2.gif")
+gif_list.append("Andre_Braugher3.gif")
+gif_list.append("Burt_Lancaster1.gif")
+gif_list.append("Burt_Lancaster2.gif")
+gif_list.append("Burt_Lancaster3.gif")
+gif_list.append("Burt_Lancaster4.gif")
+gif_list.append("Burt_Lancaster5.gif")
+gif_list.append("Burt_Lancaster6.gif")
+gif_list.append("Christoph_Waltz0.gif")
+gif_list.append("Christoph_Waltz1.gif")
+gif_list.append("Christoph_Waltz2.gif")
+gif_list.append("Christoph_Waltz3.gif")
+gif_list.append("Christoph_Waltz4.gif")
+gif_list.append("Jason_Momoa1.gif")
+gif_list.append("Jason_Momoa2.gif")
+gif_list.append("Jason_Momoa3.gif")
+gif_list.append("Jason_Momoa4.gif")
+gif_list.append("Jason_Momoa5.gif")
+gif_list.append("Jason_Momoa.gif")
+gif_list.append("Jeremy_Renner0.gif")
+gif_list.append("Jeremy_Renner1.gif")
+gif_list.append("Jeremy_Renner2.gif")
+gif_list.append("Jeremy_Renner3.gif")
+gif_list.append("Madeleine_Stowe0.gif")
+gif_list.append("Madeleine_Stowe1.gif")
+gif_list.append("Madeleine_Stowe2.gif")
+gif_list.append("Madeleine_Stowe3.gif")
+gif_list.append("Madeleine_Stowe4.gif")
+gif_list.append("Madeleine_Stowe5.gif")
+gif_list.append("Madeleine_Stowe6.gif")
+gif_list.append("Michelle_Fairley1.gif")
+gif_list.append("Michelle_Fairley2.gif")
+gif_list.append("Michelle_Fairley3.gif")
+gif_list.append("Michelle_Fairley4.gif")
+gif_list.append("Michelle_Fairley5.gif")
+gif_list.append("Michelle_Fairley6.gif")
+gif_list.append("Michelle_Fairley7.gif")
+gif_list.append("Michelle_Fairley8.gif")
+gif_list.append("Michelle_Fairley9.gif")
+gif_list.append("Stephen_Baldwin1.gif")
+gif_list.append("Stephen_Baldwin2.gif")
+gif_list.append("Stephen_Baldwin3.gif")
+gif_list.append("Stephen_Baldwin4.gif")
+gif_list.append("Stephen_Baldwin5.gif")
+gif_list.append("Steve_McQueen0.gif")
+gif_list.append("Steve_McQueen1.gif")
+gif_list.append("Steve_McQueen2.gif")
+gif_list.append("Steve_McQueen3.gif")
+gif_list.append("Steve_McQueen4.gif")
+gif_list.append("Steve_McQueen5.gif")
+gif_list.append("Steve_McQueen6.gif")
+gif_list.append("Steve_McQueen7.gif")
+gif_list.append("Steven_Van_Zandt1.gif")
+gif_list.append("Steven_Van_Zandt2.gif")
+gif_list.append("Zooey_Deschanel1.gif")
+gif_list.append("Zooey_Deschanel2.gif")
+gif_list.append("Zooey_Deschanel3.gif")
+gif_list.append("Zooey_Deschanel4.gif")
+gif_list.append("Zooey_Deschanel5.gif")
+gif_list.append("Zooey_Deschanel6.gif")
+gif_list.append("Zooey_Deschanel7.gif")
+gif_list.append("Deborah_Kara_Unger0.gif")
+gif_list.append("Deborah_Kara_Unger10.gif")
+gif_list.append("Deborah_Kara_Unger11.gif")
+gif_list.append("Deborah_Kara_Unger12.gif")
+gif_list.append("Deborah_Kara_Unger13.gif")
+gif_list.append("Deborah_Kara_Unger2.gif")
+gif_list.append("Deborah_Kara_Unger3.gif")
+gif_list.append("Deborah_Kara_Unger4.gif")
+gif_list.append("Deborah_Kara_Unger5.gif")
+gif_list.append("Deborah_Kara_Unger6.gif")
+gif_list.append("Deborah_Kara_Unger7.gif")
+gif_list.append("Deborah_Kara_Unger8.gif")
+gif_list.append("Deborah_Kara_Unger9.gif")
+gif_list.append("Iain_Glen0.gif")
+gif_list.append("Iain_Glen1.gif")
+gif_list.append("Iain_Glen2.gif")
+gif_list.append("Iain_Glen3.gif")
+gif_list.append("Iain_Glen4.gif")
+gif_list.append("Iain_Glen5.gif")
+gif_list.append("Iain_Glen6.gif")
+gif_list.append("Ian_McKellen0.gif")
+gif_list.append("Ian_McKellen2.gif")
+gif_list.append("Ian_McKellen3.gif")
+gif_list.append("Ian_McKellen5.gif")
+gif_list.append("Ian_McKellen6.gif")
+gif_list.append("Louis_Theroux0.gif")
+gif_list.append("Louis_Theroux1.gif")
+gif_list.append("Alan_Arkin0.gif")
+gif_list.append("Alan_Arkin1.gif")
+gif_list.append("Alan_Arkin2.gif")
+gif_list.append("Alexander_Siddig1.gif")
+gif_list.append("Alexander_Siddig2.gif")
+gif_list.append("Alexander_Siddig3.gif")
+gif_list.append("Alexander_Siddig4.gif")
+gif_list.append("Alexander_Siddig5.gif")
+gif_list.append("Alexander_Siddig6.gif")
+gif_list.append("Ava_Gardner0.gif")
+gif_list.append("Ava_Gardner10.gif")
+gif_list.append("Ava_Gardner11.gif")
+gif_list.append("Ava_Gardner12.gif")
+gif_list.append("Ava_Gardner13.gif")
+gif_list.append("Ava_Gardner14.gif")
+gif_list.append("Ava_Gardner1.gif")
+gif_list.append("Ava_Gardner2.gif")
+gif_list.append("Ava_Gardner3.gif")
+gif_list.append("Ava_Gardner4.gif")
+gif_list.append("Ava_Gardner5.gif")
+gif_list.append("Ava_Gardner6.gif")
+gif_list.append("Ava_Gardner7.gif")
+gif_list.append("Ava_Gardner8.gif")
+gif_list.append("Ava_Gardner9.gif")
+gif_list.append("Benedict_Cumberbatch1.gif")
+gif_list.append("Benedict_Cumberbatch2.gif")
+gif_list.append("Benedict_Cumberbatch3.gif")
+gif_list.append("Benedict_Cumberbatch4.gif")
+gif_list.append("Benedict_Cumberbatch5.gif")
+gif_list.append("Benedict_Cumberbatch6.gif")
+gif_list.append("Benedict_Cumberbatch7.gif")
+gif_list.append("Cameron_Diaz0.gif")
+gif_list.append("Cameron_Diaz1.gif")
+gif_list.append("Cameron_Diaz2.gif")
+gif_list.append("Cameron_Diaz3.gif")
+gif_list.append("Cameron_Diaz4.gif")
+gif_list.append("Cameron_Diaz5.gif")
+gif_list.append("Cate_Blanchett0.gif")
+gif_list.append("Cate_Blanchett10.gif")
+gif_list.append("Cate_Blanchett11.gif")
+gif_list.append("Cate_Blanchett12.gif")
+gif_list.append("Cate_Blanchett13.gif")
+gif_list.append("Cate_Blanchett14.gif")
+gif_list.append("Cate_Blanchett15.gif")
+gif_list.append("Cate_Blanchett16.gif")
+gif_list.append("Cate_Blanchett17.gif")
+gif_list.append("Cate_Blanchett18.gif")
+gif_list.append("Cate_Blanchett19.gif")
+gif_list.append("Cate_Blanchett1.gif")
+gif_list.append("Cate_Blanchett2.gif")
+gif_list.append("Cate_Blanchett4.gif")
+gif_list.append("Cate_Blanchett5.gif")
+gif_list.append("Cate_Blanchett6.gif")
+gif_list.append("Cate_Blanchett7.gif")
+gif_list.append("Cate_Blanchett8.gif")
+gif_list.append("Cate_Blanchett9.gif")
+gif_list.append("Diane_Keaton0.gif")
+gif_list.append("Diane_Keaton1.gif")
+gif_list.append("Diane_Keaton2.gif")
+gif_list.append("Diane_Keaton3.gif")
+gif_list.append("Edie_Falco1.gif")
+gif_list.append("Edie_Falco2.gif")
+gif_list.append("Edie_Falco3.gif")
+gif_list.append("Edie_Falco4.gif")
+gif_list.append("Edie_Falco5.gif")
+gif_list.append("Harvey_Keitel0.gif")
+gif_list.append("Harvey_Keitel1.gif")
+gif_list.append("Harvey_Keitel2.gif")
+gif_list.append("Harvey_Keitel3.gif")
+gif_list.append("Harvey_Keitel4.gif")
+gif_list.append("Harvey_Keitel5.gif")
+gif_list.append("Harvey_Keitel6.gif")
+gif_list.append("Ian_Holm0.gif")
+gif_list.append("Ian_Holm1.gif")
+gif_list.append("Ian_Holm2.gif")
+gif_list.append("Ian_Holm3.gif")
+gif_list.append("Ian_Holm4.gif")
+gif_list.append("Ian_Holm5.gif")
+gif_list.append("James_D'Arcy0.gif")
+gif_list.append("James_D'Arcy1.gif")
+gif_list.append("James_D'Arcy2.gif")
+gif_list.append("James_D'Arcy3.gif")
+gif_list.append("James_D'Arcy4.gif")
+gif_list.append("James_D'Arcy6.gif")
+gif_list.append("Kirstie_Alley0.gif")
+gif_list.append("Kirstie_Alley1.gif")
+gif_list.append("Kirstie_Alley2.gif")
+gif_list.append("Kirstie_Alley3.gif")
+gif_list.append("Marisa_Tomei1.gif")
+gif_list.append("Marisa_Tomei2.gif")
+gif_list.append("Marisa_Tomei3.gif")
+gif_list.append("Marisa_Tomei4.gif")
+gif_list.append("Marisa_Tomei5.gif")
+gif_list.append("Morena_Baccarin0.gif")
+gif_list.append("Morena_Baccarin1.gif")
+gif_list.append("Natalia_Tena0.gif")
+gif_list.append("Natalia_Tena1.gif")
+gif_list.append("Natalia_Tena2.gif")
+gif_list.append("Natalia_Tena3.gif")
+gif_list.append("Natalia_Tena4.gif")
+gif_list.append("Natalia_Tena5.gif")
+gif_list.append("Natalia_Tena6.gif")
+gif_list.append("Neal_McDonough0.gif")
+gif_list.append("Neal_McDonough1.gif")
+gif_list.append("Neal_McDonough2.gif")
+gif_list.append("Neal_McDonough3.gif")
+gif_list.append("Priscilla_Presley0.gif")
+gif_list.append("Priscilla_Presley1.gif")
+gif_list.append("Priscilla_Presley2.gif")
+gif_list.append("Priscilla_Presley3.gif")
+gif_list.append("Priscilla_Presley4.gif")
+gif_list.append("Priscilla_Presley5.gif")
+gif_list.append("Priscilla_Presley6.gif")
+gif_list.append("Priscilla_Presley7.gif")
+gif_list.append("Priscilla_Presley8.gif")
+gif_list.append("Priscilla_Presley9.gif")
+gif_list.append("Sam_Rockwell0.gif")
+gif_list.append("Sam_Rockwell1.gif")
+gif_list.append("Sam_Rockwell2.gif")
+gif_list.append("Sam_Rockwell3.gif")
+gif_list.append("Sam_Rockwell4.gif")
+gif_list.append("Sebastian_Koch0.gif")
+gif_list.append("Sebastian_Koch1.gif")
+gif_list.append("Sebastian_Koch2.gif")
+gif_list.append("Sebastian_Koch3.gif")
+gif_list.append("Sebastian_Koch4.gif")
+gif_list.append("Sebastian_Koch5.gif")
+gif_list.append("Sebastian_Koch6.gif")
+gif_list.append("Sebastian_Koch7.gif")
+gif_list.append("Tina_Fey0.gif")
+gif_list.append("Tina_Fey1.gif")
+gif_list.append("Tina_Fey2.gif")
+gif_list.append("Carrie_Coon0.gif")
+gif_list.append("Carrie_Coon10.gif")
+gif_list.append("Carrie_Coon1.gif")
+gif_list.append("Carrie_Coon2.gif")
+gif_list.append("Carrie_Coon3.gif")
+gif_list.append("Carrie_Coon4.gif")
+gif_list.append("Carrie_Coon5.gif")
+gif_list.append("Carrie_Coon6.gif")
+gif_list.append("Carrie_Coon7.gif")
+gif_list.append("Carrie_Coon8.gif")
+gif_list.append("Carrie_Coon9.gif")
+gif_list.append("Christina_Hendricks1.gif")
+gif_list.append("Christina_Hendricks2.gif")
+gif_list.append("Christina_Hendricks3.gif")
+gif_list.append("Christina_Hendricks4.gif")
+gif_list.append("Gary_Cooper0.gif")
+gif_list.append("Gary_Cooper1.gif")
+gif_list.append("Gary_Cooper2.gif")
+gif_list.append("Gary_Cooper3.gif")
+gif_list.append("Gary_Cooper5.gif")
+gif_list.append("Gary_Cooper6.gif")
+gif_list.append("Jennifer_Carpenter0.gif")
+gif_list.append("Jennifer_Carpenter2.gif")
+gif_list.append("Jennifer_Carpenter3.gif")
+gif_list.append("Jennifer_Carpenter4.gif")
+gif_list.append("Julia_Ormond0.gif")
+gif_list.append("Julia_Ormond1.gif")
+gif_list.append("Julia_Ormond2.gif")
+gif_list.append("Julia_Ormond3.gif")
+gif_list.append("Monica_Bellucci0.gif")
+gif_list.append("Monica_Bellucci2.gif")
+gif_list.append("Monica_Bellucci4.gif")
+gif_list.append("Monica_Bellucci5.gif")
+gif_list.append("Thandie_Newton0.gif")
+gif_list.append("Thandie_Newton1.gif")
+gif_list.append("Thandie_Newton2.gif")
+gif_list.append("Thandie_Newton3.gif")
+gif_list.append("Charlotte_Gainsbourg0.gif")
+gif_list.append("Charlotte_Gainsbourg1.gif")
+gif_list.append("Charlotte_Gainsbourg2.gif")
+gif_list.append("Charlotte_Gainsbourg3.gif")
+gif_list.append("Charlotte_Gainsbourg4.gif")
+gif_list.append("Charlotte_Gainsbourg5.gif")
+gif_list.append("Charlotte_Gainsbourg6.gif")
+gif_list.append("Charlotte_Gainsbourg7.gif")
+gif_list.append("Charlotte_Gainsbourg8.gif")
+gif_list.append("Charlotte_Gainsbourg9.gif")
+gif_list.append("Christopher_Plummer0.gif")
+gif_list.append("Christopher_Plummer2.gif")
+gif_list.append("Christopher_Plummer4.gif")
+gif_list.append("Christopher_Plummer5.gif")
+gif_list.append("Christopher_Plummer6.gif")
+gif_list.append("Jennifer_Connelly0.gif")
+gif_list.append("Jennifer_Connelly1.gif")
+gif_list.append("Jennifer_Connelly2.gif")
+gif_list.append("Jennifer_Connelly3.gif")
+gif_list.append("Jennifer_Connelly4.gif")
+gif_list.append("Jennifer_Connelly5.gif")
+gif_list.append("Jennifer_Connelly6.gif")
+gif_list.append("Jennifer_Connelly7.gif")
+gif_list.append("Lara_Flynn_Boyle0.gif")
+gif_list.append("Rachel_McAdams6.gif")
+gif_list.append("Rene_Russo0.gif")
+gif_list.append("Rene_Russo1.gif")
+gif_list.append("Rene_Russo2.gif")
+gif_list.append("Rene_Russo3.gif")
+gif_list.append("Rene_Russo4.gif")
+gif_list.append("Rene_Russo5.gif")
+gif_list.append("Rachel_McAdams8.gif")
+gif_list.append("Jane_Fonda0.gif")
+gif_list.append("Katharine_Hepburn1.gif")
+gif_list.append("Katharine_Hepburn2.gif")
+gif_list.append("Katharine_Hepburn3.gif")
+gif_list.append("Katharine_Hepburn4.gif")
+gif_list.append("Katharine_Hepburn5.gif")
+gif_list.append("Katharine_Hepburn6.gif")
+gif_list.append("Philip_Seymour_Hoffman0.gif")
+gif_list.append("Philip_Seymour_Hoffman1.gif")
+gif_list.append("Philip_Seymour_Hoffman2.gif")
+gif_list.append("Philip_Seymour_Hoffman3.gif")
+gif_list.append("Philip_Seymour_Hoffman4.gif")
+gif_list.append("Philip_Seymour_Hoffman5.gif")
+gif_list.append("Philip_Seymour_Hoffman6.gif")
+
+gif_list.append ("Ian_McKellen7.gif")
+gif_list.append ("Jessica_Lange0.gif")
+gif_list.append ("Jessica_Lange1.gif")
+gif_list.append ("Jessica_Lange2.gif")
+gif_list.append ("Jessica_Lange3.gif")
+gif_list.append ("Jessica_Lange4.gif")
+gif_list.append ("Jessica_Lange5.gif")
+gif_list.append ("Jessica_Lange6.gif")
+gif_list.append ("Jessica_Lange7.gif")
+gif_list.append ("Jessica_Lange8.gif")
+gif_list.append ("Judi_Dench0.gif")
+gif_list.append ("Judi_Dench1.gif")
+gif_list.append ("Judi_Dench2.gif")
+gif_list.append ("Judi_Dench3.gif")
+gif_list.append ("Judi_Dench4.gif")
+gif_list.append ("Judi_Dench5.gif")
+gif_list.append ("Judi_Dench6.gif")
+gif_list.append ("Judi_Dench7.gif")
+gif_list.append ("Judi_Dench8.gif")
+gif_list.append ("Judi_Dench9.gif")
+gif_list.append ("Gwendoline_Christie0.gif")
+gif_list.append ("Gwendoline_Christie1.gif")
+gif_list.append ("Gwendoline_Christie3.gif")
+gif_list.append ("Gwendoline_Christie4.gif")
+gif_list.append ("Gwendoline_Christie5.gif")
+gif_list.append ("Gwendoline_Christie6.gif")
+gif_list.append ("Gwendoline_Christie8.gif")
+gif_list.append ("Julia_Stiles0.gif")
+gif_list.append ("Julia_Stiles1.gif")
+gif_list.append ("Julia_Stiles2.gif")
+gif_list.append ("Julia_Stiles3.gif")
+gif_list.append ("Julia_Stiles4.gif")
+gif_list.append ("Julia_Stiles5.gif")
+gif_list.append ("Julia_Stiles6.gif")
+gif_list.append ("Julia_Stiles7.gif")
+gif_list.append ("Julia_Stiles8.gif")
+gif_list.append ("Lauren_Holly0.gif")
+gif_list.append ("Lauren_Holly1.gif")
+gif_list.append ("Lauren_Holly2.gif")
+gif_list.append ("Lauren_Holly4.gif")
+gif_list.append ("Juliette_Binoche1.gif")
+gif_list.append ("Juliette_Binoche2.gif")
+gif_list.append ("Juliette_Binoche3.gif")
+gif_list.append ("Juliette_Binoche4.gif")
+gif_list.append ("Juliette_Binoche5.gif")
+gif_list.append ("Juliette_Binoche6.gif")
+gif_list.append ("Juliette_Binoche7.gif")
+gif_list.append ("Juliette_Binoche8.gif")
+gif_list.append ("Juliette_Binoche9.gif")
+gif_list.append ("Zoe_Saldana0.gif")
+gif_list.append ("Zoe_Saldana1.gif")
+gif_list.append ("Zoe_Saldana2.gif")
+gif_list.append ("Zoe_Saldana3.gif")
+gif_list.append ("Zoe_Saldana4.gif")
+gif_list.append ("Zoe_Saldana5.gif")
+gif_list.append ("Zoe_Saldana6.gif")
+gif_list.append ("Zoe_Saldana7.gif")
+gif_list.append ("Zoe_Saldana8.gif")
+gif_list.append ("Zoe_Saldana9.gif")
+gif_list.append ("Claire_Danes0.gif")
+gif_list.append ("Claire_Danes1.gif")
+gif_list.append ("Claire_Danes2.gif")
+gif_list.append ("Claire_Danes3.gif")
+gif_list.append ("Elizabeth_Banks0.gif")
+gif_list.append ("Elizabeth_Banks1.gif")
+gif_list.append ("Elizabeth_Banks3.gif")
+gif_list.append ("Elizabeth_Banks4.gif")
+gif_list.append ("Elizabeth_Banks5.gif")
+gif_list.append ("Elizabeth_Banks6.gif")
+gif_list.append ("Elizabeth_Banks7.gif")
+gif_list.append ("Elizabeth_Banks8.gif")
+gif_list.append ("Elizabeth_Banks9.gif")
+gif_list.append ("Kim_Bassinger0.gif")
+gif_list.append ("Kim_Bassinger1.gif")
+gif_list.append ("Kim_Bassinger2.gif")
+gif_list.append ("Kim_Bassinger3.gif")
+gif_list.append ("Kim_Bassinger4.gif")
+gif_list.append ("Kim_Bassinger5.gif")
+gif_list.append ("Kim_Bassinger6.gif")
+gif_list.append ("Winona_Ryder0.gif")
+gif_list.append ("Winona_Ryder10.gif")
+gif_list.append ("Winona_Ryder11.gif")
+gif_list.append ("Winona_Ryder12.gif")
+gif_list.append ("Winona_Ryder1.gif")
+gif_list.append ("Winona_Ryder2.gif")
+gif_list.append ("Winona_Ryder3.gif")
+gif_list.append ("Winona_Ryder4.gif")
+gif_list.append ("Winona_Ryder5.gif")
+gif_list.append ("Winona_Ryder6.gif")
+gif_list.append ("Winona_Ryder7.gif")
+gif_list.append ("Winona_Ryder8.gif")
+gif_list.append ("Winona_Ryder9.gif")
