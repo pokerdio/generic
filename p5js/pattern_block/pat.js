@@ -6,6 +6,17 @@ function verify2pow(x) {
 
 class Nom {
     constructor(whole, div, two, three, six) {
+	if (whole instanceof Nom) {
+	    let other = whole;
+	    verify2pow(other.div)
+	    this.whole = other.whole
+	    this.div = other.whole
+	    this.two = other.two
+	    this.three = other.three
+	    this.six = other.six
+	    this.simp();
+	    return;
+	}
         this.whole = whole || 0;
 	this.div = div || 1;
         this.two = two || 0;
@@ -26,6 +37,9 @@ class Nom {
     clone() {
 	return new Nom(this.whole, this.div, this.two, this.three, this.six);
     }
+    isZero() {
+	return this.whole === 0 && this.two === 0 && this.three === 0 && this.six === 0;
+    }
 
     simp () {
 	while(this.div > 1 && (this.whole % 2 == 0) && (this.two % 2 == 0)&& 
@@ -44,12 +58,12 @@ class Nom {
         if (this.two !== 0) parts.push(`${this.two}*sqrt(2)`);
         if (this.three !== 0) parts.push(`${this.three}*sqrt(3)`);
         if (this.six !== 0) parts.push(`${this.six}*sqrt(6)`);
-	let s = parts.length > 0 ? parts.join(' + ') : '0'
+	let s = parts.length > 0 ? parts.join('+') : '0'
 	if (this.div > 1) {
 	    if (parts.length > 1) {
 		s = "(" + s + ")"
 	    }
-	    s = s + " / " + this.div; 
+	    s = s + "/" + this.div; 
 	}
 	return s
     }
@@ -69,7 +83,9 @@ class Nom {
             throw new TypeError('Argument must be a number or an instance of Nom or a number');
         }
     }
-
+    neg() {
+	return new Nom(-this.whole, this.div, -this.two, -this.three, -this.six)
+    }
     add(other) {
         if (other instanceof Nom) {
 	    let this_multi = 1
@@ -89,6 +105,34 @@ class Nom {
         } else if (typeof other === 'number') {
             return new Nom(
                 this.whole + other * this.div,
+		this.div,
+                this.two,
+                this.three,
+                this.six,
+            );
+        } else {
+            throw new TypeError('Argument must be a number or an instance of Nom or a number');
+        }
+    }
+    sub(other) {
+        if (other instanceof Nom) {
+	    let this_multi = 1
+	    let other_multi = 1
+	    if (this.div > other.div) {
+		other_multi = this.div / other.div
+	    } else {
+		this_multi = other.div / this.div
+	    }
+            return new Nom(
+                this.whole * this_multi - other.whole * other_multi,
+		Math.max(this.div, other.div),
+                this.two * this_multi - other.two * other_multi,
+                this.three * this_multi - other.three * other_multi,
+                this.six * this_multi - other.six * other_multi
+            );
+        } else if (typeof other === 'number') {
+            return new Nom(
+                this.whole - other * this.div,
 		this.div,
                 this.two,
                 this.three,
@@ -123,15 +167,6 @@ class Nom {
     }
 }
 
-class Pat {
-    static color = {lit:'white', dark:'black', transparent:'gray'}
-    constructor(point1, point2) {
-	this.cols = cols;
-	this.rows = rows;
-    }
-    isEqual(other) {
-    }
-}
 
 class Matrix2x2 {
     constructor(a, b, c, d) {
@@ -185,6 +220,7 @@ class Matrix2x2 {
 }
 
 
+
 let sin15 = new Nom(0, 4, -1, 0, 1)
 let cos15 = new Nom(0, 4, 1, 0, 1)
 
@@ -192,16 +228,200 @@ let neg_sin15 = new Nom(0, 4, 1, 0, -1)
 let neg_cos15 = cos15;
 
 let left15 = new Matrix2x2(cos15, neg_sin15, sin15, cos15)
-let left30 = left15.multiply(left15)
-let left45 = left15.multiply(left30)
-let left60 = left30.multiply(left30)
-let left120 = left60.multiply(left60)
-
 let right15 = new Matrix2x2(cos15, sin15, neg_sin15, cos15)
-let right30 = right15.multiply(right15)
-let right45 = right15.multiply(right30)
-let right60 = right30.multiply(right30)
-let right120 = right60.multiply(right60)
+
+let rot = {}
+rot[0] = new Matrix2x2(1, 0, 0, 1)
+
+for (angle=15 ; angle<540 ; angle+=15) {
+    rot[angle] = rot[angle - 15].multiply(left15)
+    rot[-angle] = rot[-angle + 15].multiply(right15)
+}
+
+function vectorSub(a, b) {
+    return [a[0].sub(b[0]), a[1].sub(b[1])]
+}
+
+function vectorSum(a, b) {
+    return [b[0].add(a[0]), b[1].add(a[1])]
+}
+
+// Function to compute the cross product of vectors AB and AC
+function crossProduct(A, B, C) {
+    return (B[0].sub(A[0])).multiply(C[1].sub(A[1])).sub((B[1].sub(A[1])).multiply(C[0].sub(A[0])));
+}
+
+class Pat {
+    //pseudo intersection test that simply tests if any of the vertices is inside the other poly
+    intersect(other) {
+	if (other.pointInside(this.center)) {
+	    return true;
+	}
+	if (this.pointInside(other.center)) {
+	    return true;
+	}
+	for (let p of this.points) {
+	    if (other.pointInside(p)) {
+		return true;
+	    }
+	}
+	for (let p of other.points) {
+	    if (this.pointInside(p)) {
+		return true;
+	    }
+	}
+	return false;
+    }
+
+    toString() {
+	return this.name + " at " + this.center[0] + " , " + this.center[1]
+    }
+
+    // Function to check if a point is strictly inside a convex polygon
+    pointInside(point) {
+	let prevSign = null;
+	let polygon = this.points
+	let n = polygon.length;
+
+	for (let i = 0; i < n; i++) {
+            let A = polygon[i];
+            let B = polygon[(i + 1) % n];
+            let crossProd = crossProduct(A, B, point);
+
+            // If point is exactly on the edge, return false (not strictly inside)
+            if (crossProd.isZero()) {
+		return false;
+            }
+
+            let currentSign = Math.sign(crossProd.toFloat());
+
+            if (prevSign === null) {
+		prevSign = currentSign;
+            } else if (prevSign !== currentSign) {
+		return false;
+            }
+	}
+
+	return true;
+    }
+
+    constructor(a, b, shape, color) {
+	if (typeof a[0] == "number") {
+	    a[0] = new Nom(a[0])
+	}
+	if (typeof a[1] == "number") {
+	    a[1] = new Nom(a[1])
+	}
+	if (typeof b[0] == "number") {
+	    b[0] = new Nom(b[0])
+	}
+	if (typeof b[1] == "number") {
+	    b[1] = new Nom(b[1])
+	}
+
+	this.points = [a, b]
+	let v = vectorSub(b, a)
+	
+	for (let m of shape) {
+	    a = b
+	    v = m.transformVector(v)
+	    b = vectorSum(b, v)
+	    this.points.push(b)
+	}
+
+	//cx, cy will be the approximate center, a sample inside point
+	let cx=this.points[0][0], cy=this.points[0][1]; 
+	for (let i=1 ; i<this.points.length+3 ; ++i) {
+	    cx = cx.add(this.points[i % this.points.length][0]);
+	    cy = cy.add(this.points[i % this.points.length][1]);
+
+	    cx.div *= 2;
+	    cx.simp();
+
+	    cy.div *= 2;
+	    cy.simp();
+	}
+	this.center = [cx, cy]
+	this.color = color; 
+	this.name = "polygon" + this.points.length
+    }
+
+    static makeSquare(a, b) {
+	return new Pat(a, b, [rot[90], rot[90]], "purple")
+    }
+    static makeTri(a, b) {
+	return new Pat(a, b, [rot[120]], "orange")
+    }
+    static makeHex(a, b) {
+	return new Pat(a, b, [rot[60], rot[60], rot[60], rot[60]], "red")
+    }
+    static makeRho(a, b) {
+	return new Pat(a, b, [rot[60], rot[120]], "green")
+    }
+
+    static makeRhoRev(a, b) {
+	return new Pat(a, b, [rot[120], rot[60]], "green")
+    }
+
+    static makeNeedle(a, b) {
+	return new Pat(a, b, [rot[30], rot[150]], "blue")
+    }
+    static makeNeedleRev(a, b) {
+	return new Pat(a, b, [rot[150], rot[30]], "blue")
+    }
+
+    static makeTrap(a, b) {
+	return new Pat(a, b, [rot[60], rot[120], rot[0]], [255, 255, 125])
+    }
+
+    static makeTrapRev(a, b) {
+	return new Pat(a, b, [rot[120], rot[0], rot[120]], [255, 255, 125])
+    }
+    static makeTrapRev2(a, b) {
+	return new Pat(a, b, [rot[60], rot[60], rot[120]], [255, 255, 125])
+    }
 
 
+    draw() {
+	fill(this.color)
+	strokeWeight(0.02);
+	stroke("black");
 
+	beginShape();
+	for (let v of this.points) {
+	    vertex(v[0].toFloat(), v[1].toFloat())
+	}
+	endShape(CLOSE);
+    }
+}
+
+
+function getBox(vpat) {
+    let minx=0,miny=0,maxx=1, maxy=0;
+    for (let pattern of vpat) {
+	for (let p of pattern.points) {
+	    minx = min(minx, p[0].toFloat())
+	    maxx = max(maxx, p[0].toFloat())
+	    miny = min(miny, p[1].toFloat())
+	    maxy = max(maxy, p[1].toFloat())
+	}
+    }
+    let w = maxx - minx;
+    let h = maxy - miny;
+    return [minx - w/7, miny - h/7, maxx + w/7, maxy + h/7];
+}
+
+
+function approachBox(current, desired, step) {
+    step = step || 0.05
+
+    let [x0, y0, x1, y1] = current;
+    let [dx0, dy0, dx1, dy1] = desired;
+    
+    x0 += (dx0 - x0) * step;
+    y0 += (dy0 - y0) * step;
+    x1 += (dx1 - x1) * step;
+    y1 += (dy1 - y1) * step;
+    
+    return [x0, y0, x1, y1];
+}

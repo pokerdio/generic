@@ -5,13 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Paste Image from Clipboard</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-  <script src="sketch.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
   <script src="pat.js"></script>
+  <script src="sketch.js"></script>
 </head>
 <body>
   <div id="canvasContainer"></div>
   <div class="bottomContainer">
-    <input id="textInput" type="text" placeholder="Type something" oninput="handleTextChange()">
+    <textarea id="textInput" class="full-width-textarea" placeholder="" oninput="handleTextChange(event)"></textarea>
   </div>
 </body>
 </html>
