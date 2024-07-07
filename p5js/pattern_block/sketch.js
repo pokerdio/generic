@@ -72,11 +72,11 @@ function draw() {
     // 	    }
     // 	}
     // }
-    for (let i=1 ; i<open.length ; ++i) {
-	stroke(0)
-	strokeWeight(0.04);
-	myLine(...open[i])
-    }
+    // for (let i=1 ; i<open.length ; ++i) {
+    // 	stroke(0)
+    // 	strokeWeight(0.04);
+    // 	myLine(...open[i])
+    // }
 
     if (open.length > 0) {
 	stroke(255, 150, 150)
@@ -111,8 +111,6 @@ function handleTextChange(event) {
     for (let i=0 ; i<processedValue.length ; ++i) {
 	doLetter(processedValue[i]);
     }
-
-//    textarea.value = compressString(processedValue)
 }
 
 function segmentId(a, b) {
@@ -166,7 +164,6 @@ function tryPoly(maker) {
 		open.shift()
 		open = open.concat(cut);
 	    }
-	    console.log("" + poly);
 	    pat.push(poly)
 	    return true; 
 	}
@@ -174,67 +171,63 @@ function tryPoly(maker) {
     return false;
 }
 
-function repeatLetters(input) {
-  // Remove all whitespace from the input string
-  const trimmedInput = input.replace(/\s+/g, '');
-  
-  let result = '';
-  let i = 0;
-  
-  while (i < trimmedInput.length) {
-    const currentChar = trimmedInput[i];
-    
-    // Check if the next character(s) is a digit
-    if (i + 1 < trimmedInput.length && /\d/.test(trimmedInput[i + 1])) {
-      let j = i + 1;
-      let numberStr = '';
-      
-      // Collect all consecutive digits
-      while (j < trimmedInput.length && /\d/.test(trimmedInput[j])) {
-        numberStr += trimmedInput[j];
-        j++;
-      }
-      
-      const repeatCount = parseInt(numberStr, 10);
-	result += currentChar.repeat(min(repeatCount, 20));
-      i = j; // Skip all the digits as they have been processed
-    } else {
-      result += currentChar;
-      i++;
+function takeNumber(str, idx) {
+    let numberStr = '';
+    while (idx < str.length && /\d/.test(str[idx])) {
+	numberStr += str[idx];
+	idx++;
     }
-  }
-  
-  return result;
+    return [idx, parseInt(numberStr)]
 }
 
+function parenEnd(str, idx) {
+    let parenCount = 1; 
+    while (idx < str.length) {
+	if (str[idx] == "(") {
+	    parenCount += 1;
+	} else if (str[idx] == ")") {
+	    parenCount -= 1;
+	}
+	if (parenCount === 0) {
+	    return idx + 1;
+	}
+	++idx; 
+    }
+    return false;
+}
 
-function compressString(input) {
+function repeatLetters(input) {
+    // Remove all whitespace from the input string
+    input = input.replace(/\s+/g, '');
+    
     let result = '';
     let i = 0;
     
     while (i < input.length) {
 	const currentChar = input[i];
-	let count = 1;
-	
-	// Count the number of consecutive occurrences of the current character
-	while (i + 1 < input.length && input[i + 1] === currentChar) {
-	    count++;
-	    i++;
+
+	if (currentChar == "(") {
+	    let end = parenEnd(input, i + 1)
+	    let [after, num] = takeNumber(input, end);
+	    if (num) {
+		input = input.slice(0, i) + 
+		    input.slice(i + 1, end - 1).repeat(num) +
+		    input.slice(after);
+	    } else {
+		i++;
+	    }
+	    continue;
 	}
-	
-	// If the count is 2 or more, append the character and the count
-	if (count > 1) {
-	    result += currentChar + count;
-	} else {
-	    result += currentChar;
-	}
-	
-	i++;
+
+	let [newidx, num] = takeNumber(input, i + 1);
+
+
+	result += currentChar.repeat(min(num || 1, 99));
+	i = max(newidx, i+1);
     }
     
     return result;
 }
-
 
 function doLetter(key) {
     let pat_len = pat.length; 

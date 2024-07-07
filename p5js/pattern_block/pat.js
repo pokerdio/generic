@@ -24,6 +24,9 @@ class Nom {
         this.six = six || 0;
 	verify2pow(this.div);
 	this.simp()
+	this.float = (this.whole + 1.4142135623730951 * this.two +
+		      1.7320508075688772 * this.three + 
+		      2.449489742783178 * this.six) / this.div
     }
 
     static makeRational(num, denom) {
@@ -32,6 +35,11 @@ class Nom {
 	ret.div = denom
 	ret.simp()
 	return ret
+    }
+
+    div(power_of_two) {
+	verify2pow(power_of_two)
+	return new Nom(this.whole, this.div * power_of_two, this.two, this.three, this.six)
     }
 
     clone() {
@@ -69,8 +77,7 @@ class Nom {
     }
 
     toFloat() {
-	return (this.whole + 1.4142135623730951 * this.two +
-		1.7320508075688772 * this.three + 2.449489742783178 * this.six) / this.div
+	return this.float; 
     }
 
     eql(other) {
@@ -251,15 +258,31 @@ function crossProduct(A, B, C) {
     return (B[0].sub(A[0])).multiply(C[1].sub(A[1])).sub((B[1].sub(A[1])).multiply(C[0].sub(A[0])));
 }
 
+function segHash(a, b) {
+    return a + "#" + b
+}
+
+
 class Pat {
     //pseudo intersection test that simply tests if any of the vertices is inside the other poly
+    boxIntersect (other) {
+	if (this.maxx <= other.minx || this.maxy <= other.miny ||
+	    this.minx >= other.maxx || this.miny >= other.maxy) {
+	    return false; 
+	}
+	return true; 
+    }
     intersect(other) {
-	if (other.pointInside(this.center)) {
-	    return true;
+	if (!this.boxIntersect(other)) {
+	    return false; 
 	}
-	if (this.pointInside(other.center)) {
-	    return true;
+
+	let segIntersect = this.segHash.intersection(other.segHash);
+	if (segIntersect.size >= 1) {
+	    return true; //all my Pats are polygons with the same clockwisety
+	    //therefore any common segment necessitates intersection
 	}
+
 	for (let p of this.points) {
 	    if (other.pointInside(p)) {
 		return true;
@@ -273,8 +296,12 @@ class Pat {
 	return false;
     }
 
+
     toString() {
-	return this.name + " at " + this.center[0] + " , " + this.center[1]
+	let cx = (this.maxx + this.minx) / 2
+	let cy = (this.maxy + this.miny) / 2
+
+	return this.name + " at " + cx + " , " + cy
     }
 
     // Function to check if a point is strictly inside a convex polygon
@@ -322,28 +349,45 @@ class Pat {
 	this.points = [a, b]
 	let v = vectorSub(b, a)
 	
+
+	let minx = min(a[0].toFloat(), b[0].toFloat())
+	let miny = min(a[1].toFloat(), b[1].toFloat())	
+
+	let maxx = max(a[0].toFloat(), b[0].toFloat())
+	let maxy = max(a[1].toFloat(), b[1].toFloat())	
+
+	this.segHash = new Set()
+	let sh = segHash(a, b)
+	this.segArray = [sh]
+	this.segHash.add(sh)
 	for (let m of shape) {
 	    a = b
 	    v = m.transformVector(v)
 	    b = vectorSum(b, v)
+
+	    sh = segHash(this.points[this.points.length-1], b)
+	    this.segArray.push(sh)
+	    this.segHash.add(sh)
 	    this.points.push(b)
+
+	    let bx = b[0].toFloat(), by = b[1].toFloat()
+	    minx = min(bx, minx)
+	    miny = min(by, miny)
+
+	    maxx = max(bx, maxx)
+	    maxy = max(by, maxy)
+
 	}
-
-	//cx, cy will be the approximate center, a sample inside point
-	let cx=this.points[0][0], cy=this.points[0][1]; 
-	for (let i=1 ; i<this.points.length+3 ; ++i) {
-	    cx = cx.add(this.points[i % this.points.length][0]);
-	    cy = cy.add(this.points[i % this.points.length][1]);
-
-	    cx.div *= 2;
-	    cx.simp();
-
-	    cy.div *= 2;
-	    cy.simp();
-	}
-	this.center = [cx, cy]
+	sh = segHash(b, this.points[0])
+	this.segHash.add(sh)
+	this.segArray.push(sh)
 	this.color = color; 
 	this.name = "polygon" + this.points.length
+
+	this.minx = minx
+	this.miny = miny
+	this.maxx = maxx
+	this.maxy = maxy
     }
 
     static makeSquare(a, b) {
@@ -384,7 +428,7 @@ class Pat {
 
     draw() {
 	fill(this.color)
-	strokeWeight(0.02);
+	strokeWeight(0.05);
 	stroke("black");
 
 	beginShape();

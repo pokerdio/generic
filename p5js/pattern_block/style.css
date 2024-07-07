@@ -41,10 +41,10 @@ n}
 }
 
 .full-width-textarea {
-    width: 100%;
-    height: 200px; /* Adjust the height as needed */
+    width: 66%;
+    height: 240px; /* Adjust the height as needed */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
-    font-size: 32px; /* Change to desired font size */
+    font-size: 80px; /* Change to desired font size */
 }
 
 .color-square {

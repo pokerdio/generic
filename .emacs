@@ -301,7 +301,7 @@
 (setq inhibit-splash-screen t)
 (require 'browse-kill-ring)
 (browse-kill-ring-default-keybindings)
-
+(global-set-key (kbd "C-c k") 'browse-kill-ring)
 
 (put 'dired-find-alternate-file 'disabled nil)
 
