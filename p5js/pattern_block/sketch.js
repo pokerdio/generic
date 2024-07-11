@@ -1,9 +1,18 @@
 let img;
 let pat = []
 
-let open = [[[0.0, 0.0], [1.0, 0.0]]]
+let try_poly = 0;
+let try_maker = 0; 
+
+let nomZero = new Nom(0)
+let nomOne = new Nom(1)
+let lineZero = [[nomZero, nomZero], [nomOne, nomZero]]
+    
+let open = [lineZero]
 
 let box = [-2, -2, 2, 2]
+
+let lastProcessedCommand = "";
 
 function setup() {
     let canvas = createCanvas(800, 600);
@@ -35,6 +44,8 @@ function fitBoxToCanvas(box) {
 
     scale(scaleXY)
     translate(-x0, -y0)
+
+    return scaleXY
 }
 
 function myLine(a, b) {
@@ -47,13 +58,22 @@ function myLine(a, b) {
     line(...v)
 }
 
+
+let draw_old = [0,0,0,0]
 function draw() {
     box = approachBox(box, getBox(pat))
     background(120);
     push();
-    fitBoxToCanvas(box);
+    let sc = fitBoxToCanvas(box)
+
+    let thin = 1.0
+    let thicc = 10.0
+    let w = max(min(map(sqrt(sc), 25, 5, thicc, thin), thicc), thin);
+
+    let wActual = w / (sc + 0.002);
+
     for (let p of pat) {
-	p.draw();
+	p.draw(wActual);
     }
 
     // testing pointInside
@@ -74,7 +94,10 @@ function draw() {
     // }
     // for (let i=1 ; i<open.length ; ++i) {
     // 	stroke(0)
-    // 	strokeWeight(0.04);
+    // 	strokeWeight(0.08);
+    // 	myLine(...open[i])
+    // 	stroke(0, map(i, 0, open.length, 255, 50), 0)
+    // 	strokeWeight(0.05);
     // 	myLine(...open[i])
     // }
 
@@ -87,6 +110,17 @@ function draw() {
 	myLine(...open[0])
     }
     pop();
+
+
+    //if (Pat.box_intersect_count - draw_old[0] > 0) {
+    // console.log("box", Pat.box_intersect_count, "(", Pat.box_intersect_count - draw_old[0],
+    // 		") int", Pat.intersect_count, "(", Pat.intersect_count - draw_old[1],
+    // 		") try_poly", try_poly, "(", try_poly - draw_old[2],
+    // 		") try_maker", try_maker, "(", try_maker - draw_old[3],
+    // 		")");
+    // }
+
+    draw_old = [Pat.box_intersect_count, Pat.intersect_count, try_poly, try_maker]
 }
 
 function mousePressed() {
@@ -103,11 +137,17 @@ function handleTextChange(event) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
 
-    pat = [];
-    open = [[[0.0, 0.0], [1.0, 0.0]]];
 
     let processedValue = repeatLetters(value);
-
+    if (processedValue.startsWith(lastProcessedCommand)) {
+	let len = lastProcessedCommand.length
+	lastProcessedCommand = processedValue;
+	processedValue = processedValue.slice(len)
+    } else {
+	lastProcessedCommand = processedValue;
+	pat = [];
+	open = [lineZero];
+    }
     for (let i=0 ; i<processedValue.length ; ++i) {
 	doLetter(processedValue[i]);
     }
@@ -149,23 +189,35 @@ function vetPoly(poly) {
     return true;
 }
 
-function tryPoly(maker) {
+function tryPoly(poly, i) {
+    try_poly ++; 
+    if (vetPoly(poly)) {
+	if (i == 0) {
+	    open.shift()
+	} else {
+	    open = open.slice(i + 1).concat(open.slice(0, i))
+	}
+	pat.push(poly)
+	return true; 
+    } 
+    return false;
+}
+
+function tryMaker(maker, alt_maker) {
     if (open.length <= 0) {
 	return false
     }
-
+    try_maker++;
     for (let i=0 ; i<open.length ; ++i) {
 	let poly = maker(...open[i])
-	if (vetPoly(poly)) {
-	    if (i == 0) {
-		open.shift()
-	    } else {
-		let cut = open.slice(0, i)
-		open.shift()
-		open = open.concat(cut);
+	if (tryPoly(poly, i)) {
+	    return true;
+	}
+	if (alt_maker) {
+	    poly = alt_maker(...open[i])
+	    if (tryPoly(poly, i)) {
+		return true;
 	    }
-	    pat.push(poly)
-	    return true; 
 	}
     }
     return false;
@@ -222,42 +274,63 @@ function repeatLetters(input) {
 	let [newidx, num] = takeNumber(input, i + 1);
 
 
-	result += currentChar.repeat(min(num || 1, 99));
+	result += currentChar.repeat(min(num || 1, 2500));
 	i = max(newidx, i+1);
     }
     
     return result;
 }
 
+function lineAntiEqual(l1, l2) {
+    for (let i=0 ; i<2 ; ++i) {
+	for (let j=0 ; j<2 ; ++j) {
+	    if (!l1[i][j].eql(l2[1-i][j])) {
+		return false;
+	    }
+	}
+    }
+    return true;
+}
+
+function delAntiLine(l) {
+    for (let i=0 ; i<open.length ; ++i) {
+	if (lineAntiEqual(l, open[i])) {
+	    open.splice(i, 1)
+	    return true;
+	} 
+    }
+    return false; 
+}
+
 function doLetter(key) {
     let pat_len = pat.length; 
-    vetOpen(); 
     if (open.length == 0) {
 	return; 
     }
-
     if (key === "h") {
-	tryPoly(Pat.makeHex)
+	tryMaker(Pat.makeHex)
     } else if (key === "s") {
-	tryPoly(Pat.makeSquare)
+	tryMaker(Pat.makeSquare)
     } else if (key === "r") {
-	tryPoly(Pat.makeRho)
+	tryMaker(Pat.makeRho, Pat.makeRhoRev)
     } else if (key === "R") {
-	tryPoly(Pat.makeRhoRev)
+	tryMaker(Pat.makeRhoRev, Pat.makeRho)
     } else if (key === "n") {
-	tryPoly(Pat.makeNeedle)
+	tryMaker(Pat.makeNeedle, Pat.makeNeedleRev)
     } else if (key === "N") {
-	tryPoly(Pat.makeNeedleRev)
+	tryMaker(Pat.makeNeedleRev, Pat.makeNeedle)
     } else if (key === "t") {
-	tryPoly(Pat.makeTri)
+	tryMaker(Pat.makeTri)
     } else if (key === "a") {
-	tryPoly(Pat.makeTrap)
+	tryMaker(Pat.makeTrap, Pat.makeTrapRev)
     } else if (key === "b") {
-	tryPoly(Pat.makeTrapRev)
+	tryMaker(Pat.makeTrapRev, Pat.makeTrap)
     } else if (key === "B") {
-	tryPoly(Pat.makeTrapRev2)
+	tryMaker(Pat.makeTrapRev2)
     } else if (key == "k") { //"sKip"
 	open.push(open.shift());
+    } else if (key == "K") { //"sKip"
+	open.unshift(open.pop());
     } 
     if (pat.length > pat_len) {
 	let pts = pat[pat.length - 1].points
@@ -269,11 +342,10 @@ function doLetter(key) {
 	} else {
 	    for (let i=1 ; i<n ; ++i) {
 		let l = [pts[(i + 1) % n], pts[i]]
-		if (vetLine(l)) {
+		if (!delAntiLine(l)) {
 		    open.push(l)
 		}
 	    }	    
 	}
     }
-    vetOpen();
 }

@@ -258,14 +258,12 @@ function crossProduct(A, B, C) {
     return (B[0].sub(A[0])).multiply(C[1].sub(A[1])).sub((B[1].sub(A[1])).multiply(C[0].sub(A[0])));
 }
 
-function segHash(a, b) {
-    return a + "#" + b
-}
-
-
 class Pat {
+    static intersect_count = 0; 
+    static box_intersect_count = 0; 
     //pseudo intersection test that simply tests if any of the vertices is inside the other poly
     boxIntersect (other) {
+	Pat.box_intersect_count++; 
 	if (this.maxx <= other.minx || this.maxy <= other.miny ||
 	    this.minx >= other.maxx || this.miny >= other.maxy) {
 	    return false; 
@@ -276,22 +274,31 @@ class Pat {
 	if (!this.boxIntersect(other)) {
 	    return false; 
 	}
-
-	let segIntersect = this.segHash.intersection(other.segHash);
-	if (segIntersect.size >= 1) {
-	    return true; //all my Pats are polygons with the same clockwisety
-	    //therefore any common segment necessitates intersection
+	Pat.intersect_count++; 
+	if (this.ownLineExclude(other) || other.ownLineExclude(this)) {
+	    return false;
 	}
+	return true;
+    }
+    ownLineExclude(other) {
+	// returns true if
+	// this has a line that cuts off all of the points of other
+	// from the rest of the points of this
+	let n = this.points.length
+	let n2 = other.points.length
+	for (let i=0 ; i<n ; ++i) {
+	    let a = this.points[i];
+	    let b = this.points[(i + 1) % n];
 
-	for (let p of this.points) {
-	    if (other.pointInside(p)) {
-		return true;
+	    let ok = true;
+	    for (let j=0 ; j<n2 ; ++j) {
+		let c = crossProduct(a, b, other.points[j]);
+		if (c.toFloat() > 0) {
+		    ok = false;
+		    break;
+		}
 	    }
-	}
-	for (let p of other.points) {
-	    if (this.pointInside(p)) {
-		return true;
-	    }
+	    if (ok) return true;
 	}
 	return false;
     }
@@ -356,18 +363,11 @@ class Pat {
 	let maxx = max(a[0].toFloat(), b[0].toFloat())
 	let maxy = max(a[1].toFloat(), b[1].toFloat())	
 
-	this.segHash = new Set()
-	let sh = segHash(a, b)
-	this.segArray = [sh]
-	this.segHash.add(sh)
 	for (let m of shape) {
 	    a = b
 	    v = m.transformVector(v)
 	    b = vectorSum(b, v)
 
-	    sh = segHash(this.points[this.points.length-1], b)
-	    this.segArray.push(sh)
-	    this.segHash.add(sh)
 	    this.points.push(b)
 
 	    let bx = b[0].toFloat(), by = b[1].toFloat()
@@ -378,9 +378,6 @@ class Pat {
 	    maxy = max(by, maxy)
 
 	}
-	sh = segHash(b, this.points[0])
-	this.segHash.add(sh)
-	this.segArray.push(sh)
 	this.color = color; 
 	this.name = "polygon" + this.points.length
 
@@ -408,10 +405,10 @@ class Pat {
     }
 
     static makeNeedle(a, b) {
-	return new Pat(a, b, [rot[30], rot[150]], "blue")
+	return new Pat(a, b, [rot[30], rot[150]], [100, 100, 255])
     }
     static makeNeedleRev(a, b) {
-	return new Pat(a, b, [rot[150], rot[30]], "blue")
+	return new Pat(a, b, [rot[150], rot[30]], [100, 100, 255])
     }
 
     static makeTrap(a, b) {
@@ -426,9 +423,10 @@ class Pat {
     }
 
 
-    draw() {
+    draw(w) {
+
 	fill(this.color)
-	strokeWeight(0.05);
+	strokeWeight(w);
 	stroke("black");
 
 	beginShape();
