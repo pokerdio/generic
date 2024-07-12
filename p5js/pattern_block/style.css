@@ -41,7 +41,7 @@ n}
 }
 
 .full-width-textarea {
-    width: 66%;
+    width: 100%;
     height: 240px; /* Adjust the height as needed */
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
     font-size: 32px; /* Change to desired font size */

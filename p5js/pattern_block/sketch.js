@@ -307,31 +307,62 @@ function doLetter(key) {
     if (open.length == 0) {
 	return; 
     }
-    if (key === "h") {
-	tryMaker(Pat.makeHex)
-    } else if (key === "s") {
-	tryMaker(Pat.makeSquare)
-    } else if (key === "r") {
-	tryMaker(Pat.makeRho, Pat.makeRhoRev)
-    } else if (key === "R") {
-	tryMaker(Pat.makeRhoRev, Pat.makeRho)
-    } else if (key === "n") {
-	tryMaker(Pat.makeNeedle, Pat.makeNeedleRev)
-    } else if (key === "N") {
-	tryMaker(Pat.makeNeedleRev, Pat.makeNeedle)
-    } else if (key === "t") {
-	tryMaker(Pat.makeTri)
+    key = key.toLowerCase()
+
+    if (key === "w") {
+	tryMaker(Pat.makeHex())
     } else if (key === "a") {
-	tryMaker(Pat.makeTrap, Pat.makeTrapRev)
+	tryMaker(Pat.makeSquare())
+    } else if (key === "s") {
+	tryMaker(Pat.makeOcto())
+    } else if (key === "d") {
+	tryMaker(Pat.makeRho(), Pat.makeRhoRev())
+    } else if (key === "f") {
+	tryMaker(Pat.makeRhoRev(), Pat.makeRho())
+    } else if (key === "e") {
+	tryMaker(Pat.makeNeedle(), Pat.makeNeedleRev())
+    } else if (key === "r") {
+	tryMaker(Pat.makeNeedleRev(), Pat.makeNeedle())
+    } else if (key === "q") {
+	tryMaker(Pat.makeTri())
+    } else if (key === "c") {
+	tryMaker(Pat.makeTrap(), Pat.makeTrapRev())
+    } else if (key === "v") {
+	tryMaker(Pat.makeTrapRev(), Pat.makeTrap())
     } else if (key === "b") {
-	tryMaker(Pat.makeTrapRev, Pat.makeTrap)
-    } else if (key === "B") {
-	tryMaker(Pat.makeTrapRev2)
-    } else if (key == "k") { //"sKip"
+	tryMaker(Pat.makeTrapRev2())
+    } else if (key == "z") { 
 	open.push(open.shift());
-    } else if (key == "K") { //"sKip"
+    } else if (key == "x") { 
 	open.unshift(open.pop());
-    } 
+    } else if (key === "y") { // WHITE TEAM
+	tryMaker(Pat.makeHex(255))
+    } else if (key === "g") {
+	tryMaker(Pat.makeSquare(255))
+    } else if (key === "h") {
+	tryMaker(Pat.makeOcto(255))
+    } else if (key === "j") {
+	tryMaker(Pat.makeRho(255), Pat.makeRhoRev(255))
+    } else if (key === "k") {
+	tryMaker(Pat.makeRhoRev(255), Pat.makeRho(255))
+    } else if (key === "u") {
+	tryMaker(Pat.makeNeedle(255), Pat.makeNeedleRev(255))
+    } else if (key === "i") {
+	tryMaker(Pat.makeNeedleRev(255), Pat.makeNeedle(255))
+    } else if (key === "t") {
+	tryMaker(Pat.makeTri(255))
+    } else if (key === "n") {
+	tryMaker(Pat.makeTrap(255), Pat.makeTrapRev(255))
+    } else if (key === "m") {
+	tryMaker(Pat.makeTrapRev(255), Pat.makeTrap(255))
+    } else if (key === "l") {
+	tryMaker(Pat.makeTrapRev2(255))
+    } else if (key == "o") { 
+	open.push(open.shift());
+    } else if (key == "p") { 
+	open.unshift(open.pop());
+    }
+
     if (pat.length > pat_len) {
 	let pts = pat[pat.length - 1].points
 	let n = pts.length

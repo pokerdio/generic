@@ -387,44 +387,45 @@ class Pat {
 	this.maxy = maxy
     }
 
-    static makeSquare(a, b) {
-	return new Pat(a, b, [rot[90], rot[90]], "purple")
+    static makeSquare(color) {
+	return ((a, b) => new Pat(a, b, [rot[90], rot[90]], color || "purple"))
     }
-    static makeTri(a, b) {
-	return new Pat(a, b, [rot[120]], "orange")
+    static makeOcto(color) {
+	return (a, b) => new Pat(a, b, [rot[45], rot[45], rot[45], 
+					       rot[45], rot[45], rot[45]], 
+					color || "cyan")
     }
-    static makeHex(a, b) {
-	return new Pat(a, b, [rot[60], rot[60], rot[60], rot[60]], "red")
+    static makeTri(color) {
+	return (a, b) => new Pat(a, b, [rot[120]], color || "orange")
     }
-    static makeRho(a, b) {
-	return new Pat(a, b, [rot[60], rot[120]], "green")
+    static makeHex(color) {
+	return (a, b) => new Pat(a, b, [rot[60], rot[60], rot[60], rot[60]], color || "red")
     }
-
-    static makeRhoRev(a, b) {
-	return new Pat(a, b, [rot[120], rot[60]], "green")
+    static makeRho(color) {
+	return (a, b) => new Pat(a, b, [rot[60], rot[120]], color || "green")
     }
-
-    static makeNeedle(a, b) {
-	return new Pat(a, b, [rot[30], rot[150]], [100, 100, 255])
+    static makeRhoRev(color) {
+	return (a, b) => new Pat(a, b, [rot[120], rot[60]], color || "green")
     }
-    static makeNeedleRev(a, b) {
-	return new Pat(a, b, [rot[150], rot[30]], [100, 100, 255])
+    static makeNeedle(color) {
+	return (a, b) => new Pat(a, b, [rot[30], rot[150]], color || [100, 100, 255])
     }
-
-    static makeTrap(a, b) {
-	return new Pat(a, b, [rot[60], rot[120], rot[0]], [255, 255, 125])
+    static makeNeedleRev(color) {
+	return (a, b) => new Pat(a, b, [rot[150], rot[30]], color || [100, 100, 255])
     }
-
-    static makeTrapRev(a, b) {
-	return new Pat(a, b, [rot[120], rot[0], rot[120]], [255, 255, 125])
+    static makeTrap(color) {
+	return (a, b) => new Pat(a, b, [rot[60], rot[120], rot[0]], color || [255, 255, 125])
     }
-    static makeTrapRev2(a, b) {
-	return new Pat(a, b, [rot[60], rot[60], rot[120]], [255, 255, 125])
+    static makeTrapRev(color) {
+	return (a, b) => new Pat(a, b, [rot[120], rot[0], rot[120]], 
+					color || [255, 255, 125])
     }
-
+    static makeTrapRev2(color) {
+	return (a, b) => new Pat(a, b, [rot[60], rot[60], rot[120]], 
+					color || [255, 255, 125])
+    }
 
     draw(w) {
-
 	fill(this.color)
 	strokeWeight(w);
 	stroke("black");
