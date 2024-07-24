@@ -1,7 +1,8 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(set-face-attribute 'default nil :height 180)
+
+
 
 ;https://i.imgur.com/6vYPb3C.jpg
 (setq frame-inhibit-implied-resize t) ;; prevent resize window on startup
@@ -18,7 +19,7 @@
    '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
 		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(package-selected-packages
-   '(trashed marginalia vertico ein browse-kill-ring casual buffer-move magit-section lsp-mode flycheck f dash paredit nodejs-repl clhs modus-themes)))
+   '(lua-mode trashed marginalia vertico ein browse-kill-ring casual buffer-move magit-section lsp-mode flycheck f dash paredit nodejs-repl clhs modus-themes)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -193,6 +194,10 @@
                   (find-file "~/read/misc/tractatus-logico-org-master/tractatus.org")))
 
 
+
+(set-face-attribute 'default nil :height 140)
+
+
 ;(add-hook 'python-mode-hook 'py-autopep8-mode)
 (add-hook 'python-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-hook 'electric-pair-mode)
@@ -330,7 +335,6 @@
 
 (add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
 
-
 (setq backup-by-copying t)
 
 (require 'dired)
@@ -339,8 +343,42 @@
 (define-key dired-mode-map (kbd "% .") 'dired-mark-extension)
 
 
-;(setq dired-listing-switches "-al") ; if you want to include the hidden files from dired
-(setq dired-listing-switches "-l") ; if you want to remove the hidden files from dired
+
+
+(setq dired-listing-switches "-al") ; if you want to include the hidden files from dired
+;(setq dired-listing-switches "-l") ; if you want to remove the hidden files from dired
 
 
 
+; C-c C-= and C-c C-- increase and decrease the global font height
+; with zero parameter reset to default
+; with positive parm repeat more times 
+(defvar *dio/face-height-default* 140)
+(defvar *dio/face-height* *dio/face-height-default*)
+(set-face-attribute 'default nil :height *dio/face-height*)
+(global-set-key (kbd "C-c C-=")
+		(lambda (arg)
+		  (interactive "p")
+                  (if (> arg 0)
+                      (dotimes (x (min 19 (max arg 1)))
+		        (setf *dio/face-height* (+ (if (> *dio/face-height* 100) 20 10) *dio/face-height*)))
+                    (setf *dio/face-height* *dio/face-height-default*))
+                  (set-face-attribute 'default nil :height *dio/face-height*)))
+
+(global-set-key (kbd "C-c C--")
+		(lambda (arg)
+		  (interactive "p")
+                  (if (> arg 0)
+                      (dotimes (x (min 19 (max arg 1)))
+		        (setf *dio/face-height* 
+                              (- *dio/face-height*
+                                 (cond
+                                  ((< *dio/face-height* 20) 0)
+                                  ((< *dio/face-height* 100) 10)
+                                  (t 20)))))
+                    (setf *dio/face-height* *dio/face-height-default*))
+		  (set-face-attribute 'default nil :height *dio/face-height*)))
+
+
+
+;hello
