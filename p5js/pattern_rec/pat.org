@@ -1,0 +1,13 @@
+* misc code
+ 
+** square triangle grid
+q:s(pppp)
+p:t(qqq)
+x:q
+** 5 square cross
+x:s(ssss)
+** 6 square cross
+x:s(sssq)
+q:s(..s)
+** line
+q:s(..s)
