@@ -1,0 +1,1 @@
+/home/dio/scripts/tomp3.sh
