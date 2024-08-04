@@ -1,1 +1,4 @@
-/home/dio/scripts/o.sh
+#!/bin/bash
+
+
+setsid -w xdg-open $*

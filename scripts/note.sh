@@ -1,1 +1,5 @@
-/home/dio/scripts/note.sh
+#!/bin/bash
+#note taking script
+
+echo $(date): $* >> ~/notes.txt
+echo Note saved: $*
