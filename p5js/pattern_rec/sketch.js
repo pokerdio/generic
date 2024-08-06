@@ -12,9 +12,37 @@ let box = [-2, -2, 2, 2]
 
 let lastProcessedCommand = "";
 
-function resetPats() {
+let rec
+
+
+
+function makeSquareRec(color, patAdder) {
+    return function (lineMaker) {
+	let line = lineMaker()
+	if (line) { 
+	    let p = new Pat(line[0], line[1], [rot[90], rot[90]], color || "purple")
+	    patAdder(p)
+	    let ret = []
+	    let np = p.points.length
+	    for (let i=((pat.length > 1) ? 1 : 0) ; i<np ; ++i) {
+		ret.push([p.points[(i + 1) % np], p.points[i]])
+	    }
+	    console.log("square function returns", ret.length)
+	    return ret
+	}
+    }
+}
+
+
+
+function resetPats(txt) {
     pat = [];
-    tiling1_Octo(...lineZero, 5, tryPoly)
+//    tiling1_Octo(...lineZero, 3, tryPoly)
+//    tiling2_Cross(lineZero[1], lineZero[0], 24, tryPoly)
+//    rec = new Rec("x:q4;q:s.>.q")
+    rec = new Rec(txt || "x:s")
+    rec.addF("s", makeSquareRec("red", tryPoly))
+    rec.go(lineZero)
 }
 
 function setup() {
@@ -93,7 +121,8 @@ function handleTextChange(event) {
     const value = textarea.value;
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-
+    
+    resetPats(value)
 
     // let processedValue = repeatLetters(value);
     // if (processedValue.startsWith(lastProcessedCommand)) {

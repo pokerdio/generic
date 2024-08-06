@@ -486,7 +486,6 @@ function approachBox(current, desired, step) {
     return [x0, y0, x1, y1];
 }
 
-
 function tiling1_Octo(a, b, depth, createPatCallback, delta) {
     console.log("octo call", a, b, depth)
     let octo = Pat.makeOcto("red")
@@ -518,6 +517,36 @@ function tiling1_Sq(a, b, depth, createPatCallback) {
     if (depth > 0) {
 	for (let i=0 ; i<n ; ++i) {
 	    tiling1_Octo(pat.points[(i + 1) % n], pat.points[i], depth - 1, createPatCallback, 1)
+	}
+    }
+}
+
+function tiling2_Cross(a, b, depth, createPatCallback, maxdepth) {
+    maxdepth = maxdepth || depth
+    console.log("cross call", a, b, depth)
+
+    let sq = Pat.makeSquare("yellow")
+    
+    let pat = sq(a, b)
+    if (!createPatCallback(pat)) {
+	return;
+    }
+
+    let n = pat.points.length
+    if (depth > 0) {
+	tiling2_Cross(pat.points[3], pat.points[2], depth - 1, createPatCallback, maxdepth)
+    } else {
+	let x = int(maxdepth * 0.48)
+	if (x < 1) {
+	    return
+	}
+	for (let i=1 ; i<n ; ++i) {
+	    tiling2_Cross(pat.points[2], pat.points[1], 
+			 x, createPatCallback, x)
+	    tiling2_Cross(pat.points[3], pat.points[2], 
+			 x, createPatCallback, x)
+	    tiling2_Cross(pat.points[0], pat.points[3], 
+			 x, createPatCallback, x)
 	}
     }
 }
