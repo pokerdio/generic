@@ -8,39 +8,46 @@ var Rec = class {
     }
 
     static proc(s) {
-	s = s.toLowerCase();
 	s = s.split(/[\s,;]+/)
 	let ret = {}
 	for (let word of s) {
-	    let match = word.match(/^[a-z]:([a-z](-*|[0-9]+)[.^>]*)*$/)
+	    let match = word.match(/^[a-zA-Z]:([a-zA-Z#](-*|[0-9]+)[.^>]*[*]?)*$/)
 	    if (!match) {
+		console.log("failed match", word)
 		continue; 
 	    }
 	    word = match[0]
 
 	    let ret_entry = []
 	    let ret_key = word[0]
-	    let val = 0;
+	    let val = 1;
+	    let no_digit = true;
 	    let parm = [];
 	    let letter = null
 	    for (let i=2 ; i<word.length ; ++i) {
 		let char = word[i]
 		if (char === "-") {
-		    val--;
+		    if (val === 1) {
+			val = -1;
+		    } else {
+			val--;
+		    }
 		} else if (/^\d$/.test(char)) {
-		    if (val <= 0) {
+		    if (no_digit) {
 			val = parseInt(char)
+			no_digit = false;
 		    } else {
 			val = val * 10 + parseInt(char)
 		    }
-		} else if (".^>".includes(char)) {
+		} else if (".^>*".includes(char)) {
 		    parm.push(char)
 		} else {
 		    if (letter) {
 			ret_entry.push([letter, val, parm])
 		    }
 		    letter = char;
-		    val = -1;
+		    val = 1;
+		    no_digit = true;
 		    parm = [];
 		}
 	    }
@@ -96,33 +103,75 @@ var Rec = class {
 	let ret = []
 	this.stack.push(local_stack)
 
-	for (let c of this.defs[command]) {
-	    console.log("doing sub commands", c)
-	    let [c2, d2, parms] = c
+	let def = this.defs[command]
+	let start = 0, stop = def.length
+
+	for (let i=0 ; i<def.length ; ++i) {
+	    if(def[i][0] === "#") {
+		if (depth > 1) {
+		    stop = i;
+		} else {
+		    start = i + 1;
+		}
+		break;
+	    }
+	}
+
+	for (let i=start ; i<stop ; ++i) {
+	    
+	    console.log("doing sub commands", command, def[i][0])
+	    let [c2, d2, parms] = def[i]
+	    Rec.assert ("#" !== c2, "unpossible") 
+
 	    parms = parms || []
 	    let val
+
+	    if (c2 === command && !(c2 in this.f)) {
+		if (depth == 1) {
+		    continue; 		    
+		}
+		if (d2 === 1) {
+		    d2 = -1; 
+		}
+	    }
+
 	    if (d2 < 0) {
 		d2 = Math.max(depth + d2, 0)
 	    }
-	    if (c2 in this.defs) {
-		if (d2 > 0) {
-		    val = this.rec(c2, d2)
+
+	    if (c2 === command) {
+		if (c2 in this.f) { // if you redefine a builtin function, the new one calls the builtin, not itself
+		    console.log("calling builtin function from override")
+		    val = this.execf(c2, d2)
+		} else {
+		    if (d2 > 0) {
+			val = this.rec(c2, d2)
+		    }
 		}
-	    } else if (c2 in this.f) {
-		val = this.execf(c2, d2)
+	    } else {
+		if (c2 in this.defs) {
+		    if (d2 > 0) {
+			val = this.rec(c2, d2)
+		    }
+		} else if (c2 in this.f) {
+		    val = this.execf(c2, d2)
+		}
 	    }
 
 	    if (!val || val.length <= 0) {
 		continue;
 	    }
 
-	    var parm = ">" 
-	    if (parms.length > 0) {
-		parm = parms[parms.length - 1]
-	    }
+	    var parm = ">" //if no parms directions are given, all are used
 	    for (let i=0 ; i<val.length ; i++) {
 		if (i < parms.length) {
-		    parm = parms[i]
+		    if (parms[i] != "*") {
+			parm = parms[i] //if explicit parms are given, use them
+		    }
+		} else if (parms.length >= 1) { 
+		    if (parms[parms.length - 1] !== "*") { 
+			parm = '.'; //after explicit parms, discard rest
+		    }
 		}
 		if (parm === "^") {
 		    ret.push(val[i])
@@ -132,6 +181,7 @@ var Rec = class {
 	    }
 	}
 	this.stack.pop()
+	console.log(`command ${command}(${depth}) returns ${ret.length}`)
 	return ret
     }
     setErrorMessageFunction (f) {

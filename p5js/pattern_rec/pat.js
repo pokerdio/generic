@@ -323,6 +323,22 @@ class Pat {
 	return this.name + " at " + cx + " , " + cy
     }
 
+    toHash() { //generates a string that uniquely identifies the poly
+	// including similar ones with a different string order
+
+	let p = [...this.points].sort((a,b) => {
+	    if (a[0].eql(b[0])) {
+		return a[1].toFloat() - b[1].toFloat();
+	    }
+	    return a[0].toFloat() - b[0].toFloat();
+	})
+	let s = p[0].toString();
+	for (let i=0 ; i<p.length ; ++i) {
+	    s = s + "," + p[i].toString();
+	}
+	return s;
+    }
+
     // Function to check if a point is strictly inside a convex polygon
     pointInside(point) {
 	let prevSign = null;

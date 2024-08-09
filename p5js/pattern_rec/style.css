@@ -1,7 +1,12 @@
 html, body {
+    background-color:black;
+    color:white;
     margin: 0;
     padding: 0;
+    display:flex;
+    height:100vh;
 }
+
 canvas {
     display: block;
 }
@@ -13,119 +18,39 @@ label {
     margin-bottom: 10px;
 }
 
-#allContainer {
+.container {
     display: flex;
-    justify-content: left;
-};
+    width: 100%;
+    height:600px;
+}
 
-#bottomContainer {
+.bottomContainer {
+    flex:1;
     display: flex; 
-    flex-direction: row;
-    justify-content: space-evenly;
+    flex-direction: column;
 };
 
 
 #canvasContainer {
-    text-align: center;
-    margin: 20px;
-    width:450px;
-n}
-
-#checkboxContainer {
-    text-align: center;
-    display: inline-block;
-    margin: 20px;
-    width:100px;
-    margin:20px;
-    /* background:pink; */
+    flex:1;
+    border:1px solid #ccc; 
+    height:100vh;
+    margin-right 10px;
 }
 
 .full-width-textarea {
     width: 100%;
-    height: 240px; /* Adjust the height as needed */
+    height:100vh;
     box-sizing: border-box; /* Include padding and border in the element's total width and height */
     font-size: 32px; /* Change to desired font size */
+    background-color:black;
+    color:white;
 }
-
-.color-square {
-    width:40px;
-    height:40px;
-    border: 3px solid black;
-}
-
-/* CSS */
-.button-28 {
-  appearance: none;
-  background-color: transparent;
-  border: 2px solid #1A1A1A;
-  border-radius: 15px;
-  box-sizing: border-box;
-  color: #3B3B3B;
-  cursor: pointer;
-  display: inline-block;
-  font-family: Roobert,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-  font-size: 16px;
-  font-weight: 600;
-  line-height: normal;
-  margin: 10px;
-  min-height: 40px;
-  min-width: 0;
-  outline: none;
-  padding: 16px 24px;
-  text-align: center;
-  text-decoration: none;
-  transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
-n  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-  width: 95%;
-  will-change: transform;
-  background:white; 
-}
-
-.button-28:disabled {
-  pointer-events: none;
-}
-
-.button-28:hover {
-  color: #fff;
-  background-color: #1A1A1A;
-  box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
-  transform: translateY(-2px);
-}
-
-.button-28:active {
-  box-shadow: none;
-  transform: translateY(0);
-}
-
-
-
-
 
 .bottomContainer {
+    flex:1;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 800px;
-}
-
-.bottomChildContainer {
-    width: 45%;
-    margin-right: 10px;
-    margin-left: 10px;
-    text-align: left; 
-}
-
-.bottomLabel{
-    position:relative;
-    display: inline-block;
-    top:10px;
-    width: 0px;
-}
-
-input[type="range"] {
-    width: 100%;
+    flex-direction: column; 
 }
 
 input[type="text"] {

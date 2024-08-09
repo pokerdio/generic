@@ -1,5 +1,6 @@
 let img;
 let pat = []
+let pathash = new Set()
 
 let try_poly = 0;
 let try_maker = 0; 
@@ -16,11 +17,11 @@ let rec
 
 
 
-function makeSquareRec(color, patAdder) {
+function makeRecFun(shape, patAdder, color) {
     return function (lineMaker) {
 	let line = lineMaker()
 	if (line) { 
-	    let p = new Pat(line[0], line[1], [rot[90], rot[90]], color || "purple")
+	    let p = new Pat(line[0], line[1], shape, color || "purple")
 	    patAdder(p)
 	    let ret = []
 	    let np = p.points.length
@@ -33,15 +34,29 @@ function makeSquareRec(color, patAdder) {
     }
 }
 
-
-
-function resetPats(txt) {
+function alterPats(txt) {
     pat = [];
+    patHash = new Set();
 //    tiling1_Octo(...lineZero, 3, tryPoly)
 //    tiling2_Cross(lineZero[1], lineZero[0], 24, tryPoly)
 //    rec = new Rec("x:q4;q:s.>.q")
-    rec = new Rec(txt || "x:s")
-    rec.addF("s", makeSquareRec("red", tryPoly))
+    rec = new Rec(txt || document.getElementById('textInput').value || "x:s")
+    rec.addF("s", makeRecFun([rot[90], rot[90]], tryPoly, "purple"))
+    rec.addF("o", makeRecFun([rot[45], rot[45], rot[45], 
+				 rot[45], rot[45], rot[45]], tryPoly, "cyan"))
+    rec.addF("t", makeRecFun([rot[120]], tryPoly, "yellow"))
+    rec.addF("h", makeRecFun([rot[60], rot[60], rot[60], rot[60]], tryPoly, "red"))
+    rec.addF("r", makeRecFun([rot[60], rot[120]], tryPoly, "green"))
+    rec.addF("R", makeRecFun([rot[120], rot[60]], tryPoly, "green"))
+    rec.addF("n", makeRecFun([rot[30], rot[150]], tryPoly, [100, 100, 255]))
+    rec.addF("N", makeRecFun([rot[150], rot[30]], tryPoly, [100, 100, 255]))
+    rec.addF("T", makeRecFun([rot[60], rot[120], rot[0]], tryPoly, [255, 255, 125]))
+    rec.addF("z", makeRecFun([rot[120], rot[0], rot[120]], tryPoly, [255, 255, 125]))
+    rec.addF("Z", makeRecFun([rot[60], rot[60], rot[120]], tryPoly, [255, 255, 125]))
+
+    rec.addF("m", makeRecFun([rot[15], rot[165]], tryPoly, [100, 255, 100]))
+    rec.addF("M", makeRecFun([rot[165], rot[15]], tryPoly, [100, 255, 100]))
+
     rec.go(lineZero)
 }
 
@@ -51,8 +66,7 @@ function setup() {
 
     strokeWeight(0.02)
     noSmooth()
-    resetPats()
-    // Add an event listener for pasting images
+    alterPats()
 }
 
 function fitBoxToCanvas(box) {
@@ -92,7 +106,7 @@ function myLine(a, b) {
 
 function draw() {
     box = approachBox(box, getBox(pat))
-    background(120);
+    background(0);
     push();
     let sc = fitBoxToCanvas(box)
 
@@ -122,17 +136,7 @@ function handleTextChange(event) {
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     
-    resetPats(value)
-
-    // let processedValue = repeatLetters(value);
-    // if (processedValue.startsWith(lastProcessedCommand)) {
-    // 	let len = lastProcessedCommand.length
-    // 	lastProcessedCommand = processedValue;
-    // 	processedValue = processedValue.slice(len)
-    // } else {
-    // 	lastProcessedCommand = processedValue;
-    // 	resetPats()
-    // }
+    alterPats(value)
 }
 
 function segmentId(a, b) {
@@ -142,13 +146,18 @@ function segmentId(a, b) {
 function tryPoly(poly) {
     console.log("try poly" + poly)
     try_poly++; 
-    for (let p of pat) {
-	if (poly.intersect(p)) {
-	    console.log("fail")
-	    return false; 
-	}
+    // for (let p of pat) {
+    // 	if (poly.intersect(p)) {
+    // 	    console.log("fail")
+    // 	    return false; 
+    // 	}
+    // }
+    
+    let hash = poly.toHash()
+    if (!patHash.has(hash)) {
+	pat.push(poly)
+	patHash.add(hash)
     }
-    pat.push(poly)
     console.log("success", pat.length)
     return true;
 }
