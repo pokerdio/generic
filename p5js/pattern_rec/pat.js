@@ -461,7 +461,7 @@ class Pat {
     draw(w) {
 	fill(this.color)
 	strokeWeight(w);
-	stroke("black");
+	stroke("white");
 
 	beginShape();
 	for (let v of this.points) {

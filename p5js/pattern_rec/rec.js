@@ -89,7 +89,14 @@ var Rec = class {
     execf (f, depth) {
 	return this.f[f](() => this.pop(), depth)
     }
+    panic() {
+	this.panicAttack = true;
+    }
     rec(command, depth) {
+	if (this.panicAttack) {
+	    console.log("panic abort!", command, depth)
+	    return;
+	}
 	console.log("rec", command, depth)
 	if (depth <= 0) {
 	    return
@@ -188,6 +195,7 @@ var Rec = class {
 	this.errorMessageFunction = f
     }
     go (initial_data) {
+	this.panicAttack = false; 
 	initial_data = initial_data || "patient zero"
 	this.stack = [[initial_data]]
 	try {

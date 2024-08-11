@@ -2,6 +2,8 @@ let img;
 let pat = []
 let pathash = new Set()
 
+const MAX_PAT = 2000
+
 let try_poly = 0;
 let try_maker = 0; 
 
@@ -144,6 +146,10 @@ function segmentId(a, b) {
 }
 
 function tryPoly(poly) {
+    if (pat.length > MAX_PAT) {
+	rec.panic();
+	return false;
+    }
     console.log("try poly" + poly)
     try_poly++; 
     // for (let p of pat) {
