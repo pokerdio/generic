@@ -248,3 +248,53 @@ function lineEqual(l1, l2) {
     return true;
 }
 
+
+function exampleButton (dir) {
+    var x = examples[((example_count % examples.length) + examples.length) % examples.length]
+    var edit_box = document.getElementById("textInput");
+    var txt = edit_box.value;
+    if (txt != x) {
+	saveCode();
+    }
+    if (dir) {
+	example_count++; 
+    } else {
+	example_count--;
+    }
+    x = examples[((example_count % examples.length) + examples.length) % examples.length]
+    edit_box.value = x;
+    alterPats(x);
+}
+
+var saveCodeText = "";
+function saveCode() {
+    saveCodeText = document.getElementById("textInput").value; 
+}
+
+function restoreCode() {
+    document.getElementById("textInput").value = saveCodeText;
+    alterPats(saveCodeText);
+}
+
+function copyCode() {
+    copyTextToClipboard(document.getElementById("textInput").value);
+}
+
+function copyTextToClipboard(text) {
+    // Create a temporary textarea element to hold the text
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+
+    // Set the textarea to be invisible
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+
+    document.body.appendChild(textarea);
+
+    // Select and copy the text inside the textarea
+    textarea.select();
+    document.execCommand('copy');
+
+    // Remove the textarea from the DOM
+    document.body.removeChild(textarea);
+}
