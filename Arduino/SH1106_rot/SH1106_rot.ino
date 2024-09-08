@@ -7,8 +7,8 @@
 #include "new_fonts.h"
 
 
-const char* ssid = "COUNTDOWN";    // SSID of the access point
-const char* password = "543210";  // Password for the access point
+const char* ssid = "COUNTDOWN-735";    // SSID of the access point
+const char* password = "5432154321";  // Password for the access point
 
 void sendWiFiCommand(int message, long seed);
 
@@ -21,12 +21,7 @@ bool server = false;
 bool client = false;
 
 
-#define MESSAGE_HELLO  99
-#define MESSAGE_START_0 100
-#define MESSAGE_START_1 101
-#define MESSAGE_START_2 102
-#define MESSAGE_START_3 103
-#define MESSAGE_START_4 104
+
 
 struct incoming_t {
     int message; 
@@ -49,7 +44,7 @@ struct incoming_t {
 
 bool change = false; 
 int button_state = 0;
-int game_selected = -1; 
+int game_selected = -1;  //rename this variable and move to countdown internal
 
 long last_button_action = 0; 
 int encoder_count = 100;
@@ -61,7 +56,6 @@ int game_value[9];
 int game_target;
 long game_timer; 
 
-
 int best = 0;
 int best_delta = 1200; 
 
@@ -71,16 +65,323 @@ char game_op_cur[12]; // rotation ops for the current press and rotate session
 
 Rotary * rotary; 
 
-#define STATE_INTRO 1
-#define STATE_GAME_SELECT 2
-#define STATE_GAME 3
-#define STATE_END_GAME 4
+enum {
+    STATE_MENU = 1, 
+    STATE_GAME,
+    STATE_MESSAGE,
+    STATE_END_GAME
+};
 
-int state = STATE_INTRO; 
+int state = STATE_MENU; 
+int state_before_message = 0; 
+int state_message = 0; 
 int clk = 0; 
 
 
 SH1106 display(true, OLED_RESET, OLED_DC, OLED_CS); // FOR SPI
+
+
+enum {
+    MENU_FAIL = -1,
+    MESSAGE_HELLO = 50, 
+    MESSAGE_START = 51,
+    MESSAGE_START_END = (51 + 16), 
+
+    MENU_ASLEEP=100,
+    MENU_FIRST=100,
+    MENU_COUNTDOWN_SELECT,
+    MENU_MESSAGE_SELECT,
+
+    MENU_COUNTDOWN_TIMED_SELECT,
+    MENU_COUNTDOWN_FREE_SELECT,
+    MENU_COUNTDOWN_20,
+    MENU_COUNTDOWN_50,
+    MENU_COUNTDOWN_100,
+    MENU_COUNTDOWN_1000,
+    MENU_COUNTDOWN_0,
+    MENU_COUNTDOWN_1,
+    MENU_COUNTDOWN_2,
+    MENU_COUNTDOWN_3,
+    MENU_COUNTDOWN_4,
+
+
+    MENU_MESSAGE_YES,
+    MENU_MESSAGE_NO,
+    MENU_MESSAGE_LATER,    
+    MENU_MESSAGE_COME,
+    MENU_MESSAGE_WANT,
+    MENU_MESSAGE_FOOD,
+    MENU_MESSAGE_TOY,
+    MENU_MESSAGE_WATER,
+    MENU_MESSAGE_BUBBLE_WATER,
+    MENU_MESSAGE_LAST, 
+
+
+    MENU_LAST //keep this last, okay? 
+};
+
+
+int menu_option_countdown_timed = MENU_COUNTDOWN_TIMED_SELECT; 
+int menu_option_countdown_max = MENU_COUNTDOWN_20; 
+int menu_option_countdown_large = MENU_COUNTDOWN_2; 
+
+int menu_state = MENU_COUNTDOWN_SELECT;
+
+
+#define MENU_LENGTH (MENU_LAST - MENU_FIRST)
+
+int menuNext(int entry) {
+    switch (entry) {
+    case MENU_COUNTDOWN_SELECT:
+	return MENU_MESSAGE_SELECT;
+    case MENU_MESSAGE_SELECT:
+	return MENU_COUNTDOWN_SELECT;
+
+    case MENU_COUNTDOWN_TIMED_SELECT:
+	return MENU_COUNTDOWN_FREE_SELECT;
+    case MENU_COUNTDOWN_FREE_SELECT:
+	return MENU_COUNTDOWN_TIMED_SELECT;
+    case MENU_COUNTDOWN_20:
+	return MENU_COUNTDOWN_50;
+    case MENU_COUNTDOWN_50:
+	return MENU_COUNTDOWN_100;
+    case MENU_COUNTDOWN_100:
+	return MENU_COUNTDOWN_1000;
+    case MENU_COUNTDOWN_1000:
+	return MENU_COUNTDOWN_20;
+    case MENU_COUNTDOWN_0:
+	return MENU_COUNTDOWN_1;
+    case MENU_COUNTDOWN_1:
+	return MENU_COUNTDOWN_2;
+    case MENU_COUNTDOWN_2:
+	return MENU_COUNTDOWN_3;
+    case MENU_COUNTDOWN_3:
+	return MENU_COUNTDOWN_4;
+    case MENU_COUNTDOWN_4:
+	return MENU_COUNTDOWN_0;
+
+
+    case MENU_MESSAGE_YES:
+	return MENU_MESSAGE_NO;
+    case MENU_MESSAGE_NO:
+	return MENU_MESSAGE_LATER;
+    case MENU_MESSAGE_LATER:
+	return MENU_MESSAGE_COME;
+    case MENU_MESSAGE_COME:
+	return MENU_MESSAGE_WANT;
+    case MENU_MESSAGE_WANT:
+	return MENU_MESSAGE_FOOD;
+    case MENU_MESSAGE_FOOD:
+	return MENU_MESSAGE_TOY;
+    case MENU_MESSAGE_TOY:
+	return MENU_MESSAGE_WATER;
+    case MENU_MESSAGE_WATER:
+	return MENU_MESSAGE_BUBBLE_WATER;
+    case MENU_MESSAGE_BUBBLE_WATER:
+	return MENU_MESSAGE_YES;
+
+    default:
+	return MENU_FAIL; 
+    };
+    return MENU_COUNTDOWN_SELECT;  //fail 
+}
+
+int menuPrev(int entry) {
+    switch(entry) {
+    case MENU_COUNTDOWN_SELECT:
+	return MENU_MESSAGE_SELECT;
+    case MENU_MESSAGE_SELECT:
+	return MENU_COUNTDOWN_SELECT;
+
+    case MENU_COUNTDOWN_TIMED_SELECT:
+	return MENU_COUNTDOWN_FREE_SELECT;
+    case MENU_COUNTDOWN_FREE_SELECT:
+	return MENU_COUNTDOWN_TIMED_SELECT;
+    case MENU_COUNTDOWN_20:
+	return MENU_COUNTDOWN_1000;
+    case MENU_COUNTDOWN_50:
+	return MENU_COUNTDOWN_20;
+    case MENU_COUNTDOWN_100:
+	return MENU_COUNTDOWN_50;
+    case MENU_COUNTDOWN_1000:
+	return MENU_COUNTDOWN_100;
+    case MENU_COUNTDOWN_0:
+	return MENU_COUNTDOWN_4;
+    case MENU_COUNTDOWN_1:
+	return MENU_COUNTDOWN_0;
+    case MENU_COUNTDOWN_2:
+	return MENU_COUNTDOWN_1;
+    case MENU_COUNTDOWN_3:
+	return MENU_COUNTDOWN_2;
+    case MENU_COUNTDOWN_4:
+	return MENU_COUNTDOWN_3;
+
+
+    case MENU_MESSAGE_YES:
+	return MENU_MESSAGE_BUBBLE_WATER;
+    case MENU_MESSAGE_NO:
+	return MENU_MESSAGE_YES;
+    case MENU_MESSAGE_LATER:
+	return MENU_MESSAGE_NO;
+    case MENU_MESSAGE_COME:
+	return MENU_MESSAGE_LATER;
+    case MENU_MESSAGE_WANT:
+	return MENU_MESSAGE_COME;
+    case MENU_MESSAGE_FOOD:
+	return MENU_MESSAGE_WANT;
+    case MENU_MESSAGE_TOY:
+	return MENU_MESSAGE_FOOD;
+    case MENU_MESSAGE_WATER:
+	return MENU_MESSAGE_TOY;
+    case MENU_MESSAGE_BUBBLE_WATER:
+	return MENU_MESSAGE_WATER;
+
+    }
+    return MENU_COUNTDOWN_SELECT;  //fail 
+}
+
+const char* menuString(int entry) {
+    switch (entry) { 
+    case MENU_COUNTDOWN_SELECT:
+	return "Countdown";
+    case MENU_MESSAGE_SELECT:
+	return "Message";
+
+    case MENU_COUNTDOWN_TIMED_SELECT:
+	return "Timed Contest";
+    case MENU_COUNTDOWN_FREE_SELECT:
+	return "Free Play";
+    case MENU_COUNTDOWN_20:
+	return "20 MAX";
+    case MENU_COUNTDOWN_50:
+	return "50 MAX";
+    case MENU_COUNTDOWN_100:
+	return "99 MAX";
+    case MENU_COUNTDOWN_1000:
+	return "999 MAX";
+    case MENU_COUNTDOWN_0:
+	return "6 small";
+    case MENU_COUNTDOWN_1:
+	return "1 large";
+    case MENU_COUNTDOWN_2:
+	return "2 large";
+    case MENU_COUNTDOWN_3:
+	return "3 large";
+    case MENU_COUNTDOWN_4:
+	return "4 large";
+    case MENU_MESSAGE_YES:
+	return "DA";
+    case MENU_MESSAGE_NO:
+	return "NU";
+    case MENU_MESSAGE_LATER:
+	return "MAI TARZIU";
+    case MENU_MESSAGE_COME:
+	return "VINO!";
+    case MENU_MESSAGE_WANT:
+	return "VREAU!";
+    case MENU_MESSAGE_FOOD:
+	return "MANCARE";
+    case MENU_MESSAGE_TOY:
+	return "JUCARIE";
+    case MENU_MESSAGE_WATER:
+	return "APA";
+    case MENU_MESSAGE_BUBBLE_WATER:
+	return "APA CU BULE";
+    }
+    return "";
+}
+
+void menuCountDownStart(void) {
+    int m = MESSAGE_START;
+    switch(menu_option_countdown_max) {
+    case MENU_COUNTDOWN_20:
+	break;
+    case MENU_COUNTDOWN_50:
+	m += 1; 
+	break;
+    case MENU_COUNTDOWN_100:
+	m += 2; 
+	break;
+    case MENU_COUNTDOWN_1000:
+	m += 3 + (menu_option_countdown_large - MENU_COUNTDOWN_0); //values 3..7 inclusive are 
+	break;
+    }
+    if (menu_option_countdown_max) {
+	m += 8; 
+    }
+
+    int seed = millis(); 
+    sendWiFiCommand(m, seed);
+    gameStart(m, seed);
+
+    menu_state = MENU_COUNTDOWN_SELECT;
+}
+
+void messageSend(int entry) {
+    if (state != STATE_MESSAGE) { 
+	state_before_message = state;
+    }
+    state = STATE_MESSAGE;
+    state_message = entry; 
+}
+
+void menuAction(int entry) {
+    switch (entry) {
+    case MENU_COUNTDOWN_SELECT:
+	menu_state = MENU_COUNTDOWN_TIMED_SELECT;
+	break;
+    case MENU_MESSAGE_SELECT:
+	menu_state = MENU_MESSAGE_YES;
+	break;
+    case MENU_COUNTDOWN_TIMED_SELECT:
+	menu_option_countdown_timed = MENU_COUNTDOWN_TIMED_SELECT; 
+	menu_state = menu_option_countdown_max; 
+	break;
+    case MENU_COUNTDOWN_FREE_SELECT:
+	menu_option_countdown_timed = MENU_COUNTDOWN_FREE_SELECT; 
+	menu_state = menu_option_countdown_max; 
+	break;
+    case MENU_COUNTDOWN_20:
+    case MENU_COUNTDOWN_50:
+    case MENU_COUNTDOWN_100:
+	menuCountDownStart();
+	menu_option_countdown_max = entry;
+	menu_state = MENU_COUNTDOWN_SELECT;
+	break;
+    case MENU_COUNTDOWN_1000:
+	menu_option_countdown_max = entry; 
+	menu_state = menu_option_countdown_large; 
+	break;
+    case MENU_COUNTDOWN_0:
+    case MENU_COUNTDOWN_1:
+    case MENU_COUNTDOWN_2:
+    case MENU_COUNTDOWN_3:
+    case MENU_COUNTDOWN_4:
+	menu_option_countdown_large = entry;
+	menuCountDownStart();
+	break;
+
+
+    case MENU_MESSAGE_YES:
+    case MENU_MESSAGE_NO:
+    case MENU_MESSAGE_LATER:
+    case MENU_MESSAGE_COME:
+    case MENU_MESSAGE_WANT:
+    case MENU_MESSAGE_FOOD:
+    case MENU_MESSAGE_TOY:
+    case MENU_MESSAGE_WATER:
+    case MENU_MESSAGE_BUBBLE_WATER:
+	messageSend(entry);
+	sendWiFiCommand(entry, 0);
+	break; 
+    default:
+	menu_state = MENU_COUNTDOWN_SELECT; // menu fail state should never happen
+	break;
+    };
+}
+
+
+
 int getPos(void);
 
 void encoderReset(void) {
@@ -149,37 +450,30 @@ void gameOverlay(SH1106 &display) {
 }
 
 
-void drawFrameIntro(SH1106 &display) {
+void drawFrameMenu(SH1106 &display) {
     static char txt[] = "COUNTDOWN";
 
     display.clear();
-    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
     display.setFont(SansSerif_bold_14);
 
-    int w = 0;
-    int repeat = 1; 
 
-    for (int i=0 ; txt[i] ; ++i) {
-	String s = String(txt[i]);
-	int sw = display.getStringWidth(s);
+    display.drawString(8, 4, String(menuString(menuPrev(menu_state))));
 
-	int st; 
-	if (clk < 50) {
-	    st = clk - i;
-	    st = (st < 0) ? 0 : st;
-	} else {
-	    st = i + 80 - clk;
-	    st = (st < 0) ? 0 : st;
-	}
-	int delta = (st * 2 >= sw + 1) ? (sw + 1) / 2 : st;
-	display.setColor(WHITE);
-	display.fillRect(w + sw / 2 - delta, 18, delta * 2, 20);
-		
-	display.setColor(BLACK);
-	display.drawString(w + sw / 2, 20, s);
+    display.drawRect(6, 22, display.getStringWidth(String(menuString(menu_state))) + 4, 18);
+    display.drawString(8, 24, String(menuString(menu_state)));
 
-	w += sw + 2;
+    if (menuPrev(menu_state) != menuNext(menu_state)) {
+	display.drawString(8, 44, String(menuString(menuNext(menu_state))));
     }
+}
+
+void drawMessage(SH1106 &display) {
+    display.clear();
+    display.setTextAlignment(TEXT_ALIGN_LEFT);
+    display.setFont(SansSerif_bold_14);
+
+    display.drawString(4, 24, String(menuString(state_message)));
 }
 
 
@@ -218,10 +512,7 @@ void drawOption (SH1106 &display, const String& text, const String &subtext, int
 	    if (i > 5 || !(game_value[i] == game_target && (millis() % 750 > 375))) {
 		display.drawString(x + w / 2, y + 2, text);
 	    }
-	} else if (state == STATE_GAME_SELECT) {
-	    display.drawString(x + w / 2, y + 2, text);	    
-	}
-
+	} 
     }
     if (selected) {
 	int wide = 6;
@@ -241,26 +532,6 @@ void drawOption (SH1106 &display, const String& text, const String &subtext, int
     if (active) {
 	display.drawRect(x + 1, y + 1, w - 1, h - 1);
     }
-}
-
-void drawFrameSelect(SH1106 &display) {
-    int sel = encode(encoder_count, 9);
-    String empty = "";
-
-    display.clear();
-//    p(display, 54, String (digitalRead(ROT_A)) + String (digitalRead(ROT_B)) + String (digitalRead(ROT_C)));
-
-    drawOption (display, String("999"), String("-"), sel == 0, 0, 0, 0);
-    drawOption (display, String("999"), String("0/6"), sel == 1, 0, 0, 1);
-    drawOption (display, String("999"), String("1/5"), sel == 2, 0, 0, 2);
-    drawOption (display, String("999"), String("2/4"), sel == 3, 0, 1, 0);
-
-    drawOption (display, String("999"), String("3/3"), sel == 4, 0, 1, 1);
-    drawOption (display, String("999"), String("4/2"), sel == 5, 0, 1, 2);
-
-    drawOption (display, String("20"), empty, sel == 6, 0, 2, 0);
-    drawOption (display, String("50"), empty, sel == 7, 0, 2, 1);
-    drawOption (display, String("100"), empty, sel == 8, 0, 2, 2);
 }
 
 void gameInit(int max, int large_count) {
@@ -337,55 +608,47 @@ void gameInit(int max, int large_count) {
     game_op = '+';
 }
 
-void gameStart(int type, int seed) {
+void gameStart(int message, int seed) {
     int small_count = 0;
-    int count = 6; 
+    int type; 
+    int timed;
+
+    if (message < MESSAGE_START || message >= MESSAGE_START_END) {
+	return;
+    }
+    message -= MESSAGE_START;
+
     setState(STATE_GAME);
-    type = encode(type, 9); 
+    type = encode(message, 8);
+    timed = (message >= 8); 
 
     if (seed >= 0) { 
 	randomSeed(seed);
     } else {
 	randomSeed(millis());
     }
-    if (type < 0) {
-	type = encode(encoder_count, 9);
-    }
-
-    game_timer = millis() + 91000;
-
     switch (type) {
     case 0:
-	gameInit(1000, random(5));
-	game_timer = 0; 
+	gameInit(20, 0);
 	break;
     case 1:
-	gameInit(1000, 0);	
+	gameInit(50, 0);	
 	break;
     case 2:
-	gameInit(1000, 1);
+	gameInit(100, 0);
 	break;
     case 3:
-	gameInit(1000, 2);
-	break;
     case 4:
-	gameInit(1000, 3);
-	break;
     case 5:
-	gameInit(1000, 4);
-	break;
     case 6:
-	gameInit(20, 0);
-	game_timer = 0; 
-	break;
     case 7:
-	gameInit(50, 0);
-	game_timer = 0; 
+	gameInit(1000, type - 3);
 	break;
-    case 8:
-	gameInit(100, 0);
-	game_timer = 0; 
-	break;
+    }
+    if (timed) {
+	game_timer = millis() + 91000;
+    } else {
+	game_timer = 0;
     }
 
     encoderReset(); 
@@ -451,6 +714,13 @@ ICACHE_RAM_ATTR void detectRotation() {
     int n = 0, m; 
     change = true; 
     switch (state) { 
+    case STATE_MENU:
+	if (DIR_CW == dir) {
+	    menu_state = menuNext(menu_state);
+	} else if (DIR_CCW == dir) {
+	    menu_state = menuPrev(menu_state);
+	}
+	break;
     case STATE_GAME:
 	if (button_state) { 
 	    if (encoder_pressed_count < 0) { 
@@ -489,7 +759,7 @@ ICACHE_RAM_ATTR void detectRotation() {
 	break;
     default:
 	if (DIR_CW == dir) {
-		encoder_count++;
+	    encoder_count++;
 	} else if (DIR_CCW == dir) {
 	    encoder_count--;
 	}
@@ -563,26 +833,16 @@ void detectPush() {
 
     change = true;  
     switch (state) {
-    case STATE_INTRO:
-	if (ACTION) {
-	    last_button_action = millis(); 
-	    setState(STATE_GAME_SELECT);
-	    clk = 0; 
+    case STATE_MENU:
+	if (ACTION) { 
+	    menuAction(menu_state);
 	}
 	break;
-    case STATE_GAME_SELECT:
+    case STATE_MESSAGE:
 	if (ACTION) {
-	    long seed = millis(); 
-	    last_button_action = millis(); 
-
-	    int game_type = encode(encoder_count, 9);
-	    if (game_type >= 1 && game_type < 6) { 
-		sendWiFiCommand(MESSAGE_START_0 + game_type - 1, seed);
-	    }
-	    gameStart(game_type, seed);
-	    clk = 0; 
+	    state = state_before_message;
 	}
-	break;
+	break; 
     case STATE_GAME:
 	if (ACTION) {
 	    last_button_action = millis(); 
@@ -645,7 +905,8 @@ void detectPush() {
     case STATE_END_GAME:
 	if (ACTION) {
 	    last_button_action = millis(); 
-	    setState(STATE_GAME_SELECT);
+	    setState(STATE_MENU);
+	    menu_state = MENU_COUNTDOWN_SELECT;
 	    clk = 0; 
 	}
 	break;
@@ -685,11 +946,12 @@ void setup() {
     // try to Connect to the Access Point
     WiFi.begin(ssid, password);
     int i; 
-    for (i=0 ; (WiFi.status() != WL_CONNECTED) && i<10 ; ++i) {
+    const int ntry = 40; 
+    for (i=0 ; (WiFi.status() != WL_CONNECTED) && i<ntry ; ++i) {
 	delay(200);
 	Serial.print(".");
     }
-    if (i < 10) {
+    if (i < ntry) {
 	server = false;
 	client = true; 
 	Serial.println("Connected to AP");
@@ -705,6 +967,7 @@ void setup() {
 	server = true;
 	client = false; 
 
+	WiFi.mode(WIFI_AP);
 	WiFi.softAP(ssid, password);
 	serverIP = WiFi.softAPIP();
 	Serial.print("AP IP address: ");
@@ -717,22 +980,11 @@ void setup() {
 }
 
 void startIncoming() {
-    switch(incoming.message) {
-    case MESSAGE_START_0:
-	gameStart(1, incoming.seed);
-	break;
-    case MESSAGE_START_1:
-	gameStart(2, incoming.seed);
-	break;
-    case MESSAGE_START_2:
-	gameStart(3, incoming.seed);
-	break;
-    case MESSAGE_START_3:
-	gameStart(4, incoming.seed);
-	break;
-    case MESSAGE_START_4:
-	gameStart(5, incoming.seed);
-	break;
+    if(incoming.message >= MESSAGE_START && incoming.message < MESSAGE_START_END) {
+	gameStart(incoming.message, incoming.seed);
+    }
+    if(incoming.message >= MENU_MESSAGE_YES && incoming.message < MENU_MESSAGE_LAST) {
+	messageSend(incoming.message);
     }
 }
 
@@ -748,15 +1000,21 @@ void listenWiFiCommand() {
 	// Store client IP and port from the packet metadata
 	clientIP = udp.remoteIP();
 
-	if (state == STATE_GAME_SELECT) {
-	    startIncoming(); 
+	switch (state) {
+	case STATE_MENU:
+	case STATE_MESSAGE:
+	    startIncoming();
+	    break;
 	}
     }
     if (client) {
 	Serial.printf("client received packet: %d %ld\n", incoming.message, incoming.seed);
 
-	if (state == STATE_GAME_SELECT) {
+	switch (state) {
+	case STATE_MENU:
+	case STATE_MESSAGE:
 	    startIncoming(); 
+	    break;
 	}
     }
 
@@ -782,18 +1040,12 @@ void loop() {
     listenWiFiCommand();
 
     switch(state) {
-    case STATE_INTRO:
-	drawFrameIntro(display);
-	if (clk > 100) {
-	    setState(STATE_GAME_SELECT);
-	} else {
-	    break;
-	}
-    case STATE_GAME_SELECT:
-	if (change) {
-	    drawFrameSelect(display);
-	}
+    case STATE_MENU:
+	drawFrameMenu(display);
 	break;
+    case STATE_MESSAGE:
+	drawMessage(display);
+	break; 
     case STATE_GAME:
 	drawFrameGame(display);
 	if (game_timer > 0 && game_timer < millis ()) {
