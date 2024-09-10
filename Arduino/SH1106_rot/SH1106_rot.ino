@@ -22,7 +22,6 @@ bool client = false;
 
 
 
-
 struct incoming_t {
     int message; 
     long seed; 
@@ -41,6 +40,10 @@ struct incoming_t {
 #define OLED_RESET  D0   // RESET
 #define OLED_DC     D3   // Data/Command
 #define OLED_CS     D8   // Chip select
+
+
+//buzzer
+#define TONE_PIN (D6)
 
 bool change = false; 
 int button_state = 0;
@@ -65,11 +68,18 @@ char game_op_cur[12]; // rotation ops for the current press and rotate session
 
 Rotary * rotary; 
 
+#define TONE_MIN 100
+#define TONE_MAX 2400
+
+int state_tone = 500; 
+int state_ban_tone_traffic = 0; 
+
 enum {
     STATE_MENU = 1, 
     STATE_GAME,
     STATE_MESSAGE,
-    STATE_END_GAME
+    STATE_END_GAME,
+    STATE_TONE
 };
 
 int state = STATE_MENU; 
@@ -91,6 +101,7 @@ enum {
     MENU_FIRST=100,
     MENU_COUNTDOWN_SELECT,
     MENU_MESSAGE_SELECT,
+    MENU_TONE_SELECT,
 
     MENU_COUNTDOWN_TIMED_SELECT,
     MENU_COUNTDOWN_FREE_SELECT,
@@ -104,7 +115,7 @@ enum {
     MENU_COUNTDOWN_3,
     MENU_COUNTDOWN_4,
 
-
+    MENU_MESSAGE_QUIT,
     MENU_MESSAGE_YES,
     MENU_MESSAGE_NO,
     MENU_MESSAGE_LATER,    
@@ -135,7 +146,10 @@ int menuNext(int entry) {
     case MENU_COUNTDOWN_SELECT:
 	return MENU_MESSAGE_SELECT;
     case MENU_MESSAGE_SELECT:
+	return MENU_TONE_SELECT;
+    case MENU_TONE_SELECT:
 	return MENU_COUNTDOWN_SELECT;
+
 
     case MENU_COUNTDOWN_TIMED_SELECT:
 	return MENU_COUNTDOWN_FREE_SELECT;
@@ -161,6 +175,9 @@ int menuNext(int entry) {
 	return MENU_COUNTDOWN_0;
 
 
+
+    case MENU_MESSAGE_QUIT:
+	return MENU_MESSAGE_YES;
     case MENU_MESSAGE_YES:
 	return MENU_MESSAGE_NO;
     case MENU_MESSAGE_NO:
@@ -178,7 +195,7 @@ int menuNext(int entry) {
     case MENU_MESSAGE_WATER:
 	return MENU_MESSAGE_BUBBLE_WATER;
     case MENU_MESSAGE_BUBBLE_WATER:
-	return MENU_MESSAGE_YES;
+	return MENU_MESSAGE_QUIT;
 
     default:
 	return MENU_FAIL; 
@@ -189,9 +206,11 @@ int menuNext(int entry) {
 int menuPrev(int entry) {
     switch(entry) {
     case MENU_COUNTDOWN_SELECT:
-	return MENU_MESSAGE_SELECT;
+	return MENU_TONE_SELECT;
     case MENU_MESSAGE_SELECT:
 	return MENU_COUNTDOWN_SELECT;
+    case MENU_TONE_SELECT:
+	return MENU_MESSAGE_SELECT;
 
     case MENU_COUNTDOWN_TIMED_SELECT:
 	return MENU_COUNTDOWN_FREE_SELECT;
@@ -217,8 +236,10 @@ int menuPrev(int entry) {
 	return MENU_COUNTDOWN_3;
 
 
-    case MENU_MESSAGE_YES:
+    case MENU_MESSAGE_QUIT:
 	return MENU_MESSAGE_BUBBLE_WATER;
+    case MENU_MESSAGE_YES:
+	return MENU_MESSAGE_QUIT;
     case MENU_MESSAGE_NO:
 	return MENU_MESSAGE_YES;
     case MENU_MESSAGE_LATER:
@@ -246,6 +267,8 @@ const char* menuString(int entry) {
 	return "Countdown";
     case MENU_MESSAGE_SELECT:
 	return "Message";
+    case MENU_TONE_SELECT:
+	return "Beep";
 
     case MENU_COUNTDOWN_TIMED_SELECT:
 	return "Timed Contest";
@@ -269,6 +292,10 @@ const char* menuString(int entry) {
 	return "3 large";
     case MENU_COUNTDOWN_4:
 	return "4 large";
+
+
+    case MENU_MESSAGE_QUIT:
+	return "<<<";
     case MENU_MESSAGE_YES:
 	return "DA";
     case MENU_MESSAGE_NO:
@@ -330,6 +357,12 @@ void menuAction(int entry) {
     case MENU_COUNTDOWN_SELECT:
 	menu_state = MENU_COUNTDOWN_TIMED_SELECT;
 	break;
+    case MENU_TONE_SELECT:
+	state = STATE_TONE; 
+	tone(TONE_PIN, state_tone);
+	sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	state_ban_tone_traffic = 0; 
+	break;
     case MENU_MESSAGE_SELECT:
 	menu_state = MENU_MESSAGE_YES;
 	break;
@@ -361,7 +394,9 @@ void menuAction(int entry) {
 	menuCountDownStart();
 	break;
 
-
+    case MENU_MESSAGE_QUIT:
+	menu_state = MENU_MESSAGE_SELECT;
+	break;
     case MENU_MESSAGE_YES:
     case MENU_MESSAGE_NO:
     case MENU_MESSAGE_LATER:
@@ -691,6 +726,24 @@ void updateBest() {
     }
 }
 
+
+void drawTone(SH1106 &display) {
+    display.clear();
+    display.setColor(WHITE);
+
+    double m = log(TONE_MIN);
+    double M = log(TONE_MAX);
+    double x = log(state_tone);
+
+    int proc = (int)100.0 * (x - m) / (M - m);
+
+    display.drawRect(14, 30, 101, 5);
+    display.fillRect(15, 31, proc, 4);
+
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.drawString(64, 40, String(proc));
+}
+
 void drawFrameEndGame(SH1106 &display) {
     display.clear();
 //    p(display, 54, String (digitalRead(ROT_A)) + String (digitalRead(ROT_B)) + String (digitalRead(ROT_C)));
@@ -713,7 +766,23 @@ ICACHE_RAM_ATTR void detectRotation() {
     int dir = rotary->process(); 
     int n = 0, m; 
     change = true; 
-    switch (state) { 
+    switch (state) {
+    case STATE_TONE:  
+	if (DIR_CW == dir) {
+	    state_tone = (int)state_tone * 1.1;
+	    if (state_tone > TONE_MAX) {
+		state_tone = TONE_MAX;
+	    }
+	    sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	} else if (DIR_CCW == dir) {
+	    state_tone = (int)state_tone * 0.9;
+	    if (state_tone < TONE_MIN) {
+		state_tone = TONE_MIN;
+	    }
+	    sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	}
+	tone(TONE_PIN, state_tone);
+	break; 
     case STATE_MENU:
 	if (DIR_CW == dir) {
 	    menu_state = menuNext(menu_state);
@@ -832,19 +901,20 @@ void detectPush() {
     }
 
     change = true;  
-    switch (state) {
-    case STATE_MENU:
-	if (ACTION) { 
+    if (ACTION) {
+	switch (state) {
+	case STATE_TONE:
+	    noTone(TONE_PIN);
+	    state = STATE_MENU;
+	    state_ban_tone_traffic = 1; 
+	    break;
+	case STATE_MENU:
 	    menuAction(menu_state);
-	}
-	break;
-    case STATE_MESSAGE:
-	if (ACTION) {
+	    break;
+	case STATE_MESSAGE:
 	    state = state_before_message;
-	}
-	break; 
-    case STATE_GAME:
-	if (ACTION) {
+	    break; 
+	case STATE_GAME:
 	    last_button_action = millis(); 
 
 	    switch(game_op) {
@@ -900,16 +970,14 @@ void detectPush() {
 		updateBest();
 		break;
 	    }
-	}
-	break;
-    case STATE_END_GAME:
-	if (ACTION) {
+	    break;
+	case STATE_END_GAME:
 	    last_button_action = millis(); 
 	    setState(STATE_MENU);
 	    menu_state = MENU_COUNTDOWN_SELECT;
 	    clk = 0; 
+	    break;
 	}
-	break;
     }
     if (!new_button_state) {
 	last_button_action = millis(); 
@@ -977,9 +1045,17 @@ void setup() {
 	udp.begin(port);
 	Serial.printf("Listening on UDP port %d\n", port);
     }
+
+    pinMode(TONE_PIN, OUTPUT);
 }
 
 void startIncoming() {
+    if (incoming.message == MENU_TONE_SELECT && !state_ban_tone_traffic) {
+	state_tone = incoming.seed;
+	tone(TONE_PIN, state_tone);
+	state = STATE_TONE; 
+	return; 
+    }
     if(incoming.message >= MESSAGE_START && incoming.message < MESSAGE_START_END) {
 	gameStart(incoming.message, incoming.seed);
     }
@@ -1003,6 +1079,7 @@ void listenWiFiCommand() {
 	switch (state) {
 	case STATE_MENU:
 	case STATE_MESSAGE:
+	case STATE_TONE:
 	    startIncoming();
 	    break;
 	}
@@ -1013,6 +1090,7 @@ void listenWiFiCommand() {
 	switch (state) {
 	case STATE_MENU:
 	case STATE_MESSAGE:
+	case STATE_TONE:
 	    startIncoming(); 
 	    break;
 	}
@@ -1040,6 +1118,9 @@ void loop() {
     listenWiFiCommand();
 
     switch(state) {
+    case STATE_TONE:
+	drawTone (display);
+	break;
     case STATE_MENU:
 	drawFrameMenu(display);
 	break;
