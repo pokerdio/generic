@@ -10,7 +10,7 @@
 const char* ssid = "COUNTDOWN-735";    // SSID of the access point
 const char* password = "5432154321";  // Password for the access point
 
-void sendWiFiCommand(int message, long seed);
+void sendWiFiCommand(int message, long data);
 
 WiFiUDP udp;
 IPAddress serverIP;    // IP of the AP
@@ -22,11 +22,34 @@ bool client = false;
 
 
 
-struct incoming_t {
+struct {
     int message; 
-    long seed; 
+    union { 
+	long data;
+	unsigned char ubytes[4];
+	char bytes[4];
+    };
 } incoming; 
- 
+
+
+#define PONG_PAD_WIDTH 8
+
+struct {
+    char ys; //server pad height
+    char yc; //client pad height
+
+    char bx; //ball x
+    char by; //ball y
+
+    char dirx;
+    char diry; 
+
+    unsigned char score_s;
+    unsigned char score_c;
+
+    int update_required; 
+} pong; 
+
 
 //one board has a square rotary encoder, one has a square one of a different model, hence slightly different code
 //#define ROUND
@@ -72,6 +95,7 @@ Rotary * rotary;
 #define TONE_MAX 2400
 
 int state_tone = 500; 
+int state_send_tone = 0; 
 int state_ban_tone_traffic = 0; 
 
 enum {
@@ -79,6 +103,7 @@ enum {
     STATE_GAME,
     STATE_MESSAGE,
     STATE_END_GAME,
+    STATE_PONG,
     STATE_TONE
 };
 
@@ -91,6 +116,7 @@ int clk = 0;
 SH1106 display(true, OLED_RESET, OLED_DC, OLED_CS); // FOR SPI
 
 
+// this has both menu IDs and packet message IDS
 enum {
     MENU_FAIL = -1,
     MESSAGE_HELLO = 50, 
@@ -102,6 +128,8 @@ enum {
     MENU_COUNTDOWN_SELECT,
     MENU_MESSAGE_SELECT,
     MENU_TONE_SELECT,
+    MENU_PONG_SELECT,
+    MENU_PONG_QUIT,
 
     MENU_COUNTDOWN_TIMED_SELECT,
     MENU_COUNTDOWN_FREE_SELECT,
@@ -148,6 +176,8 @@ int menuNext(int entry) {
     case MENU_MESSAGE_SELECT:
 	return MENU_TONE_SELECT;
     case MENU_TONE_SELECT:
+	return MENU_PONG_SELECT;
+    case MENU_PONG_SELECT:
 	return MENU_COUNTDOWN_SELECT;
 
 
@@ -206,11 +236,15 @@ int menuNext(int entry) {
 int menuPrev(int entry) {
     switch(entry) {
     case MENU_COUNTDOWN_SELECT:
-	return MENU_TONE_SELECT;
+	return MENU_PONG_SELECT;
     case MENU_MESSAGE_SELECT:
 	return MENU_COUNTDOWN_SELECT;
     case MENU_TONE_SELECT:
 	return MENU_MESSAGE_SELECT;
+    case MENU_PONG_SELECT:
+	return MENU_TONE_SELECT;
+
+
 
     case MENU_COUNTDOWN_TIMED_SELECT:
 	return MENU_COUNTDOWN_FREE_SELECT;
@@ -269,6 +303,8 @@ const char* menuString(int entry) {
 	return "Message";
     case MENU_TONE_SELECT:
 	return "Beep";
+    case MENU_PONG_SELECT:
+	return "Pong";
 
     case MENU_COUNTDOWN_TIMED_SELECT:
 	return "Timed Contest";
@@ -349,11 +385,107 @@ void messageSend(int entry) {
 	state_before_message = state;
     }
     state = STATE_MESSAGE;
+    noTone(TONE_PIN);
     state_message = entry; 
+}
+
+void pongBallReset(void) {
+    pong.dirx = 1 - random(0, 2) * 2;
+    pong.diry = 1 - random(0, 2) * 2;
+
+    pong.bx = 64;
+    pong.by = 32;
+}
+
+void menuPongStart(void) {
+    pongBallReset(); 
+
+    pong.ys = 32;  //server
+    pong.yc = 32;  //client
+
+    state = STATE_PONG; 
+    pong.score_s = 0;
+    pong.score_c = 0; 
+}
+
+
+void pongSend(int send_ball) {
+    pong.update_required = 0; 
+    if (server) {
+	incoming.bytes[0] = pong.ys;
+	incoming.bytes[1] = pong.score_c;//server keeps track of own goals, which raise score_c
+    } else {
+	incoming.bytes[0] = pong.yc;
+	incoming.bytes[1] = pong.score_s;//client keeps track of own goals, which raise score_s
+    }
+
+    if (!send_ball) {
+	incoming.bytes[2] = -128;
+	incoming.bytes[3] = -128;
+	sendWiFiCommand(MENU_PONG_SELECT, incoming.data);
+	return; 
+    }
+
+    if (pong.dirx > 0) {
+	incoming.bytes[2] = pong.bx;
+    }  else {
+	incoming.bytes[2] = -pong.bx;
+    }
+    if (pong.diry > 0) {
+	incoming.bytes[3] = pong.by;
+    }  else {
+	incoming.bytes[3] = -pong.by;
+    }
+
+    sendWiFiCommand(MENU_PONG_SELECT, incoming.data);
+}
+
+void shortBeep(void) {
+    tone(TONE_PIN, 1200, 20);
+}
+
+void longBeep(void) {
+    tone(TONE_PIN, 1200, 150);
+}
+
+void pongRecv(void) {
+    int beep = 0; 
+    if (client) {
+	pong.ys = incoming.bytes[0];
+	if (pong.score_c != incoming.bytes[1]) {
+	    pong.score_c = incoming.bytes[1];
+	    longBeep();
+	    beep = 1; 
+	}
+    } else {
+	pong.yc = incoming.bytes[0];
+	if (pong.score_s != incoming.bytes[1]) {
+	    pong.score_s = incoming.bytes[1];
+	    longBeep();
+	    beep = 1; 
+	}
+    }
+    char old_dirx = pong.dirx;
+    if (incoming.bytes[2] > -128)  {
+	pong.bx = abs(incoming.bytes[2]);
+	pong.by = abs(incoming.bytes[3]);
+
+	if ((client && pong.bx < 40) || (server && pong.bx > 80)) {
+	    pong.dirx = (incoming.bytes[2] > 0) ? 1 : -1; 
+	    pong.diry = (incoming.bytes[3] > 0) ? 1 : -1; 
+	}
+	if (!beep && old_dirx != pong.dirx) {
+	    shortBeep();
+	}
+    }
 }
 
 void menuAction(int entry) {
     switch (entry) {
+    case MENU_PONG_SELECT:
+	menuPongStart();
+	pongSend(1); 
+	break;
     case MENU_COUNTDOWN_SELECT:
 	menu_state = MENU_COUNTDOWN_TIMED_SELECT;
 	break;
@@ -414,8 +546,6 @@ void menuAction(int entry) {
 	break;
     };
 }
-
-
 
 int getPos(void);
 
@@ -686,6 +816,7 @@ void gameStart(int message, int seed) {
 	game_timer = 0;
     }
 
+    noTone(TONE_PIN);
     encoderReset(); 
     encoder_active_rotation = false;
     encoder_count = 0; 
@@ -762,26 +893,69 @@ void drawFrameEndGame(SH1106 &display) {
     }
 }
 
+void drawFrameDebug(SH1106 &display) {
+    return;
+    display.setColor(WHITE);
+    display.setTextAlignment(TEXT_ALIGN_RIGHT);
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(125, 1, String(ESP.getFreeHeap()));
+}
+
+
 ICACHE_RAM_ATTR void detectRotation() {
     int dir = rotary->process(); 
     int n = 0, m; 
+    int old; 
     change = true; 
     switch (state) {
+    case STATE_PONG:
+	if (DIR_CW == dir) {
+	    m = -2;
+	} else if (DIR_CCW == dir) {
+	    m = 2;
+	} else {
+	    break;
+	}
+	if (server) {
+	    old = pong.ys; 
+	    pong.ys += m;
+	    if (pong.ys > 63 - PONG_PAD_WIDTH) {
+		pong.ys = 63 - PONG_PAD_WIDTH;
+	    }
+	    if (pong.ys < PONG_PAD_WIDTH) {
+		pong.ys = PONG_PAD_WIDTH;
+	    }
+	    if (pong.ys != old) {
+		pong.update_required = 1; 
+	    }
+	} else {
+	    old = pong.yc; 
+	    pong.yc += m;	    
+	    if (pong.yc > 63 - PONG_PAD_WIDTH) {
+		pong.yc = 63 - PONG_PAD_WIDTH;
+	    }
+	    if (pong.yc < PONG_PAD_WIDTH) {
+		pong.yc = PONG_PAD_WIDTH;
+	    }
+	    if (pong.yc != old) {
+		pong.update_required = 1; 
+	    }
+	}
+	break;	
     case STATE_TONE:  
 	if (DIR_CW == dir) {
 	    state_tone = (int)state_tone * 1.1;
 	    if (state_tone > TONE_MAX) {
 		state_tone = TONE_MAX;
 	    }
-	    sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	    state_send_tone = 1; 
 	} else if (DIR_CCW == dir) {
 	    state_tone = (int)state_tone * 0.9;
 	    if (state_tone < TONE_MIN) {
 		state_tone = TONE_MIN;
 	    }
-	    sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	    state_send_tone = 1; 
 	}
-	tone(TONE_PIN, state_tone);
 	break; 
     case STATE_MENU:
 	if (DIR_CW == dir) {
@@ -903,6 +1077,13 @@ void detectPush() {
     change = true;  
     if (ACTION) {
 	switch (state) {
+	case STATE_PONG:
+	    noTone(TONE_PIN);
+	    state = STATE_MENU;
+	    sendWiFiCommand(MENU_PONG_QUIT, 0); 
+	    delay(50);
+	    sendWiFiCommand(MENU_PONG_QUIT, 0); 
+	    break;
 	case STATE_TONE:
 	    noTone(TONE_PIN);
 	    state = STATE_MENU;
@@ -1049,20 +1230,28 @@ void setup() {
     pinMode(TONE_PIN, OUTPUT);
 }
 
-void startIncoming() {
+void startIncoming(void) {
+    if (incoming.message == MENU_PONG_SELECT && state != STATE_PONG)  {
+	menuPongStart(); 
+	pongRecv(); 
+	noTone(TONE_PIN);
+	return;
+    }
+    
     if (incoming.message == MENU_TONE_SELECT && !state_ban_tone_traffic) {
-	state_tone = incoming.seed;
+	state_tone = incoming.data;
 	tone(TONE_PIN, state_tone);
 	state = STATE_TONE; 
 	return; 
     }
     if(incoming.message >= MESSAGE_START && incoming.message < MESSAGE_START_END) {
-	gameStart(incoming.message, incoming.seed);
+	gameStart(incoming.message, incoming.data);
     }
     if(incoming.message >= MENU_MESSAGE_YES && incoming.message < MENU_MESSAGE_LAST) {
 	messageSend(incoming.message);
     }
 }
+
 
 void listenWiFiCommand() {
     int packetSize = udp.parsePacket();
@@ -1072,22 +1261,42 @@ void listenWiFiCommand() {
     udp.read((char*)&incoming, sizeof(incoming));    
     if (server) {
 	// Print the received packet
-	Serial.printf("server received packet: %d %ld\n", incoming.message, incoming.seed);
+	Serial.printf("server received packet: %d %ld\n", incoming.message, incoming.data);
 	// Store client IP and port from the packet metadata
 	clientIP = udp.remoteIP();
 
 	switch (state) {
+	case STATE_PONG:
+	    if (incoming.message == MENU_PONG_SELECT) {
+		pongRecv();
+	    }
+	    if (incoming.message == MENU_PONG_QUIT) {
+		state = STATE_MENU;
+		noTone(TONE_PIN);
+		menu_state = MENU_PONG_SELECT;
+	    }
+	    break;
 	case STATE_MENU:
 	case STATE_MESSAGE:
 	case STATE_TONE:
-	    startIncoming();
+	    if (incoming.message == MENU_PONG_SELECT) {
+		startIncoming();
+	    }
+	    if (incoming.message == MENU_PONG_QUIT) {
+		state = STATE_MENU;
+		noTone(TONE_PIN);
+		menu_state = MENU_PONG_SELECT;
+	    }
 	    break;
 	}
     }
     if (client) {
-	Serial.printf("client received packet: %d %ld\n", incoming.message, incoming.seed);
+	Serial.printf("client received packet: %d %ld\n", incoming.message, incoming.data);
 
 	switch (state) {
+	case STATE_PONG:
+	    pongRecv();
+	    break;
 	case STATE_MENU:
 	case STATE_MESSAGE:
 	case STATE_TONE:
@@ -1098,26 +1307,132 @@ void listenWiFiCommand() {
 
 }
 
-void sendWiFiCommand(int message, long seed) {
+void sendWiFiCommand(int message, long data) {
+    int ret; 
     incoming.message = message;
-    incoming.seed = seed;
+    incoming.data = data;
 
     if (client) { 
-	Serial.printf("client sending packet: %d %ld\n", message, seed);
-	udp.beginPacket(serverIP, port);
+	Serial.printf("client sending packet: %d %ld\n", message, data);
+	ret = udp.beginPacket(serverIP, port);
     } else {
-	Serial.printf("server sending packet: %d %ld\n", message, seed);
-	udp.beginPacket(clientIP, port);	
+	Serial.printf("server sending packet: %d %ld\n", message, data);
+	ret = udp.beginPacket(clientIP, port);	
     }
+    if (!ret) {
+	Serial.printf("beginPacket fail\n");
+	return;
+    }
+
     udp.write((char*)&incoming, sizeof(incoming));
-    udp.endPacket(); 
+    if (!udp.endPacket()) {
+	switch(WiFi.status()) {
+	case WL_CONNECTED:
+	    Serial.printf("endPacket fail; status connected\n");
+	    break;
+	case WL_CONNECT_FAILED:
+	    Serial.printf("endPacket fail; status connect failed \n");
+	    break;
+	case WL_NO_SSID_AVAIL:
+	    Serial.printf("endPacket fail; status no ssid avail\n");
+	    break;
+	case WL_DISCONNECTED:
+	    Serial.printf("endPacket fail; status disconnected\n");
+	    break;
+	case WL_CONNECTION_LOST:
+	    Serial.printf("endPacket fail; status connection lost\n");
+	    break;
+	default:
+	    Serial.printf("endPacket fail; status other\n");
+	    break;
+	}
+    } 
+}
+
+void pongTick () {
+    if (pong.dirx == 1 && pong.bx < 127) {
+	pong.bx++; 
+    }
+    if (pong.dirx == -1 && pong.bx > 0) {
+	pong.bx--; 
+    }
+    if (pong.diry == 1 && pong.by < 63) {
+	pong.by++; 
+    }
+    if (pong.diry == -1 && pong.by > 0) {
+	pong.by--; 
+    }
+
+    if (pong.by <= 0) {
+	pong.diry = 1; 
+    }
+    if (pong.by >= 63) {
+	pong.diry = -1; 
+    }
+
+    if (server) {
+	if ((pong.dirx == -1) && (pong.bx == 2) && abs((int)pong.by - (int)pong.ys) <= PONG_PAD_WIDTH) { //boink
+	    pong.dirx = 1; 
+	    shortBeep(); 
+	    pongSend(1); 
+	} else if (pong.bx <= 0) {
+	    pong.score_c++; 
+	    pongBallReset();
+	    longBeep(); 
+	    pongSend(1);
+	}
+	if (((pong.bx == 4) || (pong.bx == 8) || (pong.bx == 68)) && pong.dirx == 1) {
+	    pongSend(1);  // redundancy sends
+	}
+    } else if (client) {
+	if ((pong.dirx == 1) && (pong.bx == 125) && abs((int)pong.by - (int)pong.yc) <= PONG_PAD_WIDTH) { //boink
+	    pong.dirx = -1; 
+	    shortBeep(); 
+	    pongSend(1); 
+	} else if (pong.bx >= 127) {
+	    pong.score_s++; 
+	    pongBallReset();
+	    longBeep(); 
+	    pongSend(1); 
+	}
+	if (((pong.bx == 122) || (pong.bx == 116) || (pong.bx == 58)) && pong.dirx == -1) {
+	    pongSend(1);  // redundancy sends
+	}
+    }
+}
+
+void drawPong (SH1106 &display) {
+    display.clear();     
+    display.fillRect(2, pong.ys - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);
+    display.fillRect(125, pong.yc - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);    
+    display.fillRect(pong.bx - 1, pong.by - 1, 3, 3);
+
+    display.setTextAlignment(TEXT_ALIGN_CENTER);
+    display.setFont(ArialMT_Plain_10);
+    display.drawString(20, 3, String((int)pong.score_s));
+    display.drawString(107, 3, String((int)pong.score_c));
 }
 
 void loop() {
     detectPush();
     listenWiFiCommand();
 
+    if (state_send_tone) {
+	tone(TONE_PIN, state_tone);
+	sendWiFiCommand(MENU_TONE_SELECT, state_tone);
+	state_send_tone = 0;
+    }
+
     switch(state) {
+    case STATE_PONG:
+	pongTick();
+	pongTick();
+
+	if (pong.update_required) {
+	    pongSend(0); 
+	}
+	drawPong(display); 
+	break;
     case STATE_TONE:
 	drawTone (display);
 	break;
@@ -1139,6 +1454,7 @@ void loop() {
     }
     change = false; 
 
+    drawFrameDebug(display);
     display.display();
     clk++;
     delay(20);
