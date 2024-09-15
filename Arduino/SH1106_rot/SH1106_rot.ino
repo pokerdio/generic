@@ -26,8 +26,8 @@ struct {
     int message; 
     union { 
 	long data;
-	unsigned char ubytes[4];
-	char bytes[4];
+	uint8_t ubytes[4];
+	int8_t bytes[4];
     };
 } incoming; 
 
@@ -35,17 +35,17 @@ struct {
 #define PONG_PAD_WIDTH 8
 
 struct {
-    char ys; //server pad height
-    char yc; //client pad height
+    int ys; //server pad height
+    int yc; //client pad height
+    
+    int bx; //ball x
+    int by; //ball y
 
-    char bx; //ball x
-    char by; //ball y
+    int dirx;
+    int diry; 
 
-    char dirx;
-    char diry; 
-
-    unsigned char score_s;
-    unsigned char score_c;
+    int score_s;
+    int score_c;
 
     int update_required; 
 } pong; 
@@ -467,10 +467,10 @@ void pongRecv(void) {
     }
     char old_dirx = pong.dirx;
     if (incoming.bytes[2] > -128)  {
-	pong.bx = abs(incoming.bytes[2]);
-	pong.by = abs(incoming.bytes[3]);
+	pong.bx = abs((int)incoming.bytes[2]);
+	pong.by = abs((int)incoming.bytes[3]);
 
-	if ((client && pong.bx < 40) || (server && pong.bx > 80)) {
+	if ((client && pong.bx < 80) || (server && pong.bx > 40)) {
 	    pong.dirx = (incoming.bytes[2] > 0) ? 1 : -1; 
 	    pong.diry = (incoming.bytes[3] > 0) ? 1 : -1; 
 	}
@@ -898,7 +898,9 @@ void drawFrameDebug(SH1106 &display) {
     display.setColor(WHITE);
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
     display.setFont(ArialMT_Plain_10);
-    display.drawString(125, 1, String(ESP.getFreeHeap()));
+    display.drawString(125, 50, String(incoming.data) + String(" ") + 
+		       String((int)incoming.bytes[2]) + String(" ") + 
+		       String(String((int)incoming.bytes[3])));
 }
 
 
@@ -1279,14 +1281,10 @@ void listenWiFiCommand() {
 	case STATE_MENU:
 	case STATE_MESSAGE:
 	case STATE_TONE:
-	    if (incoming.message == MENU_PONG_SELECT) {
-		startIncoming();
-	    }
 	    if (incoming.message == MENU_PONG_QUIT) {
-		state = STATE_MENU;
-		noTone(TONE_PIN);
-		menu_state = MENU_PONG_SELECT;
+		break; 
 	    }
+	    startIncoming();
 	    break;
 	}
     }
@@ -1295,11 +1293,21 @@ void listenWiFiCommand() {
 
 	switch (state) {
 	case STATE_PONG:
-	    pongRecv();
+	    if (incoming.message == MENU_PONG_SELECT) {
+		pongRecv();
+	    }
+	    if (incoming.message == MENU_PONG_QUIT) {
+		state = STATE_MENU;
+		noTone(TONE_PIN);
+		menu_state = MENU_PONG_SELECT;
+	    }
 	    break;
 	case STATE_MENU:
 	case STATE_MESSAGE:
 	case STATE_TONE:
+	    if (incoming.message == MENU_PONG_QUIT) {
+		break; 
+	    }
 	    startIncoming(); 
 	    break;
 	}
