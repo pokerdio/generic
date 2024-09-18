@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
-#include "SH1106.h"
+#include "mySH1106.h"
 
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -28,11 +28,12 @@ struct {
 	long data;
 	uint8_t ubytes[4];
 	int8_t bytes[4];
+	float floats[2];
     };
 } incoming; 
 
 
-#define PONG_PAD_WIDTH 8
+#define PONG_PAD_WIDTH 6
 
 struct {
     int ys; //server pad height
@@ -48,6 +49,7 @@ struct {
     int score_c;
 
     int update_required; 
+    int ball_reset_update_required;  
 } pong; 
 
 
@@ -67,6 +69,9 @@ struct {
 
 //buzzer
 #define TONE_PIN (D6)
+
+int trill_count = 0; 
+int beep_beep_count = 0; 
 
 bool change = false; 
 int button_state = 0;
@@ -128,6 +133,9 @@ enum {
     MENU_COUNTDOWN_SELECT,
     MENU_MESSAGE_SELECT,
     MENU_TONE_SELECT,
+    MENU_TONE_QUIT,
+
+
     MENU_PONG_SELECT,
     MENU_PONG_QUIT,
 
@@ -394,11 +402,12 @@ void pongBallReset(void) {
     pong.diry = 1 - random(0, 2) * 2;
 
     pong.bx = 64;
-    pong.by = 32;
+    pong.by = 32 + 7 - random(0, 15);
 }
 
 void menuPongStart(void) {
     pongBallReset(); 
+    pong.ball_reset_update_required = 3; 
 
     pong.ys = 32;  //server
     pong.yc = 32;  //client
@@ -563,14 +572,6 @@ int encode(int n, int div) {
 	}
     }
     return n; 
-}
-
-
-void p(SH1106 &display, int y, const String & s) {
-    display.setColor(WHITE);
-    display.setTextAlignment(TEXT_ALIGN_RIGHT);
-    display.setFont(ArialMT_Plain_10);
-    display.drawString(128, y, s);
 }
 
 
@@ -832,7 +833,6 @@ void drawFrameGame(SH1106 &display) {
     String empty = "";
 
     display.clear();
-//    p(display, 44, String (digitalRead(ROT_A)) + String (digitalRead(ROT_B)) + String (digitalRead(ROT_C)));
     for (int i=0 ; i<6 ; ++i) {
 	if (game_value[i] <= 0) {
 	    continue; 
@@ -877,7 +877,6 @@ void drawTone(SH1106 &display) {
 
 void drawFrameEndGame(SH1106 &display) {
     display.clear();
-//    p(display, 54, String (digitalRead(ROT_A)) + String (digitalRead(ROT_B)) + String (digitalRead(ROT_C)));
     display.setColor(WHITE);
     display.setTextAlignment(TEXT_ALIGN_CENTER);
     display.setFont(ArialMT_Plain_24);
@@ -893,14 +892,11 @@ void drawFrameEndGame(SH1106 &display) {
     }
 }
 
-void drawFrameDebug(SH1106 &display) {
-    return;
+void drawFrameDebug(SH1106 &display, int value) {
     display.setColor(WHITE);
     display.setTextAlignment(TEXT_ALIGN_RIGHT);
     display.setFont(ArialMT_Plain_10);
-    display.drawString(125, 50, String(incoming.data) + String(" ") + 
-		       String((int)incoming.bytes[2]) + String(" ") + 
-		       String(String((int)incoming.bytes[3])));
+    display.drawString(125, 50, String(value));
 }
 
 
@@ -1071,9 +1067,11 @@ void delSelected() {
 void detectPush() {
     int new_button_state = !digitalRead(ROT_C);
     int i;
-
     if (!new_button_state) {
 	encoderReset(); 
+    }
+    if (state_ban_tone_traffic > 0) {
+	state_ban_tone_traffic--; 
     }
 
     change = true;  
@@ -1089,13 +1087,19 @@ void detectPush() {
 	case STATE_TONE:
 	    noTone(TONE_PIN);
 	    state = STATE_MENU;
-	    state_ban_tone_traffic = 1; 
+	    state_ban_tone_traffic = 10; 
+	    sendWiFiCommand(MENU_TONE_QUIT, 0); 
+	    delay(50);
+	    sendWiFiCommand(MENU_TONE_QUIT, 0); 
 	    break;
 	case STATE_MENU:
 	    menuAction(menu_state);
 	    break;
 	case STATE_MESSAGE:
 	    state = state_before_message;
+	    trill_count = 0;
+	    beep_beep_count = 0; 
+	    noTone(TONE_PIN);
 	    break; 
 	case STATE_GAME:
 	    last_button_action = millis(); 
@@ -1173,9 +1177,7 @@ void detectPush() {
 
 
 void setup() {
-
     delay(10);
-
     Serial.begin(9600);
     Serial.println("connecting");
 
@@ -1251,6 +1253,7 @@ void startIncoming(void) {
     }
     if(incoming.message >= MENU_MESSAGE_YES && incoming.message < MENU_MESSAGE_LAST) {
 	messageSend(incoming.message);
+	beep_beep_count = 3; 
     }
 }
 
@@ -1266,53 +1269,36 @@ void listenWiFiCommand() {
 	Serial.printf("server received packet: %d %ld\n", incoming.message, incoming.data);
 	// Store client IP and port from the packet metadata
 	clientIP = udp.remoteIP();
-
-	switch (state) {
-	case STATE_PONG:
-	    if (incoming.message == MENU_PONG_SELECT) {
-		pongRecv();
-	    }
-	    if (incoming.message == MENU_PONG_QUIT) {
-		state = STATE_MENU;
-		noTone(TONE_PIN);
-		menu_state = MENU_PONG_SELECT;
-	    }
-	    break;
-	case STATE_MENU:
-	case STATE_MESSAGE:
-	case STATE_TONE:
-	    if (incoming.message == MENU_PONG_QUIT) {
-		break; 
-	    }
-	    startIncoming();
-	    break;
-	}
-    }
-    if (client) {
+    } else     if (client) {
 	Serial.printf("client received packet: %d %ld\n", incoming.message, incoming.data);
-
-	switch (state) {
-	case STATE_PONG:
-	    if (incoming.message == MENU_PONG_SELECT) {
-		pongRecv();
-	    }
-	    if (incoming.message == MENU_PONG_QUIT) {
-		state = STATE_MENU;
-		noTone(TONE_PIN);
-		menu_state = MENU_PONG_SELECT;
-	    }
-	    break;
-	case STATE_MENU:
-	case STATE_MESSAGE:
-	case STATE_TONE:
-	    if (incoming.message == MENU_PONG_QUIT) {
-		break; 
-	    }
-	    startIncoming(); 
+    }
+    switch (state) {
+    case STATE_PONG:
+	if (incoming.message == MENU_PONG_SELECT) {
+	    pongRecv();
+	}
+	if (incoming.message == MENU_PONG_QUIT) {
+	    state = STATE_MENU;
+	    noTone(TONE_PIN);
+	    menu_state = MENU_PONG_SELECT;
+	}
+	break;
+    case STATE_TONE:
+	if (incoming.message == MENU_TONE_QUIT) {
+	    state = STATE_MENU;
+	    noTone(TONE_PIN);
+	    menu_state = MENU_TONE_SELECT;
 	    break;
 	}
+    case STATE_MENU:
+    case STATE_MESSAGE:
+	if (incoming.message == MENU_PONG_QUIT || 
+	    incoming.message == MENU_TONE_QUIT) {
+	    break; 
+	}
+	startIncoming();
+	break;
     }
-
 }
 
 void sendWiFiCommand(int message, long data) {
@@ -1379,40 +1365,47 @@ void pongTick () {
     }
 
     if (server) {
-	if ((pong.dirx == -1) && (pong.bx == 2) && abs((int)pong.by - (int)pong.ys) <= PONG_PAD_WIDTH) { //boink
+	if (pong.ball_reset_update_required > 0) {
+	    pong.ball_reset_update_required--;
+	    pongSend(1);
+	} else if ((pong.dirx == -1) && (pong.bx == 5) && abs((int)pong.by - (int)pong.ys) <= PONG_PAD_WIDTH) { //boink
 	    pong.dirx = 1; 
 	    shortBeep(); 
 	    pongSend(1); 
 	} else if (pong.bx <= 0) {
 	    pong.score_c++; 
 	    pongBallReset();
+	    pong.ball_reset_update_required = 2; 
 	    longBeep(); 
 	    pongSend(1);
-	}
-	if (((pong.bx == 4) || (pong.bx == 8) || (pong.bx == 68)) && pong.dirx == 1) {
-	    pongSend(1);  // redundancy sends
+	} else if (((pong.bx == 8) || (pong.bx == 11)) && pong.dirx == 1) {
+	    pongSend(1);  // redundancy sends after boink
 	}
     } else if (client) {
-	if ((pong.dirx == 1) && (pong.bx == 125) && abs((int)pong.by - (int)pong.yc) <= PONG_PAD_WIDTH) { //boink
+	if (pong.ball_reset_update_required > 0) {
+	    pong.ball_reset_update_required--;
+	    pongSend(1);
+	} else if ((pong.dirx == 1) && (pong.bx == 122) && abs((int)pong.by - (int)pong.yc) <= PONG_PAD_WIDTH) { //boink
 	    pong.dirx = -1; 
 	    shortBeep(); 
 	    pongSend(1); 
 	} else if (pong.bx >= 127) {
 	    pong.score_s++; 
 	    pongBallReset();
+	    pong.ball_reset_update_required = 2; 
 	    longBeep(); 
 	    pongSend(1); 
 	}
-	if (((pong.bx == 122) || (pong.bx == 116) || (pong.bx == 58)) && pong.dirx == -1) {
-	    pongSend(1);  // redundancy sends
+	if (((pong.bx == 119) || (pong.bx == 116)) && pong.dirx == -1) {
+	    pongSend(1);  // redundancy sends after boink
 	}
     }
 }
 
 void drawPong (SH1106 &display) {
     display.clear();     
-    display.fillRect(2, pong.ys - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);
-    display.fillRect(125, pong.yc - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);    
+    display.fillRect(5, pong.ys - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);
+    display.fillRect(122, pong.yc - PONG_PAD_WIDTH, 1, PONG_PAD_WIDTH * 2);    
     display.fillRect(pong.bx - 1, pong.by - 1, 3, 3);
 
     display.setTextAlignment(TEXT_ALIGN_CENTER);
@@ -1421,7 +1414,25 @@ void drawPong (SH1106 &display) {
     display.drawString(107, 3, String((int)pong.score_c));
 }
 
+int before, after; 
 void loop() {
+    if (beep_beep_count > 0 && trill_count == 0) {
+	trill_count = 15;
+	beep_beep_count--; 
+    }
+
+    if (trill_count > 4) {
+	trill_count--;
+	if (trill_count % 2) {
+	    tone(TONE_PIN, 2000);
+	} else {
+	    noTone(TONE_PIN);
+	}
+    } else if (trill_count > 0) {
+	trill_count--;
+	noTone(TONE_PIN);
+    }
+
     detectPush();
     listenWiFiCommand();
 
@@ -1430,7 +1441,6 @@ void loop() {
 	sendWiFiCommand(MENU_TONE_SELECT, state_tone);
 	state_send_tone = 0;
     }
-
     switch(state) {
     case STATE_PONG:
 	pongTick();
@@ -1462,8 +1472,12 @@ void loop() {
     }
     change = false; 
 
-    drawFrameDebug(display);
+    drawFrameDebug(display, after - before);
+
+    before = millis(); 
     display.display();
+    after = millis(); 
+
     clk++;
-    delay(20);
+    delay(40);
 }
