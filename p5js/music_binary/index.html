@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/addons/p5.sound.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script src="sketch.js"></script>
+
+    <div class="container">
+      <!-- Checkbox for using Gray Code binary progression -->
+
+      <div>
+	<div>
+          <input type="checkbox" id="checkboxGray" onchange="updateCheckboxes()">
+          <label for="checkboxGray">Gray</label>
+	</div>
+
+	<!-- Checkbox for left or right endianness of binary code-->
+	<div>
+          <input type="checkbox" id="checkboxReverse" onchange="updateCheckboxes()">
+          <label for="checkboxReverse">Reverse</label>
+	</div>
+
+	<!-- Checkbox for whether bit 1 notes play every beat or on rising edge -->
+	<div>
+          <input type="checkbox" id="checkboxDif" onchange="updateCheckboxes()">
+          <label for="checkboxDif">Differential play</label>
+	</div>
+
+	<!-- Checkbox for sustain until 1->0 transition -->
+	<div>
+          <input type="checkbox" id="checkboxSust" onchange="updateCheckboxes()">
+          <label for="checkboxSust">Sustain</label>
+	</div>
+
+      </div>
+      <div>
+	
+	<div>
+          <input type="number" id="numberBitCount" min="1" max="9" value="6" onchange="updateNumbers()">
+          <label for="numberBitCount">Bits (1-9)</label>
+	</div>
+
+	<!-- Number Input 2 (20-80) -->
+	<div>
+          <input type="number" id="numberNote" min="20" max="80" value="60" onchange="updateNumbers()">
+          <label for="numberNote">Note (20-80)</label>
+	</div>
+	<div>
+          <input type="number" id="numberBps" min="1" max="12" value="3" onchange="updateNumbers()">
+          <label for="numberBps">Bps</label>
+	</div>
+
+
+<div>
+  <select id="scaleSelect" onchange="updateScale()">
+    <option value="pentatonicMajor">Pentatonic Major</option>
+    <option value="pentatonicMinor">Pentatonic Minor</option>
+    <option value="pentatonicHirajoshi">Hirajoshi Pentatonic Scale</option>
+    <option value="pentatonicEgyptian">Egyptian Pentatonic Scale</option>
+    <option value="heptatonicNaturalMinor">Heptatonic Natural Minor</option>
+    <option value="heptatonicMelodicMinor">Heptatonic Melodic Minor</option>
+    <option value="heptatonicMajor">Heptatonic Major</option>
+  </select>
+</div>
+<div>
+  <select id="oscShape" onchange="updateOsc()">
+    <option value="sine">Sin</option>
+    <option value="triangle">Triangle</option>
+    <option value="sawtooth">Saw</option>
+    <option value="square">Square</option>
+
+  </select>
+</div>
+
+      </div>
+    </div>
+  </body>
+</html>
