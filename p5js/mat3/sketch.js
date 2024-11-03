@@ -9,6 +9,13 @@ let bike, ground, ground_color;
 let conf = {
     bike_x: 400,
     bike_y: 450,
+
+    bike_driver_density_bonus: 50,
+    
+    bike_driver_dx: 50,
+    bike_driver_dy: 20,
+    bike_driver_radius: 10,
+
     bike_wheel_dx: 50,
     bike_wheel_dy: 50,
     bike_constraint_dx: 30,
@@ -104,6 +111,40 @@ function createBike() {
 	density: 0.02 
     });
 
+    const driver = Bodies.circle(conf.bike_x, conf.bike_y - conf.bike_driver_dy, 
+				 conf.bike_driver_radius, { 
+				     label: 'frontWheel', 
+				     friction: 0.9 
+				 });
+
+    Body.setDensity(driver, driver.density * conf.bike_driver_density_bonus)
+
+    const driverC0 = Constraint.create({
+	bodyA: vehicleBody,
+	pointA: {x:-conf.bike_driver_dx, y:0}, 
+	bodyB: driver,
+	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
+	stiffness: 0.05,
+    });
+
+
+    const driverC1 = Constraint.create({
+	bodyA: vehicleBody,
+	pointA: {x:0, y:0}, 
+	bodyB: driver,
+	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
+	stiffness: 0.05,
+    });
+
+    const driverC2 = Constraint.create({
+	bodyA: vehicleBody,
+	pointA: {x:conf.bike_driver_dx, y:0}, 
+	bodyB: driver,
+	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
+	stiffness: 0.05,
+    });
+
+
     // Wheels
     const frontWheel = Bodies.circle(conf.bike_x - conf.bike_wheel_dx, 
 				     conf.bike_y + conf.bike_wheel_dy, 
@@ -171,10 +212,17 @@ function createBike() {
 	    crossAxle0: crossAxle0,
 	    crossAxle1: crossAxle1,
 	    frontTouchGround:false,
-	    rearTouchGround:false}
+	    rearTouchGround:false,
+	    driver: driver,
+	    driverC0 : driverC0, 
+	    driverC1 : driverC1, 
+	    driverC2 : driverC2, 
+	    driverPosition: 1}
 
-    World.add(world, [vehicleBody, frontWheel, rearWheel, 
+    World.add(world, [vehicleBody, frontWheel, rearWheel,
+		      driver, driverC0, driverC1, driverC2, 
 		      frontAxle, rearAxle, wheelAxle, crossAxle0, crossAxle1]);
+    fixBikeDriverConstraints();
 }
 
 
@@ -229,6 +277,12 @@ function drawBike(delta) {
     drawConstraint(bike.crossAxle0, delta);
     drawConstraint(bike.crossAxle1, delta);
 
+
+    drawBody(bike.driver, delta);
+    // drawConstraint(bike.driverC0, delta);
+    // drawConstraint(bike.driverC1, delta);
+    // drawConstraint(bike.driverC2, delta);
+
     pop(); 
 }
 
@@ -246,6 +300,7 @@ function draw() {
     // Update the physics engine
     Engine.update(engine);    
     updateTouch();
+    fixBikeDriverConstraints(); 
 
     if (delta + bike.vehicleBody.position.x > width - 100) {
 	delta = width - 100 - bike.vehicleBody.position.x
@@ -294,26 +349,6 @@ function keyUpdate() {
     }
 
 
-    if (keyIsDown(UP_ARROW)) {
-        Body.applyForce(bike.vehicleBody, 
-                        { x: bike.vehicleBody.position.x, y: bike.vehicleBody.position.y - 20 }, 
-                        { x: torqueAmount, y: 0 });
-        Body.applyForce(bike.vehicleBody, 
-                        { x: bike.vehicleBody.position.x, y: bike.vehicleBody.position.y + 20 }, 
-                        { x: -torqueAmount, y: 0 });
-    } 
-    
-    if (keyIsDown(DOWN_ARROW)) {
-        Body.applyForce(bike.vehicleBody, 
-                        { x: bike.vehicleBody.position.x, y: bike.vehicleBody.position.y - 20 }, 
-                        { x: -torqueAmount, y: 0 });
-        Body.applyForce(bike.vehicleBody, 
-                        { x: bike.vehicleBody.position.x, y: bike.vehicleBody.position.y + 20 }, 
-                        { x: torqueAmount, y: 0 });
-    }
-
-
-
     if (keyIsDown(LEFT_ARROW)) {
         // Apply a leftward force
 	if (bike.frontTouchGround) {
@@ -351,6 +386,10 @@ function keyUpdate() {
 
 function mousePressed() {
     Body.setPosition(bike.vehicleBody, {x:mouseX - delta, y:mouseY});
+
+    Body.setPosition(bike.driver, {x:mouseX - delta, y:mouseY - conf.bike_driver_dy});
+    bike.driverPosition = 1;
+
     Body.setPosition(bike.rearWheel, {x:mouseX - delta + conf.bike_wheel_dx, y:mouseY + conf.bike_wheel_dy});
     Body.setPosition(bike.frontWheel, {x:mouseX - delta - conf.bike_wheel_dx, y:mouseY + conf.bike_wheel_dy});
     Body.setVelocity(bike.vehicleBody, {x:0, y:0})
@@ -376,4 +415,41 @@ function mousePressed() {
     Body.setAngularVelocity(bike.vehicleBody, 0);
     Body.setAngularVelocity(bike.rearWheel, 0);
     Body.setAngularVelocity(bike.frontWheel, 0);
+
+    fixBikeDriverConstraints();
+}
+
+function fixBikeDriverConstraints() {
+    let dx = conf.bike_driver_dx
+    let dy = conf.bike_driver_dy
+    if(keyIsDown(32)) { //space
+	dy *= 2;
+    }
+    switch(bike.driverPosition) {
+    case 0:
+	bike.driverC0.length = Math.hypot(dx*0.5, dy);
+	bike.driverC1.length = Math.hypot(dx*0.5, dy);
+	bike.driverC2.length = Math.hypot(dx*1.5, dy);
+	break;
+    case 1:
+	bike.driverC0.length = Math.hypot(dx, dy);
+	bike.driverC1.length = Math.hypot(0, dy);
+	bike.driverC2.length = Math.hypot(dx, dy);
+	break;
+    case 2:
+	bike.driverC0.length = Math.hypot(dx*1.5, dy);
+	bike.driverC1.length = Math.hypot(dx*0.5, dy);
+	bike.driverC2.length = Math.hypot(dx*0.5, dy);
+	break;
+    }
+
+} 
+
+function keyPressed() {
+    if (keyCode == DOWN_ARROW && bike.driverPosition > 0) {
+	bike.driverPosition--;
+    }
+    if (keyCode == UP_ARROW && bike.driverPosition < 2) {
+	bike.driverPosition++;
+    }
 }
