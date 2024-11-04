@@ -10,11 +10,15 @@ let conf = {
     bike_x: 400,
     bike_y: 450,
 
-    bike_driver_density_bonus: 50,
+    bike_driver_mass:5,
+    bike_vehicle_mass:10,
+    bike_wheel_mass:10,
     
     bike_driver_dx: 50,
     bike_driver_dy: 20,
     bike_driver_radius: 10,
+    
+
 
     bike_wheel_dx: 50,
     bike_wheel_dy: 50,
@@ -26,8 +30,12 @@ let conf = {
     terrainWidth:3000,
     terrainCount:128,
 
-    forceMagnitude: 0.03,
-    torqueAmount: 0.02
+    forceMagnitude: 0.9,
+    update_steps:2,
+    gravity_scale: 5,
+
+    dt: 10, // milliseconds per frame update
+    frameRate:30,
 }
 
 function bump(o, force = 1.0) {
@@ -42,13 +50,13 @@ function bodyTouchesGround(body) {
     const x = body.position.x; 
     const idx = floor(x / segmentWidth - 0.5); 
 
-    if (idx >= 0) {
+    if (idx >= 0 && idx < ground.length) {
 	ground_color[idx] = "white";
 	if (Matter.SAT.collides(body, ground[idx]).collided) {
 	    return true; 
 	}
     }
-    if (idx + 1 < ground.length) {
+    if (idx + 1 >= 0 && idx + 1 < ground.length) {
 	ground_color[idx + 1] = "yellow";
 	if (Matter.SAT.collides(body, ground[idx + 1]).collided) {
 	    return true; 
@@ -117,14 +125,13 @@ function createBike() {
 				     friction: 0.9 
 				 });
 
-    Body.setDensity(driver, driver.density * conf.bike_driver_density_bonus)
 
     const driverC0 = Constraint.create({
 	bodyA: vehicleBody,
 	pointA: {x:-conf.bike_driver_dx, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.05,
+	stiffness: 0.01,
     });
 
 
@@ -133,7 +140,7 @@ function createBike() {
 	pointA: {x:0, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.05,
+	stiffness: 0.01,
     });
 
     const driverC2 = Constraint.create({
@@ -141,7 +148,7 @@ function createBike() {
 	pointA: {x:conf.bike_driver_dx, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.05,
+	stiffness: 0.01,
     });
 
 
@@ -159,6 +166,11 @@ function createBike() {
 					label: 'rearWheel', 
 					friction: 0.9 
 				    });
+
+    Body.setMass(driver, conf.bike_driver_mass);
+    Body.setMass(frontWheel, conf.bike_wheel_mass);
+    Body.setMass(rearWheel, conf.bike_wheel_mass);
+    Body.setMass(vehicleBody, conf.bike_vehicle_mass);
 
     // Constraints (axles)
     const crossAxle0 = Constraint.create({
@@ -234,10 +246,15 @@ function setup() {
     // Create engine and world
     engine = Engine.create();
     engine.constraintIteration = 15; 
+
+    engine.gravity.scale *= conf.gravity_scale
+    engine.gravity.scale *= conf.update_steps
+
     world = engine.world;
 
     createTerrain(conf.terrainWidth, height, conf.terrainCount, 0, 100)
     createBike();
+    frameRate(conf.frameRate)
 }
 
 function drawBody(body, delta) {
@@ -296,11 +313,17 @@ function updateTouch() {
 function draw() {
     ground_color = new Array(ground.length).fill("green");
     background(55,77, 99);
-    keyUpdate(); 
     // Update the physics engine
-    Engine.update(engine);    
-    updateTouch();
+
     fixBikeDriverConstraints(); 
+
+
+    for (let i=0 ; i<conf.update_steps ; ++i) {
+	keyUpdate(); 
+	Engine.update(engine, conf.dt / conf.update_steps);
+	updateTouch();
+    }
+
 
     if (delta + bike.vehicleBody.position.x > width - 100) {
 	delta = width - 100 - bike.vehicleBody.position.x
@@ -315,6 +338,11 @@ function draw() {
 	drawBody(ground[i], delta);
     }
     drawBike(delta);
+
+    stroke(0)
+    fill("red")
+    textSize(24);
+    text("FPS:" + frameRate().toFixed(1), 20, 30);
 }
 
 
@@ -340,10 +368,7 @@ function drawConstraint(constraint) {
 
 
 function keyUpdate() {
-    var forceMagnitude = conf.forceMagnitude;  // Adjust this to control how much force to apply
-    const torqueAmount = conf.torqueAmount; // Adjust for desired torque effect
-
-
+    var forceMagnitude = conf.forceMagnitude / conf.update_steps;  
     if (bike.frontTouchGround && bike.rearTouchGround) {
 	forceMagnitude /= 2;
     }
@@ -384,22 +409,32 @@ function keyUpdate() {
     }
 }
 
-function mousePressed() {
-    Body.setPosition(bike.vehicleBody, {x:mouseX - delta, y:mouseY});
+function resetBike(x) {
+    x = x || bike.vehicleBody.position.x
 
-    Body.setPosition(bike.driver, {x:mouseX - delta, y:mouseY - conf.bike_driver_dy});
+    if (x < 100) {
+	x = 100
+    }
+    if (x > conf.terrainWidth - 100){
+	x = conf.terrainWidth - 100;
+    }
+
+    let y = 200
+    Body.setPosition(bike.vehicleBody, {x:x , y:y});
+    
+    Body.setPosition(bike.driver, {x:x , y:y - conf.bike_driver_dy});
     bike.driverPosition = 1;
 
-    Body.setPosition(bike.rearWheel, {x:mouseX - delta + conf.bike_wheel_dx, y:mouseY + conf.bike_wheel_dy});
-    Body.setPosition(bike.frontWheel, {x:mouseX - delta - conf.bike_wheel_dx, y:mouseY + conf.bike_wheel_dy});
+    Body.setPosition(bike.rearWheel, {x:x  + conf.bike_wheel_dx, y:y + conf.bike_wheel_dy});
+    Body.setPosition(bike.frontWheel, {x:x  - conf.bike_wheel_dx, y:y + conf.bike_wheel_dy});
     Body.setVelocity(bike.vehicleBody, {x:0, y:0})
     Body.setVelocity(bike.rearWheel, {x:0, y:0})
     Body.setVelocity(bike.frontWheel, {x:0, y:0})
 
     // Reset position
-    Body.setPosition(bike.vehicleBody, {x: mouseX - delta, y: mouseY});
-    Body.setPosition(bike.rearWheel, {x: mouseX - delta + conf.bike_wheel_dx, y: mouseY + conf.bike_wheel_dy});
-    Body.setPosition(bike.frontWheel, {x: mouseX - delta - conf.bike_wheel_dx, y: mouseY + conf.bike_wheel_dy});
+    Body.setPosition(bike.vehicleBody, {x: x , y: y});
+    Body.setPosition(bike.rearWheel, {x: x  + conf.bike_wheel_dx, y: y + conf.bike_wheel_dy});
+    Body.setPosition(bike.frontWheel, {x: x  - conf.bike_wheel_dx, y: y + conf.bike_wheel_dy});
 
     // Reset linear velocity
     Body.setVelocity(bike.vehicleBody, {x: 0, y: 0});
@@ -452,4 +487,11 @@ function keyPressed() {
     if (keyCode == UP_ARROW && bike.driverPosition < 2) {
 	bike.driverPosition++;
     }
+    if (key == "r") {
+	resetBike();
+    }
+}
+
+function mousePressed() {
+    resetBike(mouseX - delta);
 }
