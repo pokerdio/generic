@@ -10,7 +10,7 @@ let conf = {
     bike_x: 400,
     bike_y: 450,
 
-    bike_driver_mass:5,
+    bike_driver_mass:50,
     bike_vehicle_mass:10,
     bike_wheel_mass:10,
     
@@ -24,13 +24,14 @@ let conf = {
     bike_wheel_dy: 50,
     bike_constraint_dx: 30,
     stiff:0.5,
+    driver_stiff:0.05,
     timeTouch:5,
     wheelRadius:20,
 
     terrainWidth:3000,
     terrainCount:128,
 
-    forceMagnitude: 0.9,
+    forceMagnitude: 1.5,
     update_steps:2,
     gravity_scale: 5,
 
@@ -131,7 +132,7 @@ function createBike() {
 	pointA: {x:-conf.bike_driver_dx, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.01,
+	stiffness: conf.driver_stiff,
     });
 
 
@@ -140,7 +141,7 @@ function createBike() {
 	pointA: {x:0, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.01,
+	stiffness: conf.driver_stiff,
     });
 
     const driverC2 = Constraint.create({
@@ -148,7 +149,7 @@ function createBike() {
 	pointA: {x:conf.bike_driver_dx, y:0}, 
 	bodyB: driver,
 	length: bodyDistance(vehicleBody, conf.bike_driver_dx, 0, driver),
-	stiffness: 0.01,
+	stiffness: conf.driver_stiff,
     });
 
 

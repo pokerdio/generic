@@ -6,8 +6,8 @@ const render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        width: 800,
-        height: 600,
+        width: window.innerWidth - 16,
+        height: window.innerHeight - 16,
         wireframes: false,
     },
 });
@@ -20,28 +20,67 @@ const config = {
     offScreenThreshold: render.canvas.height + 100,
     friction: 0.01,
     frictionAir: 0.01,
-    restitution: 0.8
+    restitution: 0.4,
+    bounce: 0.8,
 }
 
 
 Render.run(render);
 Runner.run(Runner.create(), engine);
 
+
+// Adjust render size on window resize
+window.addEventListener('resize', () => {
+    render.canvas.width = window.innerWidth - 16;
+    render.canvas.height = window.innerHeight - 16;
+    render.options.width = window.innerWidth - 16;
+    render.options.height = window.innerHeight - 16;
+});
+
+
+
+
 // Variables for color and points
 let startPoint = null;
 
 // Add color buttons as static bodies
-const colors = ['#FF0000', '#00FF00', '#0000FF', '#333300'];
-const tools = ['rect', 'ball', 'delete', 'climb'];
+const colors = ['#FF0000', '#00FF00', '#0000FF', '#ffff00', '#00ff66'];
+const tools = ['rect', 'ball', 'delete', 'climb', 'bounce'];
 
 colors.forEach((color, index) => {
-    const button = Bodies.rectangle(50 + index * 70, 30, 60, 30, {
-        isStatic: true,
-        render: { fillStyle: color },
-    });
-    button.customColor = color; // Custom property to store color
-    button.customTool = tools[index]
-    World.add(world, button);
+    var button
+    switch(tools[index]) {
+    case "ball":
+	button = Bodies.circle(50 + index * 70, 30, 25, {
+            isStatic: true,
+            render: { fillStyle: color },
+	});
+	break;
+    case "delete":
+ 	button = [Bodies.rectangle(50 + index * 70, 30, 60, 15, {
+            isStatic: true,
+	    angle: 0.5,
+            render: { fillStyle: color },
+	}), Bodies.rectangle(50 + index * 70, 30, 60, 15, {
+            isStatic: true,
+	    angle: -0.5,
+            render: { fillStyle: color },
+	})];
+
+	break; 
+    default: 
+	button = Bodies.rectangle(50 + index * 70, 30, 60, 30, {
+            isStatic: true,
+            render: { fillStyle: color },
+	});
+    }
+    let buttons = [].concat(button)
+
+    for (let b of buttons) {
+	b.customColor = color; // Custom property to store color
+	b.customTool = tools[index]
+    }
+    World.add(world, buttons);
 });
 
 function addClimb(pointA, pointB, color) {
@@ -59,26 +98,29 @@ function addClimb(pointA, pointB, color) {
     });
 
     World.add(world, climb);
+    world.bodies.sort((a,b) =>(b.customRole == "climb" ? 1 : 0) - (a.customRole == "climb" ? 1 : 0) )
 }
 
 
 // Function to add a new rectangle
-function addRectangle(pointA, pointB, color) {
+function addRectangle(pointA, pointB, color, restitution) {
     const width = Math.hypot(pointB.x - pointA.x, pointB.y - pointA.y); // Calculate the distance between points
     const height = config.rectThickness; // Constant thickness
     const centerX = (pointA.x + pointB.x) / 2;
     const centerY = (pointA.y + pointB.y) / 2;
     const angle = Math.atan2(pointB.y - pointA.y, pointB.x - pointA.x); // Calculate angle between points
 
+    console.log("creating", restitution || config.restitution)
     const rectangle = Bodies.rectangle(centerX, centerY, width, height, {
 	angle: angle, // Set the rotation angle
 	friction: config.friction,
 	frictionAir: config.frictionAir,
-	restitution: config.restitution,
+	restitution: restitution || config.restitution,
 	isStatic: true,
 	render: { fillStyle: color },
     });
 
+    console.log(rectangle.restitution)
     World.add(world, rectangle);
 }
 
@@ -91,7 +133,7 @@ function addBall(point, color) {
 	restitution: config.restitution,
 	render: { fillStyle: color },
     });
-
+    console.log("ball resti", ball.restitution)
     World.add(world, ball);
 }
 
@@ -119,12 +161,15 @@ Events.on(mouseConstraint, 'mousedown', (event) => {
 	}
     }
     
+    let resti = config.restitution
     switch(config.selectedTool)  {
+    case 'bounce':
+	resti = config.bounce
     case 'rect':
 	if (!startPoint) {
 	    startPoint = { x, y };
 	} else {
-	    addRectangle(startPoint, { x, y }, config.selectedColor);
+	    addRectangle(startPoint, { x, y }, config.selectedColor, resti);
 	    startPoint = null;
 	}
 	break;

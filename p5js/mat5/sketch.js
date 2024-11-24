@@ -2,10 +2,11 @@ const { Engine, Render, World, Bodies, Mouse, MouseConstraint, Constraint, Event
 
 const config = {
     clength: 150,
+    scale:2.5,
     stiffness:0.03,
     radius: 10,
-    dy:20,
-    dx:30,
+    dy:25,
+    dx:50,
     restitution:0.1,
     friction: 0.02,
     frictionAir: 0.05,
@@ -22,25 +23,34 @@ const render = Render.create({
     element: document.body,
     engine: engine,
     options: {
-        width: 800,
-        height: 600,
+        width: window.innerWidth - 16,
+        height: window.innerHeight - 16,
         wireframes: false,
-        background: '#f0f0f0'
+        background: '#444444'
     }
 });
 
 // Run the renderer
 Render.run(render);
 
-// Run the engien
+// Run the engine
 Engine.run(engine);
+
+
+window.addEventListener('resize', () => {
+    render.canvas.width = window.innerWidth - 16;
+    render.canvas.height = window.innerHeight - 16;
+    render.options.width = window.innerWidth - 16;
+    render.options.height = window.innerHeight - 16;
+});
 
 
 // Enable mouse control
 const mouse = Mouse.create(render.canvas);
-const mouseObject = Bodies.circle(100, 100, config.radius, {
+const mouseObject = Bodies.circle(100, 100, config.radius * config.scale * 0.01, {
     isStatic:false,
     restitution: config.restitution,
+    mass: 5.0,
     render: { fillStyle: randomColor() }
 });
 
@@ -52,18 +62,19 @@ function randomColor() {
 
 // Function to recursively create circles
 function createRecursiveCircles(body, depth, digitString, bodies, constraints) {
+
     if (depth >= digitString.length) return;
 
     // Get the number of circles to create at this depth
     const numCircles = parseInt(digitString[depth]) + 1;
-    const radius = config.radius;  // Radius of each circle
+    const radius = config.radius * config.scale;  // Radius of each circle
 
     const parentCircles = []; // Array to keep track of this level's circles
 
     for (let i = 0; i < numCircles; i++) {
         // Random position around the parent position
-        const offsetX = (Math.random() - 0.5) * config.dx;
-        const offsetY = config.dy;
+        const offsetX = (Math.random() - 0.5) * config.dx * (depth ? config.scale : 1.5 * config.scale);
+        const offsetY = config.dy * (depth ? config.scale : 1.5 * config.scale);
         const circlePosition = {
             x: body.position.x + offsetX,
             y: body.position.y + offsetY
@@ -74,7 +85,8 @@ function createRecursiveCircles(body, depth, digitString, bodies, constraints) {
             friction: config.friction,
 	    frictionAir: config.frictionAir,
             restitution: config.restitution,
-            render: { fillStyle: randomColor() }
+	    
+            render: { fillStyle: randomColor(), strokeStyle:'#000000', lineWidth: 2 }
         });
 	bodies.push(circle)
 
