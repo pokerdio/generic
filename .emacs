@@ -2,8 +2,6 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
-
-
 ;https://i.imgur.com/6vYPb3C.jpg
 (setq frame-inhibit-implied-resize t) ;; prevent resize window on startup
 (setq default-frame-alist '((width . 100) (height . 35)))
@@ -14,18 +12,17 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("cca1d386d4a3f645c2f8c49266e3eb9ee14cf69939141e3deb9dfd50ccaada79" default))
+   '("cca1d386d4a3f645c2f8c49266e3eb9ee14cf69939141e3deb9dfd50ccaada79"
+     default))
  '(org-format-latex-options
-   '(:foreground default :background default :scale 2.0 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
-		 ("begin" "$1" "$" "$$" "\\(" "\\[")))
+   '(:foreground default :background default :scale 2.0 :html-foreground
+		 "Black" :html-background "Transparent" :html-scale
+		 1.0 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
  '(package-selected-packages
-   '(lua-mode trashed marginalia vertico ein browse-kill-ring casual buffer-move magit-section lsp-mode flycheck f dash paredit nodejs-repl clhs modus-themes)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+   '(browse-kill-ring buffer-move casual clhs dash ein f flycheck fzf
+		      lsp-mode lua-mode magit-section marginalia
+		      modus-themes nodejs-repl paredit trashed vertico
+		      zeal-at-point)))
 
 (load-theme 'modus-vivendi t)
 
@@ -46,8 +43,6 @@
 (package-initialize)
 
 (require 'nodejs-repl)
-
-
 
 (add-hook 'js-mode-hook
               (lambda ()
@@ -113,6 +108,15 @@
 (setq org-return-follows-link t)
 
 (global-set-key (kbd "C-c e") 'eshell)
+(global-set-key (kbd "C-c 0") 'bury-buffer)
+
+(use-package zeal-at-point
+  :ensure t
+  :bind ("C-c d" . zeal-at-point)
+  :config
+;  (add-to-list 'zeal-at-point-mode-alist '(c-mode . "c"))
+ ; (add-to-list 'zeal-at-point-mode-alist '(c++-mode . "cpp"))
+  )
 
 
 
@@ -156,15 +160,23 @@
 (global-set-key (kbd "C-c l")
 		(lambda () (interactive)
 		  (switch-to-buffer "*scratch*")))
+(global-set-key (kbd "C-c o")
+		(lambda () (interactive)
+		  (find-file-at-point)))
 
-(global-set-key (kbd "C-c aa") (lambda () (interactive) (find-file "~/about.org")))
+(global-set-key (kbd "C-c aa") (lambda () (interactive) (find-file "~/org/about.org")))
+(global-set-key (kbd "C-c af") (lambda () (interactive) (find-file "~/org/phi.org")))
 (global-set-key (kbd "C-c ae") (lambda () (interactive) (find-file "~/.emacs")))
+(global-set-key (kbd "C-c av") (lambda () (interactive) (find-file "~/.vimrc")))
+(global-set-key (kbd "C-c ac") 'org-capture)
 (global-set-key (kbd "C-c ap") (lambda () (interactive) 
                                  (cd "~/test")
                                  (run-python) 
                                  (delete-other-windows)
                                  (split-window-below)
                                  (find-file "~/test/test.py")))
+
+(global-set-key (kbd "C-c as") (lambda () (interactive) (scratch-buffer)))
 
 (global-set-key (kbd "C-c al") (lambda () (interactive) 
                                  (cd "~/test")
@@ -363,7 +375,8 @@
                       (dotimes (x (min 19 (max arg 1)))
 		        (setf *dio/face-height* (+ (if (> *dio/face-height* 100) 20 10) *dio/face-height*)))
                     (setf *dio/face-height* *dio/face-height-default*))
-                  (set-face-attribute 'default nil :height *dio/face-height*)))
+                  (set-face-attribute 'default nil :height *dio/face-height*)
+                  (text-scale-adjust 0)))
 
 (global-set-key (kbd "C-c C--")
 		(lambda (arg)
@@ -377,8 +390,37 @@
                                   ((< *dio/face-height* 100) 10)
                                   (t 20)))))
                     (setf *dio/face-height* *dio/face-height-default*))
-		  (set-face-attribute 'default nil :height *dio/face-height*)))
+		  (set-face-attribute 'default nil :height *dio/face-height*)
+                  (text-scale-adjust 0)))
 
 
 
-;hello
+(add-to-list 'default-frame-alist '(alpha-background . 85))
+
+(setq org-directory "~/org/")
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+
+(setq org-capture-templates
+      '(("p" "philosophy stuffs")
+	("pa" "ask question" entry (file+headline "phi.org" "Question")
+	 "* %? %i\n")
+	("pj" "joke" entry (file+headline "~/org/phi.org" "Joke") "* %? %i\n")
+	("pu" "Unsinn" entry (file+headline "~/org/phi.org" "Nonsense") "* %? %i\n")
+	("pb" "bookmark" entry (file+headline "phi.org" "Bookmark") "* %? %i\n")
+	("ps" "quotation" entry (file+headline "phi.org" "Quotation") "* %? %i\n")
+
+	("b" "band" plain (file+olp "about.org" "listen" "new stuff") 
+	 "   %? %^{genre|:death:|:black:|:thrash:|:folk:|:viking:|:power metal:|:speed:}\n")
+	("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry (file+datetree "~/org/journal.org")
+         "* %?\nEntered on %U\n  %i\n  %a")
+	("r" "rent" entry (file+olp "about.org" "misc" "rent")
+	 "* %U\n %?\n")
+))
+
+(put 'scroll-left 'disabled nil)
+
+
+(put 'set-goal-column 'disabled nil)
+(global-set-key (kbd "C-x h") 'help)
