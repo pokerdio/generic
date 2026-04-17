@@ -71,8 +71,6 @@ void setup() {
         w(i, LOW);
     }
 
-
-
     // Set device as a Wi-Fi Station
     WiFi.mode(WIFI_STA);
     WiFi.disconnect();

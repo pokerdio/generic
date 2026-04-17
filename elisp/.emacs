@@ -121,10 +121,11 @@ FMT should contain a %d placeholder for the index."
  "C-c 1" my/macroexpand-1-at-point
  "C-c 2" my/macroexpand-at-point
  "C-c 3" my/insert-indexed
- "s-x" "~/org/xxx.org"
+ "C-c a x" "~/org/xxx.org"
  "C-c a e" open-init-file
  "C-c a l" scratch-buffer
 ;; "C-c p" this is used by projectile
+ "C-c a h" common-lisp-hyperspec
  "C-c e" eshell
  "C-c a p" package-list-packages
  "C-c a m" (buf-sw "*Messages*")
@@ -298,3 +299,6 @@ If already in the work buffer, bury it (toggle away)."
   :ensure t
   :commands (devdocs-lookup devdocs-install)
   :bind (("C-c d" . devdocs-lookup)))
+
+
+(add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
