@@ -77,7 +77,7 @@ uint32_t cg_highcard_value_base13(const CardGroup *sorted) {
 int cg_pair_count (const CardGroup *sorted) {
   int n = sorted->count;
   int ret = 0;
-  for (uint8_t k=0; k<n-1; k++) {
+  for (int k=0; k<n-1; k++) {
     if (RANK(sorted->cards[k]) != RANK(sorted->cards[k + 1])) {
       continue;
     }
@@ -109,6 +109,17 @@ int cg_trips_count (const CardGroup *sorted) {
   }
   return ret;
 }
+
+int cg_quads_count (const CardGroup *sorted) {
+  int n = sorted->count;
+  for (int k=0; k+3<n; k++) {
+    if (RANK(sorted->cards[k]) == RANK(sorted->cards[k + 3])) {
+      return 1;
+    }
+  }
+  return 0;
+}
+
 
 static void print_group(const CardGroup *g) {
     printf("{ count=%u, ranks=[", (unsigned)g->count);

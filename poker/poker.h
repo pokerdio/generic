@@ -30,11 +30,16 @@ typedef struct {
 typedef struct {
     const char *description;
     CardGroup group;
-    uint32_t expected;
+    int expected;
 } CGTest;
 
 //test entry in an array of CGTest  
 #define CG(...) { .cards = { __VA_ARGS__ }, .count = sizeof((uint8_t[]){ __VA_ARGS__ }) / sizeof(uint8_t) }
+#define PRINT_VAR(x) printf("%s = %d\n", #x, (x))
+#define TEST_OK(x) \
+    do { printf("Test %s: %s\n", #x, (x) ? "OLL KORRECT" : "FAIL"); } while (0)
 
+
+#define ARRAY_SIZE(rrr) (int)(sizeof(rrr) / sizeof((rrr)[0]))
 
 #endif 

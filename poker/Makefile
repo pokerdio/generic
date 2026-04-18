@@ -4,7 +4,7 @@ TARGET = poker
 
 all: $(TARGET)
 
-$(TARGET): poker.c
+$(TARGET): poker.c all_tests.c poker.h
 	$(CC) $(CFLAGS) poker.c -o $(TARGET)
 
 run: $(TARGET)
