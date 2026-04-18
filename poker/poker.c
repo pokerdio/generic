@@ -1,31 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-
-enum {
-c2c, c2d, c2h, c2s, 
-c3c, c3d, c3h, c3s, 
-c4c, c4d, c4h, c4s, 
-c5c, c5d, c5h, c5s, 
-c6c, c6d, c6h, c6s, 
-c7c, c7d, c7h, c7s, 
-c8c, c8d, c8h, c8s, 
-c9c, c9d, c9h, c9s, 
-cTc, cTd, cTh, cTs, 
-cJc, cJd, cJh, cJs, 
-cQc, cQd, cQh, cQs, 
-cKc, cKd, cKh, cKs, 
-cAc, cAd, cAh, cAs, 
-} card;
-
-#define SUIT(x) ((x) % 4)
-#define RANK(x) (((x) / 4))
+#include "poker.h"
 
 
-typedef struct {
-  uint8_t cards[7];  // each is a card enum value
-  uint8_t count;     // 0..7
-} CardGroup;
 
 _Static_assert(sizeof(CardGroup) == 8, "CardGroup must be exactly 8 bytes");
 
@@ -90,27 +68,55 @@ uint32_t cg_highcard_value_base13(const CardGroup *sorted) {
     uint8_t c = sorted->cards[sorted->count - n + k]; // ascending slice of top n
     v = v * 13u + (uint32_t)RANK(c);
   }
+  for (uint8_t k = n; k<5; k++) {
+    v = v * 13u;
+  }
   return v;
 }
 
-/* --- tiny demo --- */
-
-int main(void) {
-  CardGroup g = { .cards = { cTh, c2c, cKd, c7s, cJc, c9h, c3d }, .count = 7 };
-
-  CardGroup s;
-  cg_sort(&g, &s);
-
-  printf("sorted ranks: ");
-  for (uint8_t i = 0; i < s.count; i++) printf("%u ", (unsigned)RANK(s.cards[i]));
-  printf("\n");
-
-  CardGroup pr;
-  cg_prune_rank(&s, RANK(cTh), &pr); // remove Tens' rank
-  printf("after prune(T): count=%u\n", (unsigned)pr.count);
-
-  uint32_t hv = cg_highcard_value_base13(&s);
-  printf("highcard(base13)=%u\n", (unsigned)hv);
-
-  return 0;
+int cg_pair_count (const CardGroup *sorted) {
+  int n = sorted->count;
+  int ret = 0;
+  for (uint8_t k=0; k<n-1; k++) {
+    if (RANK(sorted->cards[k]) != RANK(sorted->cards[k + 1])) {
+      continue;
+    }
+    if (k>0 && RANK(sorted->cards[k - 1]) == RANK(sorted->cards[k])) {
+      continue;
+    }
+    if (k<n-2 && RANK(sorted->cards[k + 1]) == RANK(sorted->cards[k + 2])) {
+      continue;
+    }
+    ret++;
+  }
+  return ret;
 }
+
+int cg_trips_count (const CardGroup *sorted) {
+  int n = sorted->count;
+  int ret = 0;
+  for (int k=0; k<n-2; k++) {
+    if (RANK(sorted->cards[k]) != RANK(sorted->cards[k + 2])) {
+      continue;
+    }
+    if (k>0 && RANK(sorted->cards[k - 1]) == RANK(sorted->cards[k])) {
+      continue;
+    }
+    if (k<n-3 && RANK(sorted->cards[k + 2]) == RANK(sorted->cards[k + 3])) {
+      continue;
+    }
+    ret++;
+  }
+  return ret;
+}
+
+static void print_group(const CardGroup *g) {
+    printf("{ count=%u, ranks=[", (unsigned)g->count);
+    for (uint8_t i = 0; i < g->count; i++) {
+        if (i) printf(" ");
+        printf("%u", (unsigned)RANK(g->cards[i]));
+    }
+    printf("] }");
+}
+
+#include "all_tests.c"
