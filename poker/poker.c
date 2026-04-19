@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <assert.h>
 #include "poker.h"
 
 
@@ -19,36 +20,73 @@ static inline void cg_push(CardGroup *g, uint8_t c) {
      }
 }
 
-/* Sort key: rank ascending, suit ascending (so grouped ranks; stable enough for eval work). */
-static inline int card_less(uint8_t a, uint8_t b) {
-     return a < b;
-}
-
-/* --- requested functions --- */
-
-/* 1) Sort: src by reference, dst by reference. Does not modify src. */
+//sort a card group to a new card group, or in place
 void cg_sort(const CardGroup *src, CardGroup *dst) {
+  if (dst != src) {
      *dst = *src; // copy count + bytes
-
-     // insertion sort (n <= 7, simple and fast enough)
-     for (uint8_t i = 1; i < dst->count; i++) {
-	  uint8_t key = dst->cards[i];
-	  int j = (int)i - 1;
-	  while (j >= 0 && card_less(key, dst->cards[j])) {
-	       dst->cards[j + 1] = dst->cards[j];
-	       j--;
-	  }
-	  dst->cards[j + 1] = key;
-     }
+  }
+  for (int i=0; i<dst->count; ++i) {
+    for (int j=0; j<i; j++) {
+      if (dst->cards[j] > dst->cards[j+1]) {
+	uint8_t tmp = dst->cards[j];
+	dst->cards[j] = dst->cards[j+1];
+	dst->cards[j+1] = tmp;
+      }
+    }
+  }
 }
 
-/* 2) Prune by rank: remove all cards of rank `rank_to_remove` from src into dst. */
+//removes all cards of a rank, preserves order, can do in place if src==dest
 void cg_prune_rank(const CardGroup *src, uint8_t rank_to_remove, CardGroup *dst) {
-     cg_clear(dst);
-     for (uint8_t i = 0; i < src->count; i++) {
-	  uint8_t c = src->cards[i];
-	  if (RANK(c) != rank_to_remove) cg_push(dst, c);
-     }
+  int j = 0;
+  for (int i = 0; i < src->count; i++) {
+    uint8_t c = src->cards[i];
+    if (RANK(c) != rank_to_remove) {
+      dst->cards[j++] = c;
+    }
+  }
+  dst->count = j;
+}
+
+//removes duplicates of the same rank except one; presumes sorted, fails otherwise; can do in place
+void cg_prune_dup(const CardGroup *src_sorted, CardGroup *dst) {
+  int last_rank = -1;
+  int n = src_sorted->count;
+  int j = 0;
+  for (int i=0; i<n; i++) {
+    uint8_t card = src_sorted->cards[i];
+    int r = RANK(card);
+    assert(r >= last_rank);
+    if (r != last_rank) {
+      dst->cards[j++] = card;
+      last_rank = r;
+    }
+  }
+  dst->count = j;
+}
+
+//removes cards not of the most popular suit, can do in place
+void cg_one_suit(const CardGroup *src, CardGroup *dst) {
+  int suit_count[4] = {0};
+  int n = src->count;
+  int max_count = 0;
+  int best_suit = 0;
+  for (int i=0; i<n; i++) {
+    int suit = SUIT(src->cards[i]);
+    suit_count[suit]++;
+    if (suit_count[suit] > max_count) {
+      max_count = suit_count[suit];
+      best_suit = suit;
+    }
+  }
+  int j = 0;
+  for (int i=0; i<n; i++) {
+    if (SUIT(src->cards[i]) == best_suit) {
+      dst->cards[j++] = src->cards[i];
+    }
+  }
+  assert(j == max_count);
+  dst->count = j;
 }
 
 /*
