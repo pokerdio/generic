@@ -189,10 +189,10 @@ class FishGfx {
 }
 
 class Fish {
-    static w = 900;
-    static h = 600;
-    static halfw = 400;
-    static halfh = 200;
+    static w = 1600;
+    static h = 900;
+    static halfw = 800;
+    static halfh = 450;
     static interact_d = 20;
 
     constructor(gfx, x, y, speed, size) {
