@@ -160,6 +160,31 @@ int cg_quads_count (const CardGroup *sorted) {
   return 0;
 }
 
+//returns the highcard in a straight, or 0 if there's no straight
+//the bycicle straight returns 3, which is the code of rank 5 cards
+int cg_top_straight (const CardGroup *g) {
+    int bit = 0;
+    for (int i=0; i<g->count ; ++i) {
+	bit |= (1 << RANK(g->cards[i]));
+    }
+    int top = 12;
+    int count = 0;
+    for (int i=12; i>=0; i--) {
+	if (bit & (1 << i)) {
+	    if (5 == ++count) {
+		return top;
+	    }
+	} else {
+	    top = i - 1;
+	    count = 0;
+	}
+    }
+    if (count == 4 && bit & (1 << 12)) { //bycicle
+	return 3;
+    }
+    return 0;
+}
+
 
 static void print_group(const CardGroup *g) {
     printf("{ count=%u, ranks=[", (unsigned)g->count);

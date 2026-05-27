@@ -206,18 +206,52 @@ int test_cg_sort(int verbose) {
 }
 
 
-int main(void) {
+int test_cg_top_straight(int verbose) {
+  static const CGTest tests[] = {
+    {"single card", CG(cAc), 0},
+    {"four cards no straight yet", CG(c2c, c3c, c4c, c5c), 0},
 
-  int pair_ok = test_cg_pair_count(1);
-  int trips_ok = test_cg_trips_count(1);
-  int quads_ok = test_cg_quads_count(1);
-  int sort_ok = test_cg_sort(1);
-  int highcard_val_ok = test_cg_highcard_value_base13_exact(1);
+    {"lowest non-wheel straight 23456", CG(c2c, c3d, c4h, c5s, c6c), 4},
+    {"wheel straight A2345", CG(cAc, c2c, c3d, c4h, c5s), 3},
+    {"broadway straight TJQKA", CG(cTc, cJd, cQh, cKs, cAc), 12},
+    {"king-high straight 9TJQK", CG(c9c, cTd, cJh, cQs, cKc), 11},
+    {"queen-high straight 89TJQ", CG(c8c, c9d, cTh, cJs, cQc), 10},
 
-  TEST_OK(pair_ok);
-  TEST_OK(trips_ok);
-  TEST_OK(quads_ok);
-  TEST_OK(sort_ok);
-  TEST_OK(highcard_val_ok);
-  return 0;
+    {"no straight with gap", CG(c2c, c3d, c4h, c6s, c7c), 0},
+    {"no straight with four-run plus ace", CG(cAc, c2c, c3d, c4h, c6s), 0},
+    {"ace is not low without 2345", CG(cAc, c2c, c3d, c4h, cKs), 0},
+
+    {"duplicates do not fake straight", CG(c2c, c2d, c3c, c4c, c5c), 0},
+    {"pairs inside real straight", CG(c2c, c2d, c3c, c4c, c5c, c6c), 4},
+
+    {"seven cards finds straight", CG(c2c, c3d, c4h, c5s, c6c, c9c, cAc), 4},
+    {"seven cards chooses highest straight", CG(c2c, c3d, c4h, c5s, c6c, c7d, c8h), 6},
+    {"seven cards wheel plus higher straight chooses higher", CG(cAc, c2c, c3d, c4h, c5s, c6c, c7c), 5},
+
+    {"scrambled broadway", CG(cAc, cQc, cTc, cKc, cJc), 12},
+    {"scrambled seven-card straight", CG(c9c, c2c, c6c, c5c, c3c, c4c, cAc), 4}
+  };
+
+  return run_many_cg_tests(verbose, tests, ARRAY_SIZE(tests),
+                           cg_top_straight,
+                           "Top straight test");
 }
+int main (void) {
+    test_cg_top_straight(1);
+}
+
+/* int main(void) { */
+
+/*   int pair_ok = test_cg_pair_count(1); */
+/*   int trips_ok = test_cg_trips_count(1); */
+/*   int quads_ok = test_cg_quads_count(1); */
+/*   int sort_ok = test_cg_sort(1); */
+/*   int highcard_val_ok = test_cg_highcard_value_base13_exact(1); */
+
+/*   TEST_OK(pair_ok); */
+/*   TEST_OK(trips_ok); */
+/*   TEST_OK(quads_ok); */
+/*   TEST_OK(sort_ok); */
+/*   TEST_OK(highcard_val_ok); */
+/*   return 0; */
+/* } */
