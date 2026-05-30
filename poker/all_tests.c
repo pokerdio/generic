@@ -1,5 +1,38 @@
 #include "poker.h"
 
+
+static void print_group(const CardGroup *g) {
+    printf("{ count=%u, ranks=[", (unsigned)g->count);
+    for (uint8_t i = 0; i < g->count; i++) {
+        if (i) printf(" ");
+        printf("%u", (unsigned)RANK(g->cards[i]));
+    }
+    printf("] }");
+}
+
+
+static int run_one_cg_filter_test(const CGFilterTest *test, void (*f) (const CardGroup *, CardGroup*), int verbose) {
+    CardGroup src;
+    CardGroup dest;
+    cg_sort(&test->input, &src);
+    f(&src, &dest);
+    int pass = cg_same_cards(&dest, &test->expected);
+
+    if (verbose || !pass) {
+        printf("%s: %s\n", pass ? "PASS" : "FAIL", test->description);
+        printf("  hand     = ");
+        print_group(&test->input);
+        printf("\n");
+	printf("  expected = ");
+	print_group(&test->expected);
+        printf("  actual   = ");
+	print_group(&dest);
+	printf("\n");
+    }
+
+    return pass;
+}
+
 static int run_one_cg_test(const CGTest *test, int (*f) (const CardGroup *), int verbose) {
     int actual = f(&test->group);
     int pass = (actual == test->expected);
@@ -17,16 +50,30 @@ static int run_one_cg_test(const CGTest *test, int (*f) (const CardGroup *), int
 }
 
 int run_many_cg_tests(int verbose, const CGTest tests[], int total, int (*f) (const CardGroup *), const char* msg) {
-  int passed = 0;
+    int passed = 0;
 
-  for (int i = 0; i < total; i++) {
-    if (run_one_cg_test(&tests[i], f, verbose)) {
-      passed++;
+    for (int i = 0; i < total; i++) {
+	if (run_one_cg_test(&tests[i], f, verbose)) {
+	    passed++;
+	}
     }
-  }
-  printf("\n%s: %d/%d passed\n", msg, passed, total);
-  return passed == total;
+    printf("\n%s: %d/%d passed\n", msg, passed, total);
+    return passed == total;
 }
+
+int run_many_cg_filter_tests(int verbose, const CGFilterTest tests[], int total, 
+			     void (*f) (const CardGroup *, CardGroup *), const char* msg) {
+    int passed = 0;
+
+    for (int i = 0; i < total; i++) {
+	if (run_one_cg_filter_test(&tests[i], f, verbose)) {
+	    passed++;
+	}
+    }
+    printf("\n%s: %d/%d passed\n", msg, passed, total);
+    return passed == total;
+}
+
 
 int test_cg_pair_count(int verbose) {
   static const CGTest tests[] = {
@@ -130,6 +177,10 @@ int test_cg_quads_count(int verbose) {
     return run_many_cg_tests(verbose, tests, ARRAY_SIZE(tests), cg_quads_count, "Quads count test");
 }
 
+int cg_highcard_value_test_5 (const CardGroup *cg) {
+    return cg_highcard_value_base13(cg, 5, 0);
+}
+
 int test_cg_highcard_value_base13_exact(int verbose) {
     static const CGTest tests[] = {
 	{ "single deuce", CG(c2c), 0},
@@ -146,7 +197,7 @@ int test_cg_highcard_value_base13_exact(int verbose) {
     };
 
     return run_many_cg_tests(verbose, tests, ARRAY_SIZE(tests),
-			     cg_highcard_value_base13,
+			     cg_highcard_value_test_5,
 			     "High-card base-13 exact value test");
 }
 
@@ -206,52 +257,255 @@ int test_cg_sort(int verbose) {
 }
 
 
-int test_cg_top_straight(int verbose) {
-  static const CGTest tests[] = {
-    {"single card", CG(cAc), 0},
-    {"four cards no straight yet", CG(c2c, c3c, c4c, c5c), 0},
+int test_cg_tuple_filters(int verbose) {
+    int ret = 1;
 
-    {"lowest non-wheel straight 23456", CG(c2c, c3d, c4h, c5s, c6c), 4},
-    {"wheel straight A2345", CG(cAc, c2c, c3d, c4h, c5s), 3},
-    {"broadway straight TJQKA", CG(cTc, cJd, cQh, cKs, cAc), 12},
-    {"king-high straight 9TJQK", CG(c9c, cTd, cJh, cQs, cKc), 11},
-    {"queen-high straight 89TJQ", CG(c8c, c9d, cTh, cJs, cQc), 10},
+    static const CGFilterTest highcard_tests[] = {
+	{"empty", CG0(), CG0()},
+        {"single card", CG(cAc), CG(cAc)},
+        {"all highcards", CG(cAc, cKc, cQs), CG(cQs, cKc, cAc)},
+        {"one pair removed", CG(cAc, cKc, cAs), CG(cKc)},
+        {"two pair removed", CG(cAc, cAs, cKc, cKs, cQc), CG(cQc)},
+        {"set removed", CG(cAc, cAs, cAd, cKc), CG(cKc)},
+        {"quads removed", CG(cAc, cAs, cAd, cAh, cKc), CG(cKc)},
+        {"mixed singles pairs set", CG(c2c, c2d, c3c, c4c, c4d, c4h, cAc),
+         CG(c3c, cAc)},
+        {"seven all distinct scrambled", CG(cAc, c2c, cKc, c3d, cQs, c7h, c9c),
+         CG(c2c, c3d, c7h, c9c, cQs, cKc, cAc)}
+    };
 
-    {"no straight with gap", CG(c2c, c3d, c4h, c6s, c7c), 0},
-    {"no straight with four-run plus ace", CG(cAc, c2c, c3d, c4h, c6s), 0},
-    {"ace is not low without 2345", CG(cAc, c2c, c3d, c4h, cKs), 0},
+    static const CGFilterTest pair_tests[] = {
+	{"empty", CG0(), CG0()},
+        {"single card", CG(cAc), CG0()},
+        {"no pair", CG(cAc, cKc, cQs), CG0()},
+        {"one pair", CG(cAc, cAs, cKc), CG(cAc)},
+        {"two pair", CG(cAc, cAs, cKc, cKs, cQc), CG(cKc, cAc)},
+        {"three pair", CG(cAc, cAs, cKc, cKs, cQc, cQs), CG(cQc, cKc, cAc)},
+        {"set ignored", CG(cAc, cAs, cAd, cKc), CG0()},
+        {"quads ignored", CG(cAc, cAs, cAd, cAh, cKc), CG0()},
+        {"pair plus set", CG(cAc, cAs, cAd, cKc, cKs), CG(cKc)},
+        {"pair plus quads", CG(cAc, cAs, cAd, cAh, cKc, cKs), CG(cKc)},
+        {"seven cards pair extraction", CG(c2c, c2d, c3c, c4c, c4d, c4h, cAc),
+         CG(c2c)}
+    };
 
-    {"duplicates do not fake straight", CG(c2c, c2d, c3c, c4c, c5c), 0},
-    {"pairs inside real straight", CG(c2c, c2d, c3c, c4c, c5c, c6c), 4},
+    static const CGFilterTest set_tests[] = {
+	{"empty", CG0(), CG0()},
+        {"single card", CG(cAc), CG0()},
+        {"no set", CG(cAc, cKc, cQs), CG0()},
+        {"pair ignored", CG(cAc, cAs, cKc), CG0()},
+        {"one set", CG(cAc, cAs, cAd, cKc), CG(cAc)},
+        {"two sets", CG(cAc, cAs, cAd, cKc, cKs, cKd), CG(cKc, cAc)},
+        {"quads ignored", CG(cAc, cAs, cAd, cAh, cKc), CG0()},
+        {"set plus pair", CG(cAc, cAs, cAd, cKc, cKs), CG(cAc)},
+        {"set plus quads", CG(cAc, cAs, cAd, cKc, cKs, cKd, cKh), CG(cAc)},
+        {"seven cards mixed", CG(c2c, c2d, c2h, c4c, c4d, cAc, cKs),
+         CG(c2c)}
+    };
 
-    {"seven cards finds straight", CG(c2c, c3d, c4h, c5s, c6c, c9c, cAc), 4},
-    {"seven cards chooses highest straight", CG(c2c, c3d, c4h, c5s, c6c, c7d, c8h), 6},
-    {"seven cards wheel plus higher straight chooses higher", CG(cAc, c2c, c3d, c4h, c5s, c6c, c7c), 5},
+    static const CGFilterTest quad_tests[] = {
+	{"empty", CG0(), CG0()},
+        {"single card", CG(cAc), CG0()},
+        {"no quads", CG(cAc, cKc, cQs), CG0()},
+        {"pair ignored", CG(cAc, cAs, cKc), CG0()},
+        {"set ignored", CG(cAc, cAs, cAd, cKc), CG0()},
+        {"one quads", CG(cAc, cAs, cAd, cAh, cKc), CG(cAc)},
+        {"quads plus pair", CG(cAc, cAs, cAd, cAh, cKc, cKs), CG(cAc)},
+        {"quads plus set", CG(cAc, cAs, cAd, cAh, cKc, cKs, cKd), CG(cAc)},
+        {"low quads", CG(c2c, c2d, c2h, c2s, cAc), CG(c2c)}
+    };
 
-    {"scrambled broadway", CG(cAc, cQc, cTc, cKc, cJc), 12},
-    {"scrambled seven-card straight", CG(c9c, c2c, c6c, c5c, c3c, c4c, cAc), 4}
-  };
+    ret = ret && run_many_cg_filter_tests(verbose, highcard_tests,
+                                          ARRAY_SIZE(highcard_tests),
+                                          cg_filter_highcard,
+                                          "Filter highcard test");
 
-  return run_many_cg_tests(verbose, tests, ARRAY_SIZE(tests),
-                           cg_top_straight,
-                           "Top straight test");
+    ret = ret && run_many_cg_filter_tests(verbose, pair_tests,
+                                          ARRAY_SIZE(pair_tests),
+                                          cg_filter_pair,
+                                          "Filter pair test");
+
+    ret = ret && run_many_cg_filter_tests(verbose, set_tests,
+                                          ARRAY_SIZE(set_tests),
+                                          cg_filter_set,
+                                          "Filter set test");
+
+    ret = ret && run_many_cg_filter_tests(verbose, quad_tests,
+                                          ARRAY_SIZE(quad_tests),
+                                          cg_filter_quads,
+                                          "Filter quads test");
+
+    return ret;
 }
-int main (void) {
-    test_cg_top_straight(1);
+
+
+int test_cg_top_straight(int verbose) {
+    static const CGTest tests[] = {
+	{"single card", CG(cAc), 0},
+	{"four cards no straight yet", CG(c2c, c3c, c4c, c5c), 0},
+
+	{"lowest non-wheel straight 23456", CG(c2c, c3d, c4h, c5s, c6c), 4},
+	{"wheel straight A2345", CG(cAc, c2c, c3d, c4h, c5s), 3},
+	{"broadway straight TJQKA", CG(cTc, cJd, cQh, cKs, cAc), 12},
+	{"king-high straight 9TJQK", CG(c9c, cTd, cJh, cQs, cKc), 11},
+	{"queen-high straight 89TJQ", CG(c8c, c9d, cTh, cJs, cQc), 10},
+
+	{"no straight with gap", CG(c2c, c3d, c4h, c6s, c7c), 0},
+	{"no straight with four-run plus ace", CG(cAc, c2c, c3d, c4h, c6s), 0},
+	{"ace is not low without 2345", CG(cAc, c2c, c3d, c4h, cKs), 0},
+
+	{"duplicates do not fake straight", CG(c2c, c2d, c3c, c4c, c5c), 0},
+	{"pairs inside real straight", CG(c2c, c2d, c3c, c4c, c5c, c6c), 4},
+
+	{"seven cards finds straight", CG(c2c, c3d, c4h, c5s, c6c, c9c, cAc), 4},
+	{"seven cards chooses highest straight", CG(c2c, c3d, c4h, c5s, c6c, c7d, c8h), 6},
+	{"seven cards wheel plus higher straight chooses higher", CG(cAc, c2c, c3d, c4h, c5s, c6c, c7c), 5},
+
+	{"scrambled broadway", CG(cAc, cQc, cTc, cKc, cJc), 12},
+	{"scrambled seven-card straight", CG(c9c, c2c, c6c, c5c, c3c, c4c, cAc), 4}
+    };
+
+    return run_many_cg_tests(verbose, tests, ARRAY_SIZE(tests),
+			     cg_top_straight,
+			     "Top straight test");
+}
+
+void print_base_13(int score) {
+    if (score > 13) {
+	print_base_13(score / 13);
+    }
+    printf ("%d ", score % 13);
+}
+
+void print_score (const char* prefix, int score) {
+    int m = score / 1000000;
+    int remainder = score % 1000000;
+    printf ("%s %d -- %dM %d -- ", prefix, score, m, remainder);
+    print_base_13 (remainder);
+    printf ("\n");
+}
+
+int test_get_hand_score(const CardGroup *hand, int verbose) {
+    int score = cg_score (hand);
+    if (verbose) {
+	printf ("SCORE FOR: ");
+	print_group(hand);
+	print_score ("  - ", score);
+    }
+    return score;
+}
+
+int test_cg_score(int verbose) {
+    const CardGroup test[] = {
+        /* high card */
+        CG(c2c, c4d, c6h, c8s, cTc),
+        CG(c2c, c4d, c6h, c8s, cJc),
+        CG(c2c, c4d, c6h, c9s, cJc),
+        CG(c2c, c4d, c7h, c9s, cJc),
+        CG(c2c, c5d, c7h, c9s, cJc),
+        CG(c3c, c5d, c7h, c9s, cJc),
+        CG(cAc, cKc, cQc, c9d, c7h),
+
+        /* one pair */
+        CG(c2c, c2d, c4h, c6s, c8c),
+        CG(c2c, c2d, c4h, c6s, c9c),
+        CG(c2c, c2d, c4h, c7s, c9c),
+        CG(c2c, c2d, c5h, c7s, c9c),
+        CG(c3c, c3d, c2h, c4s, c6c),
+        CG(cAc, cAd, cKc, cQc, cJd),
+
+        /* two pair */
+        CG(c2c, c2d, c3c, c3d, c4h),
+        CG(c2c, c2d, c3c, c3d, c5h),
+        CG(c2c, c2d, c4c, c4d, c3h),
+        CG(c3c, c3d, c4c, c4d, c2h),
+
+        /* three pair: should count as best two pair plus kicker */
+        CG(c2c, c2d, c3c, c3d, c4c, c4d, c5h),
+        CG(c2c, c2d, c3c, c3d, c5c, c5d, c4h),
+
+        /* more two pair */	
+        CG(cAc, cAd, cKc, cKd, c2h),
+        CG(cAc, cAd, cKc, cKd, cQh),
+
+
+        /* trips */
+        CG(c2c, c2d, c2h, c4s, c6c),
+        CG(c2c, c2d, c2h, c4s, c7c),
+        CG(c2c, c2d, c2h, c5s, c7c),
+        CG(c3c, c3d, c3h, c2s, c4c),
+        CG(cAc, cAd, cAh, cKc, cQc),
+
+        /* straights */
+        CG(cAc, c2d, c3h, c4s, c5c), /* wheel */
+        CG(c2c, c3d, c4h, c5s, c6c),
+        CG(c3c, c4d, c5h, c6s, c7c),
+        CG(c9c, cTd, cJh, cQs, cKc),
+        CG(cTc, cJd, cQh, cKs, cAc),
+
+        /* flushes */
+        CG(c2c, c4c, c6c, c8c, cTc),
+        CG(c2c, c4c, c6c, c8c, cJc),
+        CG(c2c, c4c, c6c, c9c, cJc),
+        CG(cAc, cKc, cQc, c9c, c7c),
+
+        /* full houses */
+        CG(c2c, c2d, c2h, c3c, c3d),
+        CG(c2c, c2d, c2h, c4c, c4d),
+        CG(c3c, c3d, c3h, c2c, c2d),
+        CG(cTc, cTd, cTh, cKc, cKd),
+
+        /* double trips: should use higher trips as trips, lower trips as pair */
+        CG(c2c, c2d, c2h, cQc, cQd, cQh),
+        CG(cKc, cKd, c4c, cKh, c4d, c4h),
+
+        /* quads */
+        CG(c2c, c2d, c2h, c2s, c3c),
+        CG(c2c, c2d, c2h, c2s, cAc),
+        CG(c3c, c3d, c3h, c3s, c2c),
+        CG(cAc, cAd, cAh, cAs, cKc),
+
+        /* straight flushes */
+        CG(cAc, c2c, c3c, c4c, c5c),
+        CG(c2c, c3c, c4c, c5c, c6c),
+        CG(c3c, c4c, c5c, c6c, c7c),
+        CG(c9c, cTc, cJc, cQc, cKc),
+        CG(cTc, cJc, cQc, cKc, cAc)
+    };
+    test_get_hand_score(&test[12], 1);
+
+    int n = ARRAY_SIZE(test);
+    int okay = 0;
+    int last_score = test_get_hand_score(&test[0], verbose);
+    for (int i=1; i<n; i++) {
+	int new_score = test_get_hand_score(&test[i], verbose);
+	if (new_score >= last_score) {
+	    okay++;
+	} else {
+	    printf ("FAIL --- DESCENDING SCORE DETECTED --- FAIL\n");
+	}
+	last_score = new_score;
+    }
+    printf ("CORRECT SORT ORDER %d/%d\n", okay, n-1);
+    return okay == n - 1;
+}
+
+int main(void) {
+    test_cg_score(1);
 }
 
 /* int main(void) { */
-
-/*   int pair_ok = test_cg_pair_count(1); */
-/*   int trips_ok = test_cg_trips_count(1); */
-/*   int quads_ok = test_cg_quads_count(1); */
-/*   int sort_ok = test_cg_sort(1); */
-/*   int highcard_val_ok = test_cg_highcard_value_base13_exact(1); */
-
-/*   TEST_OK(pair_ok); */
-/*   TEST_OK(trips_ok); */
-/*   TEST_OK(quads_ok); */
-/*   TEST_OK(sort_ok); */
-/*   TEST_OK(highcard_val_ok); */
-/*   return 0; */
+/*     int pair_ok = test_cg_pair_count(1); */
+/*     int trips_ok = test_cg_trips_count(1); */
+/*     int quads_ok = test_cg_quads_count(1); */
+/*     int sort_ok = test_cg_sort(1); */
+/*     int highcard_val_ok = test_cg_highcard_value_base13_exact(1); */
+/*     int tuple_filter_ok = test_cg_tuple_filters(1); */
+/*     TEST_OK(pair_ok); */
+/*     TEST_OK(trips_ok); */
+/*     TEST_OK(quads_ok); */
+/*     TEST_OK(sort_ok); */
+/*     TEST_OK(highcard_val_ok); */
+/*     TEST_OK(tuple_filter_ok); */
+/*     return 0; */
 /* } */
