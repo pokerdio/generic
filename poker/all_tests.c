@@ -1,3 +1,8 @@
+#include <stdint.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "poker.h"
 
 
@@ -184,7 +189,7 @@ int cg_highcard_value_test_5 (const CardGroup *cg) {
 int test_cg_highcard_value_base13_exact(int verbose) {
     static const CGTest tests[] = {
 	{ "single deuce", CG(c2c), 0},
-	{ "single ace", CG(cAc), 12 * 13 * 13 * 13 * 13},
+	{ "single ace", CG(cAc), 12},
 	{ "five lowest cards", CG(c2c, c3c, c4c, c5c, c6c), ((((4 * 13 + 3) * 13 + 2) * 13 + 1) * 13 + 0) },
 	{ "broadway high-card encoding", CG(cTc, cJc, cQc, cKc, cAc), 
 	  ((((12 * 13 + 11) * 13 + 10) * 13 + 9) * 13 + 8) },
@@ -490,22 +495,21 @@ int test_cg_score(int verbose) {
     return okay == n - 1;
 }
 
-int main(void) {
-    test_cg_score(1);
-}
 
-/* int main(void) { */
-/*     int pair_ok = test_cg_pair_count(1); */
-/*     int trips_ok = test_cg_trips_count(1); */
-/*     int quads_ok = test_cg_quads_count(1); */
-/*     int sort_ok = test_cg_sort(1); */
-/*     int highcard_val_ok = test_cg_highcard_value_base13_exact(1); */
-/*     int tuple_filter_ok = test_cg_tuple_filters(1); */
-/*     TEST_OK(pair_ok); */
-/*     TEST_OK(trips_ok); */
-/*     TEST_OK(quads_ok); */
-/*     TEST_OK(sort_ok); */
-/*     TEST_OK(highcard_val_ok); */
-/*     TEST_OK(tuple_filter_ok); */
-/*     return 0; */
-/* } */
+int main(void) {
+    int pair_ok = test_cg_pair_count(1);
+    int trips_ok = test_cg_trips_count(1);
+    int quads_ok = test_cg_quads_count(1);
+    int sort_ok = test_cg_sort(1);
+    int highcard_val_ok = test_cg_highcard_value_base13_exact(1);
+    int tuple_filter_ok = test_cg_tuple_filters(1);
+    int score_ok = test_cg_score(1);
+    TEST_OK(pair_ok);
+    TEST_OK(trips_ok);
+    TEST_OK(quads_ok);
+    TEST_OK(sort_ok);
+    TEST_OK(highcard_val_ok);
+    TEST_OK(tuple_filter_ok);
+    TEST_OK(score_ok);
+    return 0;
+}

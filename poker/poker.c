@@ -1,10 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <assert.h>
 #include "poker.h"
-
-
 
 _Static_assert(sizeof(CardGroup) == 8, "CardGroup must be exactly 8 bytes");
 
@@ -337,6 +332,4 @@ int cg_score (const CardGroup *g) {
     } 
     return rank_score;
 }
-
-#include "all_tests.c"
 

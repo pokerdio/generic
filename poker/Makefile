@@ -1,14 +1,43 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Wpedantic -g -O0
-TARGET = poker
+WARN = -Wall -Wextra -Wpedantic
 
-all: $(TARGET)
+DEBUG_CFLAGS = $(WARN) -g -O0
+PREFLOP_CFLAGS ?= $(WARN) -O3 -march=native -DNDEBUG
 
-$(TARGET): poker.c all_tests.c poker.h
-	$(CC) $(CFLAGS) poker.c -o $(TARGET)
+TEST_TARGET = poker-tests
+PREFLOP_TARGET = preflop
 
-run: $(TARGET)
-	./$(TARGET)
+.PHONY: all test run preflop clean
+
+all: $(TEST_TARGET) $(PREFLOP_TARGET)
+
+$(TEST_TARGET): all_tests.c poker.c poker.h
+	$(CC) $(DEBUG_CFLAGS) all_tests.c poker.c -o $(TEST_TARGET)
+
+$(PREFLOP_TARGET): preflop.c poker.c poker.h
+	$(CC) $(PREFLOP_CFLAGS) preflop.c -o $(PREFLOP_TARGET)
+
+test_run: $(TEST_TARGET)
+	./$(TEST_TARGET)
+
+preflop_run: $(PREFLOP_TARGET)
+	./$(PREFLOP_TARGET)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TEST_TARGET) $(PREFLOP_TARGET)
+
+
+# CC = gcc
+# CFLAGS = -Wall -Wextra -Wpedantic -g -O0
+# TARGET = poker
+
+# all: $(TARGET)
+
+# $(TARGET): poker.c all_tests.c poker.h
+# 	$(CC) $(CFLAGS) poker.c -o $(TARGET)
+
+# run: $(TARGET)
+# 	./$(TARGET)
+
+# clean:
+# 	rm -f $(TARGET)
