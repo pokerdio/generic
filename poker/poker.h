@@ -87,4 +87,11 @@ int cg_same_cards (const CardGroup *src, const CardGroup *dst);
 int cg_count (const CardGroup *src, uint8_t card);
 
 
+int parse_hand(const char* s, uint8_t *dest);
+int parse_card(const char* s);
+void print_cards (uint8_t * cards, int n);
+void print_card (uint8_t card);
+void print_cards_ascii (uint8_t * cards, int n);
+void print_card_ascii (uint8_t card);
+void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int));
 #endif 

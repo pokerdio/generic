@@ -1,5 +1,9 @@
 #include <assert.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 #include "poker.h"
+#include "bitworks.h"
 
 _Static_assert(sizeof(CardGroup) == 8, "CardGroup must be exactly 8 bytes");
 
@@ -229,7 +233,7 @@ void cg_filter_quads(const CardGroup *sorted, CardGroup *dest) {
 
 
 int cg_pair_score (const CardGroup *sorted) {
-    CardGroup p, h;
+    CardGroup p=CG(0), h=CG(0);
     cg_filter_pair(sorted, &p);
     assert(p.count == 1);
     cg_filter_highcard(sorted, &h);
@@ -272,11 +276,18 @@ int cg_full_house_score(const CardGroup *sorted) {
 }
 
 int cg_quads_score(const CardGroup *sorted) {
-    CardGroup q, h;
+    CardGroup q = {0};
     cg_filter_quads(sorted, &q);
     assert(q.count == 1);
-    cg_filter_highcard(sorted, &h);
-    return SCORE_QUADS + cg_highcard_value_base13(&h, 1, cg_highcard_value_base13(&q, 1, 0)); 
+    int qrank = RANK(q.cards[0]);
+    int kicker = 0;
+    for (int i=0; i<sorted->count; i++) {
+	int crank = RANK(sorted->cards[i]);
+	if (crank != qrank && crank > kicker) {
+	    kicker = crank;
+	}
+    }
+    return SCORE_QUADS + qrank * 13 + kicker; 
 }
 
 int cg_straight_flush_score(const CardGroup *sorted) {
@@ -331,5 +342,96 @@ int cg_score (const CardGroup *g) {
 	return straight_flush_score;
     } 
     return rank_score;
+}
+
+
+
+
+void print_card (uint8_t card) {
+    static const char *suit[] = {
+	"♣", "♦", "♥", "♠"
+    };
+    printf("%c%s", "23456789TJQKA"[RANK(card)], suit[SUIT(card)]);
+}
+
+void print_cards (uint8_t * cards, int n) {
+    for (int i=0; i<n; i++) {
+	print_card(cards[i]);
+    }
+}
+
+void print_card_ascii (uint8_t card) {
+    printf("%c%c", "23456789TJQKA"[RANK(card)], "cdhs"[SUIT(card)]);
+}
+
+void print_cards_ascii (uint8_t * cards, int n) {
+    for (int i=0; i<n; i++) {
+	print_card_ascii(cards[i]);
+    }
+}
+
+
+int parse_card(const char* s) {
+    if (s == NULL || strlen(s) < 2) {
+	return -1;
+    }
+    int rank = char_idx(tolower(s[0]), "23456789tjqka");
+    int suit = char_idx(tolower(s[1]), "cdhs");
+    if (rank == -1 || suit == -1 || rank > 12 || suit > 3) {
+	return -1;
+    }
+    return rank * 4 + suit;
+}
+
+int parse_hand(const char* s, uint8_t *dest) {
+    if (s == NULL || strlen(s) != 4) {
+	return -1;
+    }
+    int c0 = parse_card(s);
+    int c1 = parse_card(s + 2);
+    if (c0 == -1 || c1 == -1) {
+	return -1;
+    }
+    dest[0] = (uint8_t)c0;
+    dest[1] = (uint8_t)c1;
+    return 0;
+}
+
+
+uint64_t gospers_hack(const uint64_t n) {
+    const uint64_t c = n & -n;
+    const uint64_t r = n + c;
+    return ( ( ( r ^ n ) >> 2 ) / c ) | r;
+}
+
+void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int)) {
+    uint8_t allow[NCARDS];
+    int nallow = 0;
+    for (int i=0; i<NCARDS; i++) {
+	if (!(forbid_bitmask & (UINT64_C(1) << i)))  {
+	    allow[nallow++] = i;
+	}
+    }
+    if (n > nallow  || n == 0) {
+	return;
+    }
+    uint64_t start = (UINT64_C(1) << n) - 1;
+    uint64_t stop = UINT64_C(1) << nallow;
+    uint8_t cards[NCARDS];
+    int ncards;
+    while (start > 0 && start<stop) {
+	ncards = 0;
+	for (int i=0; i<nallow; i++) {
+	    if ((UINT64_C(1) << i) & start) {
+		cards[ncards++] = allow[i];
+	    }
+	}
+	if (ncards != n) {
+	    printf("ERROR %d %d %d", (int) start, (int)n, (int)ncards);
+	    return;
+	}
+	f(cards, ncards);
+	start = (long int) gospers_hack(start);
+    }
 }
 

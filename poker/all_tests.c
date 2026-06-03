@@ -413,17 +413,26 @@ int test_cg_score(int verbose) {
 
         /* one pair */
         CG(c2c, c2d, c4h, c6s, c8c),
+        CG(c2c, c2d, c4h, c6s, c5d, c8c),
         CG(c2c, c2d, c4h, c6s, c9c),
         CG(c2c, c2d, c4h, c7s, c9c),
         CG(c2c, c2d, c5h, c7s, c9c),
         CG(c3c, c3d, c2h, c4s, c6c),
+        CG(cAc, cQd, cKc, cQc, cTd, c3s),
+        CG(cAc, cKd, cKc, cQc, c7d, c3s),
+        CG(cAc, cAd, cKc, cQc, c2d, c3s),
+        CG(cAc, cAd, cKc, cQc, cJd),
+        CG(cAc, cAd, cKc, cQc, cJd, c9s),
+        CG(cAc, cAd, cKc, cQc, cJd, c2s),
         CG(cAc, cAd, cKc, cQc, cJd),
 
         /* two pair */
         CG(c2c, c2d, c3c, c3d, c4h),
         CG(c2c, c2d, c3c, c3d, c5h),
         CG(c2c, c2d, c4c, c4d, c3h),
+        CG(c3c, c3d, c4c, c4d, c2h, c2s),
         CG(c3c, c3d, c4c, c4d, c2h),
+        CG(c3c, c3d, c4c, c4d, c2h, c2s),
 
         /* three pair: should count as best two pair plus kicker */
         CG(c2c, c2d, c3c, c3d, c4c, c4d, c5h),
@@ -438,37 +447,71 @@ int test_cg_score(int verbose) {
         CG(c2c, c2d, c2h, c4s, c6c),
         CG(c2c, c2d, c2h, c4s, c7c),
         CG(c2c, c2d, c2h, c5s, c7c),
+        CG(c2c, c2d, c2h, c5s, c7c, c9d),
         CG(c3c, c3d, c3h, c2s, c4c),
         CG(cAc, cAd, cAh, cKc, cQc),
 
         /* straights */
+        CG(cAc, c2d, c3h, c4s, c5c, c5d), /* wheel */
         CG(cAc, c2d, c3h, c4s, c5c), /* wheel */
-        CG(c2c, c3d, c4h, c5s, c6c),
-        CG(c3c, c4d, c5h, c6s, c7c),
+        CG(cAc, c2d, c3h, c4s, c5c, c5d), /* wheel */
+
+        CG(cAc, c2d, c3h, c4s, c5c, c7s), /* wheel */
+        CG(cAc, c2d, c3h, c4s, c5c, c5s, c5c), /* wheel */
+        CG(cAc, c2d, c3h, c4s, c5c, cKc), /* wheel */
+        CG(cAc, c2d, c3h, c4s, c5c, c5s, c5c), /* wheel */
+        CG(cAc, c2d, c3h, c4s, c5c, cKc, cKd), /* wheel */
+
+        CG(cAd, c2c, c3d, c4h, c5s, c8d, c6c),
+        CG(c2c, c3d, c4h, c5s, c8d, c6c),
+        CG(c3c, c4d, c5h, c6s, cAc, c7c),
+        CG(c2h, c3c, c4d, c5h, c6s, cAc, c7c),
+        CG(c3c, c4d, c5h, c6s, cTh, c7c),
+        CG(c3c, c4d, c5h, c6s, c9s, cTs, c7c),
+
         CG(c9c, cTd, cJh, cQs, cKc),
         CG(cTc, cJd, cQh, cKs, cAc),
 
         /* flushes */
         CG(c2c, c4c, c6c, c8c, cTc),
+        CG(c2c, c4c, c6c, c7c, c8c, cTc),
+        CG(c2c, c4c, c6c, c9c, c8c, cTc, cTd),
+        CG(c2c, c4c, c6c, c9c, c8c, cTc),
+        CG(c2c, c4c, c6c, c9c, c8c, cTc, c8d),
+
         CG(c2c, c4c, c6c, c8c, cJc),
+        CG(c2c, c4c, c6c, c9c, cJc, cJd, cJs),
         CG(c2c, c4c, c6c, c9c, cJc),
+        CG(c2c, c4c, c6c, c9c, cJc, cJd, cJs),
         CG(cAc, cKc, cQc, c9c, c7c),
 
         /* full houses */
         CG(c2c, c2d, c2h, c3c, c3d),
+        CG(c2c, c2d, c2h, c3c, c3d, cAc),
         CG(c2c, c2d, c2h, c4c, c4d),
+        CG(c2c, c2d, c2h, c4c, c4d, cKc, cAd),
         CG(c3c, c3d, c3h, c2c, c2d),
+        CG(c3c, c3d, c3h, c2c, c2d, cTs),
+
+        CG(cTc, cTd, cTh, cKc, cKd, cAc),
         CG(cTc, cTd, cTh, cKc, cKd),
+        CG(cTc, cTd, cTh, cKc, cKd, cAc),
 
         /* double trips: should use higher trips as trips, lower trips as pair */
         CG(c2c, c2d, c2h, cQc, cQd, cQh),
+        CG(c3c, c3d, c3h, cQc, cQd, cQh),
         CG(cKc, cKd, c4c, cKh, c4d, c4h),
 
         /* quads */
         CG(c2c, c2d, c2h, c2s, c3c),
         CG(c2c, c2d, c2h, c2s, cAc),
         CG(c3c, c3d, c3h, c3s, c2c),
+        CG(c3c, c3d, c3h, c3s, c2c, c4c),
+        CG(c3c, c3d, c3h, c3s, c4c, c4d),
+        CG(c3c, c3d, c3h, c3s, c4c, cAd),
+        CG(cAc, cAd, cAh, cAs, cKc, cKd, cKs),
         CG(cAc, cAd, cAh, cAs, cKc),
+        CG(cAc, cAd, cAh, cAs, cKc, cKd),
 
         /* straight flushes */
         CG(cAc, c2c, c3c, c4c, c5c),
