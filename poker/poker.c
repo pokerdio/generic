@@ -351,6 +351,10 @@ void print_card (uint8_t card) {
     static const char *suit[] = {
 	"♣", "♦", "♥", "♠"
     };
+    if (card >= NCARDS) {
+	printf(">>%d<<", (int)card);
+	return;
+    }
     printf("%c%s", "23456789TJQKA"[RANK(card)], suit[SUIT(card)]);
 }
 

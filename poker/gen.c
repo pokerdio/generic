@@ -5,6 +5,7 @@
 
 #include "poker.h"
 #include "bitworks.h"
+#include "bitscore.h"
 
 #define MAX_HAND 12
 
@@ -14,6 +15,47 @@ int tie[13][13][13][13] = {0};
 
 uint8_t hands[4];
 uint8_t hands_13[4];
+
+BitCards CG_to_BC (const CardGroup * g) {
+    BitCards ret = {0};
+    for (int i=0; i<g->count; i++) {
+	ret.suits[SUIT(g->cards[i])] |= 1 << (RANK(g->cards[i]));
+    }
+    return ret;
+}
+
+void hu_win_test_bit(uint8_t* cards, int n) {
+    if (n != 5) {
+	printf("BAD CARD NUMBER %d - needs FLOP TURN RIVER\n", n);
+	exit(-1);
+    }
+    CardGroup c;
+
+    int score1, score2;
+
+    memcpy(c.cards, cards, 5);
+    c.count = 7;
+    
+    c.cards[5] = hands[0];
+    c.cards[6] = hands[1];
+    score1 = bs_score (CG_to_BC(&c));
+
+    c.cards[5] = hands[2];
+    c.cards[6] = hands[3];
+    score2 = bs_score (CG_to_BC(&c));
+
+    if (score1 > score2) {
+	 win[hands_13[0]][hands_13[1]][hands_13[2]][hands_13[3]]++;
+	 lose[hands_13[2]][hands_13[3]][hands_13[0]][hands_13[1]]++;
+    } else if (score1 == score2) {
+	 tie[hands_13[0]][hands_13[1]][hands_13[2]][hands_13[3]]++;
+	 tie[hands_13[2]][hands_13[3]][hands_13[0]][hands_13[1]]++;
+    } else {
+	 win[hands_13[2]][hands_13[3]][hands_13[0]][hands_13[1]]++;
+	 lose[hands_13[0]][hands_13[1]][hands_13[2]][hands_13[3]]++;
+    }
+}
+
 
 void hu_win_test(uint8_t* cards, int n) {
     if (n != 5) {
@@ -81,7 +123,7 @@ void loop_hands_all_flops (int i, int j, int k, int q) {
 	  fprintf (stderr, "%d %d\n", i, j);
      }
      loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
-		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test);
+		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
 }
 
 void loop_hands() {

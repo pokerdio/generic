@@ -18,7 +18,6 @@ typedef enum {
     SCORE_STRAIGHT_FLUSH = 8000000
 } score_t;
 
-
 typedef enum {
 c2c, c2d, c2h, c2s, 
 c3c, c3d, c3h, c3s, 
@@ -85,7 +84,6 @@ void cg_sort(const CardGroup *src, CardGroup *dst);
 int cg_same_cards_sorted(const CardGroup *sorted_src, const CardGroup *sorted_dst);
 int cg_same_cards (const CardGroup *src, const CardGroup *dst);
 int cg_count (const CardGroup *src, uint8_t card);
-
 
 int parse_hand(const char* s, uint8_t *dest);
 int parse_card(const char* s);

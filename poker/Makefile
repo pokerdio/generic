@@ -6,11 +6,15 @@ PREFLOP_CFLAGS ?= $(WARN) -O3 -march=native -DNDEBUG
 
 TEST_TARGET = poker-tests
 PREFLOP_TARGET = preflop
+BIT_TARGET = bit
 GEN_TARGET = gen
 
 .PHONY: all test run preflop clean
 
-all: $(TEST_TARGET) $(PREFLOP_TARGET) $(GEN_TARGET)
+all: $(TEST_TARGET) $(PREFLOP_TARGET) $(GEN_TARGET) $(BIT_TARGET)
+
+$(BIT_TARGET): bitpoker.c poker.c poker.h bitworks.c bitworks.h bitscore.c bitscore.h
+	$(CC) $(PREFLOP_CFLAGS) bitpoker.c poker.c bitworks.c bitscore.c -o $(BIT_TARGET)
 
 $(TEST_TARGET): all_tests.c poker.c poker.h bitworks.c bitworks.h
 	$(CC) $(DEBUG_CFLAGS) all_tests.c poker.c bitworks.c -o $(TEST_TARGET)
@@ -18,8 +22,8 @@ $(TEST_TARGET): all_tests.c poker.c poker.h bitworks.c bitworks.h
 $(PREFLOP_TARGET): preflop.c poker.c poker.h bitworks.c bitworks.h
 	$(CC) $(PREFLOP_CFLAGS) preflop.c poker.c bitworks.c -o $(PREFLOP_TARGET)
 
-$(GEN_TARGET): gen.c poker.c poker.h bitworks.c bitworks.h
-	$(CC) $(PREFLOP_CFLAGS) gen.c poker.c bitworks.c -o $(GEN_TARGET)
+$(GEN_TARGET): gen.c poker.c poker.h bitworks.c bitworks.h bitscore.c bitscore.h
+	$(CC) $(PREFLOP_CFLAGS) gen.c poker.c bitworks.c bitscore.c -o $(GEN_TARGET)
 
 
 test_run: $(TEST_TARGET)
