@@ -1,426 +1,325 @@
+;; Minimal for Lisp development
+
+(setq inhibit-startup-message t)        ;; No splash screen
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(global-display-line-numbers-mode t)
+(add-to-list 'load-path (expand-file-name "lisp/" user-emacs-directory))
+(load "dio-util")
 
-;https://i.imgur.com/6vYPb3C.jpg
-(setq frame-inhibit-implied-resize t) ;; prevent resize window on startup
-(setq default-frame-alist '((width . 100) (height . 35)))
+(setq dired-dwim-target t)
 
+;; Package setup
+(require 'package)
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+	("melpa-stable" . "https://stable.melpa.org/packages/")
+	("melpa" . "https://melpa.org/packages/")))
+
+(package-initialize)
+(unless package-archive-contents
+  (package-refresh-contents))
+
+;; Use-package for easier config management
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+(setq use-package-verbose t)
+
+
+(use-package paredit
+  :hook ((emacs-lisp-mode lisp-mode lisp-data-mode) . paredit-mode))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(use-package sly
+  :init
+  (setq inferior-lisp-program "/usr/bin/sbcl"))
+
+(with-eval-after-load 'sly
+    (define-key sly-mode-map (kbd "C-c a r") #'sly-restart-inferior-lisp))
+
+(with-eval-after-load 'sly-mrepl
+  (define-key sly-mrepl-mode-map (kbd "C-c a r") #'sly-restart-inferior-lisp))
+
+(use-package company
+  :init (global-company-mode))
+
+(use-package helpful
+  :bind
+  (("C-h f" . helpful-callable)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h x" . helpful-command)))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("cca1d386d4a3f645c2f8c49266e3eb9ee14cf69939141e3deb9dfd50ccaada79"
-     default))
- '(org-format-latex-options
-   '(:foreground default :background default :scale 2.0 :html-foreground
-		 "Black" :html-background "Transparent" :html-scale
-		 1.0 :matchers ("begin" "$1" "$" "$$" "\\(" "\\[")))
+ '(doom-modeline-always-show-macro-register t)
+ '(doom-modeline-enable-word-count t)
+ '(doom-modeline-total-line-number t)
  '(package-selected-packages
-   '(browse-kill-ring buffer-move casual clhs dash ein f flycheck fzf
-		      lsp-mode lua-mode magit-section marginalia
-		      modus-themes nodejs-repl paredit trashed vertico
-		      zeal-at-point)))
-
-(load-theme 'modus-vivendi t)
-
-(global-set-key (kbd "M-n")
-   "\261\C-v\C-n")
-
-(global-set-key (kbd "M-p")
-   "\255\261\C-v\C-p")
+   '(multiple-cursors sclang-extensions sclang-snippets devdocs elpy vundo auctex magit treemacs-projectile which-key consult-projectile embark-consult embark marginalia orderless vertico doom-modeline projectile browse-kill-ring catppuccin-theme doom-themes sly-mrepl sly rainbow-delimiters paredit helpful company)))
 
 
-;(require 'expand-region)
-;(global-set-key (kbd "C-=") 'er/expand-region)
-
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
-
-
-(require 'package)
-(package-initialize)
-
-(require 'nodejs-repl)
-
-(add-hook 'js-mode-hook
-              (lambda ()
-                (define-key js-mode-map (kbd "C-x C-e") 'nodejs-repl-send-last-expression)
-                (define-key js-mode-map (kbd "C-c C-j") 'nodejs-repl-send-line)
-                (define-key js-mode-map (kbd "C-c C-r") 'nodejs-repl-send-region)
-                (define-key js-mode-map (kbd "C-c C-c") 'nodejs-repl-send-buffer)
-                (define-key js-mode-map (kbd "C-c C-l") 'nodejs-repl-load-file)
-                (define-key js-mode-map (kbd "C-c C-z") 'nodejs-repl-switch-to-repl)))
-
-(require 'clhs)
-(setq clhs-root "file:///home/dio/hyperspec/")
-
-
-
-(add-hook 'lisp-mode-hook
-          (lambda ()
-		    (local-set-key (kbd "C-c c") 'clhs-doc)))
-
-
-
-(defun dio/gen-sequence-throwaway-name ()
-  "create the list of strings from a to zz"
-  (let ((seq '()))
-    (dotimes (i 26)
-      (push (char-to-string (+ ?a i)) seq))
-    (dotimes (i 26)
-      (dotimes (j 26)
-	(push (concat (char-to-string (+ ?a i))
-		      (char-to-string (+ ?a j)))
-	      seq)))
-    (reverse seq)))
-
-(defun dio/find-throwaway-python (number)
-  "create and open a throwaway python file; with prefix opens the last existing throwaway file"
-  (interactive "p")
-  (let ((seq (dio/gen-sequence-throwaway-name))
-	(lastf ""))
-    (catch 'foo
-      (dolist (s seq)
-	(let ((fname (concat s ".py")))
-	  (if (= number 1)
-	      (when (not (file-exists-p fname))
-		(if (file-exists-p "a.py")
-		    (progn
-		      (find-file "a.py")
-		      (set-visited-file-name fname))
-		  (find-file fname))
-		(throw 'foo nil))
-	    (when (file-exists-p fname)
-	      (setf lastf fname))))))
-    (when (not (= number 1))
-      (find-file lastf))))
-
-
-
-(add-hook 'python-mode-hook
-          (lambda ()
-	    (local-set-key (kbd "C-c y") 'dio/find-throwaway-python)))
-
-
-(add-hook 'org-mode-hook 'visual-line-mode)
-(setq org-return-follows-link t)
-
-(global-set-key (kbd "C-c e") 'eshell)
-(global-set-key (kbd "C-c 0") 'bury-buffer)
-
-(use-package zeal-at-point
-  :ensure t
-  :bind ("C-c d" . zeal-at-point)
+(use-package doom-themes
   :config
-;  (add-to-list 'zeal-at-point-mode-alist '(c-mode . "c"))
- ; (add-to-list 'zeal-at-point-mode-alist '(c++-mode . "cpp"))
-  )
+  (load-theme 'doom-dracula :no-confirm)
+  (setq doom-themes-enable-bold t
+	doom-themes-enable-italic t))
+
+;; (use-package catppuccin-theme
+;;   :config
+;;   (load-theme 'catppuccin :no-confirm))
+
+(setq-default line-spacing 0.2)
+(setq line-number-mode nil)
+
+;; (set-frame-font "JetBrains Mono 16" nil t)
+
+(when (member "Fira Code" (font-family-list))
+  (set-frame-font "Fira Code Retina 14" t)
+  (add-hook 'prog-mode-hook
+            (lambda () (setq prettify-symbols-alist
+                             '(("lambda" . ?λ)
+                               ("->" . ?→)
+                               ("=>" . ?⇒)))
+              (prettify-symbols-mode 1))))
+
+;; (set-frame-parameter (selected-frame) 'alpha-background 90)
+;; (add-to-list 'default-frame-alist '(alpha-background . 90))
+
+(defun open-init-file ()
+  (interactive)
+  (find-file user-init-file))
+
+(use-package browse-kill-ring
+  :bind (("C-c a k" . browse-kill-ring)))
 
 
 
-(recentf-mode 1)
-(setq recentf-max-menu-items 125)
-(setq recentf-max-saved-items 125)
+(defun my/insert-indexed (nl count fmt)
+  "Insert COUNT+1 lines using FMT, with index 0..COUNT.
+FMT should contain a %d placeholder for the index."
+  (interactive "p\nnCount: \nsFormat str: ")
+  ;; (insert (format "%S %S %S\n" nl count fmt))
+  (let ((i0 (if (<= 0 nl) nl (- -1 nl))))
+    (setf nl (if (<= 0 nl) "\n" "")) 
+    (dotimes (i (1+ (1- count)))
+      (insert (format fmt (+ i i0)) nl))))
 
-(global-set-key (kbd "C-c r") 'recentf-open-files)
+(global-set-keys 
+ "C-c SPC" cycle-spacing
+ "C-c 1" my/macroexpand-1-at-point
+ "C-c 2" my/macroexpand-at-point
+ "C-c 3" my/insert-indexed
+ "C-c a x" "~/org/xxx.org"
+ "C-c a e" open-init-file
+ "C-c a l" scratch-buffer
+ ;; "C-c p" this is used by projectile
+ "C-c a h" common-lisp-hyperspec
+ "C-c e" eshell
+ "C-c a p" package-list-packages
+ "C-c a m" (buf-sw "*Messages*")
+ "C-c a a" "~/org/about.org"
+ "C-c a t" "~/org/tractatus-logico-org/tractatus.org"
+ "C-c 0" bury-buffer
+ "C-c c" compile
+ "<F5>" recompile)
 
-(global-set-key (kbd "C-c f") 'next-buffer)
-(global-set-key (kbd "C-c b") 'previous-buffer)
+(when (display-graphic-p)
+  (global-set-key (kbd "C-c m") #'toggle-frame-maximized))
 
-(tab-bar-mode)
-(global-set-key (kbd "C-c <left>") 'tab-bar-switch-to-prev-tab)
-(global-set-key (kbd "C-c <right>") 'tab-bar-switch-to-next-tab)
-(global-set-key (kbd "C-c <up>") 'tab-bar-new-tab)
-(global-set-key (kbd "C-c <down>") 'tab-bar-close-tab)
+(mode-set-keys (lisp-mode-shared-map lisp-interaction-mode-map)
+	       "C-c C-j" eval-print-last-sexp)
 
-(defun dio/find-previous-python ()
-  "finds the lastly visited python buffer"
-  (let ((recent-buffer nil)
-	(recent-time 0)
-	ret)
-    (dolist (buffer (buffer-list) ret)
-      (when (and (not ret) 
-		 (string-suffix-p ".py" (buffer-name buffer) t))
-	(setq ret (buffer-name buffer))))
-    ret))
-
-(global-set-key (kbd "C-c p") 
-		(lambda () (interactive)
-		  (if (get-buffer "*Python*")
-		      (if (equal "*Python*" (buffer-name (current-buffer)))
-			  (let ((py (dio/find-previous-python)))
-			    (when py 
-			      (switch-to-buffer py)))
-			(switch-to-buffer "*Python*"))
-		    (run-python)
-		    (switch-to-buffer "*Python*"))))
-
-(global-set-key (kbd "C-c l")
-		(lambda () (interactive)
-		  (switch-to-buffer "*scratch*")))
-(global-set-key (kbd "C-c o")
-		(lambda () (interactive)
-		  (find-file-at-point)))
-
-(global-set-key (kbd "C-c aa") (lambda () (interactive) (find-file "~/org/about.org")))
-(global-set-key (kbd "C-c af") (lambda () (interactive) (find-file "~/org/phi.org")))
-(global-set-key (kbd "C-c ae") (lambda () (interactive) (find-file "~/.emacs")))
-(global-set-key (kbd "C-c av") (lambda () (interactive) (find-file "~/.vimrc")))
-(global-set-key (kbd "C-c ac") 'org-capture)
-(global-set-key (kbd "C-c ap") (lambda () (interactive) 
-                                 (cd "~/test")
-                                 (run-python) 
-                                 (delete-other-windows)
-                                 (split-window-below)
-                                 (find-file "~/test/test.py")))
-
-(global-set-key (kbd "C-c as") (lambda () (interactive) (scratch-buffer)))
-
-(global-set-key (kbd "C-c al") (lambda () (interactive) 
-                                 (cd "~/test")
-                                 (let ((b (get-buffer "*slime-repl sbcl*")))
-                                   (if b
-                                       (switch-to-buffer b)
-                                       (slime))) 
-                                 (delete-other-windows)
-                                 (split-window-below)
-                                 (find-file "~/test/test.lsp")))
+(add-hook 'org-mode-hook #'visual-line-mode)
 
 
-(global-set-key (kbd "C-c am") (lambda () (interactive) 
-                                 (cd "~/test/lisp/lisp-adventure/")
-                                 (let ((b (get-buffer "*slime-repl sbcl*")))
-                                   (if b
-                                       (switch-to-buffer b)
-                                       (slime))) 
-                                 (delete-other-windows)
-                                 (split-window-below)
-                                 (find-file "~/test/lisp/lisp-adventure/main.lsp")))
+;; (use-package helm
+;;   :ensure t
+;;   :config
+;;   (helm-mode 1)  ;; enable helm-mode globally
 
+;;   ;; Replace built-ins with helm versions
+;;   (global-set-key (kbd "M-x") 'helm-M-x)
+;;   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+;;   (global-set-key (kbd "C-x b") 'helm-mini)
+;;   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;;   (global-set-key (kbd "C-h a") 'helm-apropos)
 
-(global-set-key (kbd "C-c at") 
-                (lambda () 
-                  (interactive) 
-                  (find-file "~/read/misc/tractatus-logico-org-master/tractatus.org")))
+;;   ;; Optional: fuzzy matching
+;;   (setq helm-M-x-fuzzy-match t
+;;         helm-buffers-fuzzy-matching t
+;;         helm-recentf-fuzzy-match t))
 
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-mode +1)
+  :bind (:map projectile-mode-map 
+	      ("C-c p" . projectile-command-map))
+  :config
+  (setq projectile-completion-system 'default))
 
+;; Optional: helm-projectile (if you're using projectile)
+;; (use-package helm-projectile
+;;   :after (helm projectile)
+;;   :config
+;;   (helm-projectile-on))
 
-(set-face-attribute 'default nil :height 140)
+;; Optional: live grep with helm-rg (if you install ripgrep)
+;; (use-package helm-rg
+;;   :after helm)
 
+(global-auto-revert-mode t)
 
-;(add-hook 'python-mode-hook 'py-autopep8-mode)
-(add-hook 'python-mode-hook 'electric-pair-mode)
-(add-hook 'c-mode-hook 'electric-pair-mode)
-;(add-hook 'elpy-mode-hook 'py-autopep8-mode)
-;(add-hook 'elpy-mode-hook 'electric-pair-mode)
+(setq backup-directory-alist `(("." . "~/.emacs.d/backups"))
+      auto-save-file-name-transforms `((".*" "~/.emacs.d/autosaves/" t)))
 
-(add-hook 'slime-repl-mode-hook 'electric-pair-mode)
-(add-hook 'slime-repl-mode-hook 'enable-paredit-mode)
-(add-hook 'lisp-mode-hook 'electric-pair-mode)
-(add-hook 'c++-mode-hook 'electric-pair-mode)
-(add-hook 'js-mode-hook 'electric-pair-mode)
+(electric-pair-mode 1)
 
+(use-package doom-modeline ;; required M-x nerd-icons-install-fonts
+  :init (doom-modeline-mode 1))
 
-(setq inferior-lisp-program "sbcl")
-
-(autoload 'enable-paredit-mode "paredit" "turn on pseudo-structural editing of lisp code" t)
-(add-hook 'ielm-mode-hook #'enable-paredit-mode)
-(add-hook 'lisp-mode-hook #'enable-paredit-mode)
-(add-hook 'scheme-mode-hook #'enable-paredit-mode)
-(add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-
-(add-hook 'lisp-interaction-mode-hook
-          (lambda ()
-            (keymap-set lisp-interaction-mode-map "C-c C-c" 'eval-print-last-sexp)))
-
-(setq-default c-basic-offset 4)
+(when (window-system)
+  (set-frame-height (selected-frame) 33)
+  (set-frame-width (selected-frame) 128))
 
 
 
-;; You need to modify the following line
-(setq load-path (cons "~/test/lean/lean4-mode" load-path))
+;; --- Completion & UI stack ---
 
-(setq lean4-mode-required-packages '(dash f flycheck lsp-mode magit-section s))
+(use-package vertico
+  :init
+  (vertico-mode))
 
-(let ((need-to-refresh t))
-  (dolist (p lean4-mode-required-packages)
-    (when (not (package-installed-p p))
-      (when need-to-refresh
-        (package-refresh-contents)
-        (setq need-to-refresh nil))
-      (package-install p))))
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides
+        '((file (styles partial-completion)))))  ;; for paths
 
-(require 'lean4-mode)
-(put 'narrow-to-region 'disabled nil)
+(use-package marginalia
+  :after vertico
+  :init
+  (marginalia-mode))
 
+(use-package embark
+  :bind
+  (("C-." . embark-act)         ;; context menu
+   ("C-;" . embark-dwim)        ;; smart default action
+   ("C-h B" . embark-bindings)) ;; describe bindings
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
 
-(global-set-key (kbd "<mouse-2>") 'clipboard-yank)
+(use-package consult
+  :ensure t
+  :bind (("C-x b" . consult-buffer)
+         ("C-s" . consult-line)
+         ("M-y" . consult-yank-pop)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c r" . consult-ripgrep)
+         ("C-c f" . consult-find)
+         ("C-M-l" . consult-imenu)))
 
-(add-to-list 'auto-mode-alist '("\\.ino\\'" . c-mode))
+(use-package embark-consult
+  :after (embark consult)) ;; enrich consult via Embark
 
-(add-to-list 'c-default-style '(c-mode . "k&r"))
-(setq indent-tabs-mode nil)
-(delete-selection-mode 1)
+(use-package consult-projectile
+  :ensure t
+  :after (consult projectile)
+  :bind (("C-c p f" . consult-projectile-find-file)
+         ("C-c p p" . consult-projectile-switch-project)
+         ("C-c p r" . consult-projectile-recentf)
+         ("C-c p b" . consult-projectile-switch-to-buffer)))
 
+(use-package which-key
+  :init (which-key-mode))
 
-(require 'casual)
-(define-key calc-mode-map (kbd "C-o") 'casual-main-menu)
+(use-package treemacs
+  :bind (("C-c t" . treemacs-select-window))
+  :config (setq treemacs-is-never-other-window t))
 
-(require 'buffer-move)
+(use-package treemacs-projectile
+  :after (treemacs projectile))
 
-(defun ab/switch-buffer-each-other (arg)
-  "switch current buffer with other window buffer 
-   right-2-left and up-2-down"
-  (interactive "p")
+(projectile-load-known-projects)
+
+(use-package magit 
+  :ensure t
+  :pin melpa-stable
+  :bind (("C-x g" . magit-status)))
+
+(use-package auctex
+  :defer t)
+
+(defvar my/work-buffer nil
+  "The special work buffer to jump to with `my/toggle-work-buffer'.")
+
+(defun my/toggle-work-buffer (&optional set-new)
+  "Toggle to the stored work buffer.
+With prefix arg SET-NEW (C-u), set the current buffer as the new work buffer.
+If the stored buffer no longer exists, reset it to the current buffer.
+If already in the work buffer, bury it (toggle away)."
+  (interactive "P")
   (cond
-   ((windmove-find-other-window 'right) (buf-move-right))
-   ((windmove-find-other-window 'left) (buf-move-left))
-   ((windmove-find-other-window 'up) (buf-move-up))
-   ((windmove-find-other-window 'down) (buf-move-down)))
-  (message "switch buffer done"))
+   ;; Explicitly set a new work buffer
+   (set-new
+    (setq my/work-buffer (current-buffer))
+    (message "Work buffer set to: %s" (buffer-name my/work-buffer)))
+   ;; If work buffer is dead or unset, reset to current
+   ((not (and my/work-buffer (buffer-live-p my/work-buffer)))
+    (setq my/work-buffer (current-buffer))
+    (message "Work buffer was invalid, reset to: %s" (buffer-name my/work-buffer)))
+   ;; If we're in the work buffer, bury it
+   ((eq (current-buffer) my/work-buffer)
+    (bury-buffer)
+    (message "Buried work buffer: %s" (buffer-name my/work-buffer)))
+   ;; Otherwise, jump to it
+   (t
+    (switch-to-buffer my/work-buffer)
+    (message "Switched to work buffer: %s" (buffer-name my/work-buffer)))))
 
-(defvar dio/inc-x 0)
-(defvar dio/inc-sign 1)
+(global-set-key (kbd "C-c w") #'my/toggle-work-buffer)
 
-(defun dio/inc (arg) 
-  (interactive "p")
-  (cond 
-   ((< arg 0)
-    (setq dio/inc-x (- arg))
-    (setq dio/inc-sign -1))
-   ((> arg 1)
-    (setq dio/inc-x arg)
-    (setq dio/inc-sign 1))
-   ((= arg 0)
-    (setq dio/inc-x 0)
-    (setq dio/inc-sign 1))
-   ((= arg 1)
-    (setq dio/inc-x (+ dio/inc-x dio/inc-sign))))
-  (insert (format "%d" dio/inc-x)))
+(use-package vundo
+  :ensure t
+  :bind (("C-x u" . vundo)))
 
-(global-set-key (kbd "C-c +") 'dio/inc)
+(use-package elpy
+  :init (elpy-enable))
 
-(global-set-key (kbd "C-c s") 'ab/switch-buffer-each-other)
-
-
-   
-(put 'downcase-region 'disabled nil)
-(put 'upcase-region 'disabled nil)
+(use-package devdocs
+  :ensure t
+  :commands (devdocs-lookup devdocs-install)
+  :bind (("C-c d" . devdocs-lookup)))
 
 
-;; by default it's t, meaning all warnings; this inhibits lots 
-(setq byte-compile-warnings '(cl-functions))
+(add-to-list 'auto-mode-alist '("\\.ino\\'" . c++-mode))
 
-;; no splash
+(use-package multiple-cursors
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+	 ("C-c C-<" . mc/mark-all-like-this)))
 
-(setq inhibit-splash-screen t)
-(require 'browse-kill-ring)
-(browse-kill-ring-default-keybindings)
-(global-set-key (kbd "C-c k") 'browse-kill-ring)
-
-(put 'dired-find-alternate-file 'disabled nil)
-
-;; prot dired mode configs
-
-; vertical minibuffer (package vertigo)
-(setq vertico-resize nil)
-(vertico-mode 1)
-
-;side notes to M-x, M-: function calls and other stuff (package marginalia)
-(marginalia-mode 1)
-
-
-; able to type paths directly ignoring current
-(file-name-shadow-mode 1)
-; when you do that, clean former
-(add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
-
-
-; (package trashed)
-(setq delete-by-moving-to-trash t)
-
-(setq dired-dwim-target t)
-(add-hook 'dired-mode-hook #'dired-hide-details-mode)
-
-
-(add-hook 'dired-mode-hook (lambda () (dired-omit-mode)))
-
-(setq backup-by-copying t)
-
-(require 'dired)
-(define-key dired-mode-map (kbd "% /") 'dired-mark-directories)
-(define-key dired-mode-map (kbd "% *") 'dired-mark-executables)
-(define-key dired-mode-map (kbd "% .") 'dired-mark-extension)
-
-
-
-
-(setq dired-listing-switches "-al") ; if you want to include the hidden files from dired
-;(setq dired-listing-switches "-l") ; if you want to remove the hidden files from dired
-
-
-
-; C-c C-= and C-c C-- increase and decrease the global font height
-; with zero parameter reset to default
-; with positive parm repeat more times 
-(defvar *dio/face-height-default* 140)
-(defvar *dio/face-height* *dio/face-height-default*)
-(set-face-attribute 'default nil :height *dio/face-height*)
-(global-set-key (kbd "C-c C-=")
-		(lambda (arg)
-		  (interactive "p")
-                  (if (> arg 0)
-                      (dotimes (x (min 19 (max arg 1)))
-		        (setf *dio/face-height* (+ (if (> *dio/face-height* 100) 20 10) *dio/face-height*)))
-                    (setf *dio/face-height* *dio/face-height-default*))
-                  (set-face-attribute 'default nil :height *dio/face-height*)
-                  (text-scale-adjust 0)))
-
-(global-set-key (kbd "C-c C--")
-		(lambda (arg)
-		  (interactive "p")
-                  (if (> arg 0)
-                      (dotimes (x (min 19 (max arg 1)))
-		        (setf *dio/face-height* 
-                              (- *dio/face-height*
-                                 (cond
-                                  ((< *dio/face-height* 20) 0)
-                                  ((< *dio/face-height* 100) 10)
-                                  (t 20)))))
-                    (setf *dio/face-height* *dio/face-height-default*))
-		  (set-face-attribute 'default nil :height *dio/face-height*)
-                  (text-scale-adjust 0)))
-
-
-
-(add-to-list 'default-frame-alist '(alpha-background . 85))
-
-(setq org-directory "~/org/")
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-
-(setq org-capture-templates
-      '(("p" "philosophy stuffs")
-	("pa" "ask question" entry (file+headline "phi.org" "Question")
-	 "* %? %i\n")
-	("pj" "joke" entry (file+headline "~/org/phi.org" "Joke") "* %? %i\n")
-	("pu" "Unsinn" entry (file+headline "~/org/phi.org" "Nonsense") "* %? %i\n")
-	("pb" "bookmark" entry (file+headline "phi.org" "Bookmark") "* %? %i\n")
-	("ps" "quotation" entry (file+headline "phi.org" "Quotation") "* %? %i\n")
-
-	("b" "band" plain (file+olp "about.org" "listen" "new stuff") 
-	 "   %? %^{genre|:death:|:black:|:thrash:|:folk:|:viking:|:power metal:|:speed:}\n")
-	("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
-         "* TODO %?\n  %i\n  %a")
-        ("j" "Journal" entry (file+datetree "~/org/journal.org")
-         "* %?\nEntered on %U\n  %i\n  %a")
-	("r" "rent" entry (file+olp "about.org" "misc" "rent")
-	 "* %U\n %?\n")
-))
-
-(put 'scroll-left 'disabled nil)
-
-
-(put 'set-goal-column 'disabled nil)
-(global-set-key (kbd "C-x h") 'help)
+(setq c-basic-offset 4)
+(setq indent-tabs-mode nil)
+(desktop-save-mode 1)
+(save-place-mode 1)
+(recentf-mode 1)
+(put 'narrow-to-region 'disabled nil)
