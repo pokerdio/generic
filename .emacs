@@ -323,3 +323,5 @@ If already in the work buffer, bury it (toggle away)."
 (save-place-mode 1)
 (recentf-mode 1)
 (put 'narrow-to-region 'disabled nil)
+
+(load "~/.emacs.d/init.el")
