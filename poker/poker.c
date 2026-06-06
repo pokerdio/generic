@@ -439,3 +439,23 @@ void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int))
     }
 }
 
+void loop_card_combo_bit (int n, uint64_t forbid_bitmask, void (*f) (BitCards)) {
+    int nallow = 52 - bitcount(forbid_bitmask);
+    if (nallow < n) {
+	return;
+    }
+    uint64_t start = (UINT64_C(1) << n) - 1;
+    uint64_t stop = UINT64_C(1) << nallow;
+    while (start > 0 && start<stop) {
+	if (!(start & forbid_bitmask)) {
+	    BitCards b;
+	    uint64_t x = start;
+	    for (int i=0 ; i<4; i++) {
+		b.suits[i] = x & ((UINT64_C(1) << 13) - 1);
+		x >>= 13;
+	    }
+	    f(b);
+	}
+	start = (long int) gospers_hack(start);
+    }
+}

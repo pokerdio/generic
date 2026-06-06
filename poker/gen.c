@@ -126,6 +126,37 @@ void loop_hands_all_flops (int i, int j, int k, int q) {
 		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
 }
 
+
+void loop_hands_all_flops_bit (int i, int j, int k, int q) {
+     hands[0] = (uint8_t) i;
+     hands[1] = (uint8_t) j;
+     hands[2] = (uint8_t) k;
+     hands[3] = (uint8_t) q;
+
+     if (SUIT(i) == SUIT(j) || RANK(i) == RANK(j)) {
+	  hands_13[0] = (uint8_t)RANK(i); //suited hands get upward order
+	  hands_13[1] = (uint8_t)RANK(j);
+     } else {
+	  hands_13[0] = (uint8_t)RANK(j);//offsuit hands get downward order
+	  hands_13[1] = (uint8_t)RANK(i);
+     }
+
+     if (SUIT(k) == SUIT(q) || RANK(k) == RANK(q)) {
+	  hands_13[2] = (uint8_t)RANK(k);
+	  hands_13[3] = (uint8_t)RANK(q);
+     } else {
+	  hands_13[2] = (uint8_t)RANK(q);
+	  hands_13[3] = (uint8_t)RANK(k);
+     }
+
+     if (k == 50 && q == 51) {
+	  fprintf (stderr, "%d %d\n", i, j);
+     }
+     loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
+		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
+}
+
+
 void loop_hands() {
      for(int i=0; i<51; i++) {
 	  for(int j=i+1; j<52; j++) {

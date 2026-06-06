@@ -92,4 +92,5 @@ void print_card (uint8_t card);
 void print_cards_ascii (uint8_t * cards, int n);
 void print_card_ascii (uint8_t card);
 void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int));
+uint64_t gospers_hack(const uint64_t n);
 #endif 

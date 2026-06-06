@@ -9,23 +9,6 @@
 #include "bitscore.h"
 #include "poker.h"
 
-void CG_Random7 (CardGroup * g) {
-    int last = 0;
-    for (int i=0; i<7; i++) {
-	int delta = (NCARDS - last - (6 - i) - 2);
-	if (delta > 5) {
-	    delta = rand () % delta;
-	    if (delta > 5) {
-		delta = rand () % delta;
-	    }
-	}
-	int next = last + 1 + delta;
-	g->cards[i] = next;
-	last = next;
-    }
-    g->count = 7;
-}
-
 BitCards CG_to_BC (const CardGroup * g) {
     BitCards ret = {0};
     for (int i=0; i<g->count; i++) {
@@ -76,22 +59,14 @@ void test_old(uint8_t* cards, int n) {
 }
 
 
-void test_new(uint8_t* cards, int n) {
-    assert(n == 7);
-    CardGroup c;
-    c.count = n;
-    for (int i=0; i<n; i++) {
-	c.cards[i] = cards[i];
-    }
-    
-    int score2 = bs_score(CG_to_BC(&c));
+void test_new(BitCards b) {
+    int score2 = bs_score(b);
     global_test_sum += score2;
     test_count++;
     if(test_count % 1000000 == 0) {
 	printf("%d\n", test_count /  1000000);
     }
 }
-
 
 double now(void)
 {
@@ -100,11 +75,32 @@ double now(void)
     return ts.tv_sec + ts.tv_nsec * 1e-9;
 }
 
+void loop_card_combo_bit (int n, uint64_t forbid_bitmask, void (*f) (BitCards)) {
+    int nallow = 52 - bitcount(forbid_bitmask);
+    if (nallow < n) {
+	return;
+    }
+    uint64_t start = (UINT64_C(1) << n) - 1;
+    uint64_t stop = UINT64_C(1) << nallow;
+    while (start > 0 && start<stop) {
+	if (!(start & forbid_bitmask)) {
+	    BitCards b;
+	    uint64_t x = start;
+	    for (int i=0 ; i<4; i++) {
+		b.suits[i] = x & ((UINT64_C(1) << 13) - 1);
+		x >>= 13;
+	    }
+	    f(b);
+	}
+	start = (long int) gospers_hack(start);
+    }
+}
+
 int main (void) {
     double a = now();
     loop_card_combo(7, 0, test_old);
     double b = now();
-    loop_card_combo(7, 0, test_new);
+    loop_card_combo_bit	(7, 0, test_new);
     double c = now();
     printf("old %.3lf new %.3lf %ld\n", b - a, c - b, global_test_sum);
     return 0;
