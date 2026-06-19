@@ -107,8 +107,6 @@
 (use-package browse-kill-ring
   :bind (("C-c a k" . browse-kill-ring)))
 
-
-
 (defun my/insert-indexed (nl count fmt)
   "Insert COUNT+1 lines using FMT, with index 0..COUNT.
 FMT should contain a %d placeholder for the index."
@@ -129,6 +127,7 @@ FMT should contain a %d placeholder for the index."
  "C-c a l" scratch-buffer
  ;; "C-c p" this is used by projectile
  "C-c a h" common-lisp-hyperspec
+ "C-c a s" scroll-lock-mode
  "C-c e" eshell
  "C-c a p" package-list-packages
  "C-c a m" (buf-sw "*Messages*")
@@ -324,4 +323,18 @@ If already in the work buffer, bury it (toggle away)."
 (recentf-mode 1)
 (put 'narrow-to-region 'disabled nil)
 
-(load "~/.emacs.d/init.el")
+(global-set-key (kbd "M-p")
+                (lambda () (interactive)
+                  (scroll-down-line)
+		  (forward-line -1)))
+
+(global-set-key (kbd "M-n")
+                (lambda () (interactive)
+                  (scroll-up-line)
+		  (forward-line 1)))
+
+(let ((local-config "~/.emacs.d/init.el"))
+  (when (file-exists-p local-config)
+    (load-file local-config)))
+
+;; (set-face-attribute 'default nil :height 120)  <<-- for your font setting needs, update .emacs.local.el
