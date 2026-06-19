@@ -13,7 +13,7 @@ GEN_TARGET = gen
 
 all: $(TEST_TARGET) $(PREFLOP_TARGET) $(GEN_TARGET) $(BIT_TARGET)
 
-$(BIT_TARGET): bitpoker.c poker.c poker.h bitworks.c bitworks.h bitscore.c bitscore.h
+$(BIT_TARGET): bitpoker.c poker.c poker.h bitworks.c bitworks.h
 	$(CC) $(PREFLOP_CFLAGS) bitpoker.c poker.c bitworks.c bitscore.c -o $(BIT_TARGET)
 
 $(TEST_TARGET): all_tests.c poker.c poker.h bitworks.c bitworks.h
@@ -22,7 +22,7 @@ $(TEST_TARGET): all_tests.c poker.c poker.h bitworks.c bitworks.h
 $(PREFLOP_TARGET): preflop.c poker.c poker.h bitworks.c bitworks.h
 	$(CC) $(PREFLOP_CFLAGS) preflop.c poker.c bitworks.c -o $(PREFLOP_TARGET)
 
-$(GEN_TARGET): gen.c poker.c poker.h bitworks.c bitworks.h bitscore.c bitscore.h
+$(GEN_TARGET): gen.c poker.c poker.h bitworks.c bitworks.h 
 	$(CC) $(PREFLOP_CFLAGS) gen.c poker.c bitworks.c bitscore.c -o $(GEN_TARGET)
 
 

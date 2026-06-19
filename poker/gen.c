@@ -5,9 +5,6 @@
 
 #include "poker.h"
 #include "bitworks.h"
-#include "bitscore.h"
-
-#define MAX_HAND 12
 
 int win[13][13][13][13] = {0};
 int lose[13][13][13][13] = {0};
@@ -98,64 +95,35 @@ void usage_exit (const char* msg) {
 }
 
 void loop_hands_all_flops (int i, int j, int k, int q) {
-     hands[0] = (uint8_t) i;
-     hands[1] = (uint8_t) j;
-     hands[2] = (uint8_t) k;
-     hands[3] = (uint8_t) q;
+    hands[0] = (uint8_t) i;
+    hands[1] = (uint8_t) j;
+    hands[2] = (uint8_t) k;
+    hands[3] = (uint8_t) q;
 
-     if (SUIT(i) == SUIT(j) || RANK(i) == RANK(j)) {
-	  hands_13[0] = (uint8_t)RANK(i); //suited hands get upward order
-	  hands_13[1] = (uint8_t)RANK(j);
-     } else {
-	  hands_13[0] = (uint8_t)RANK(j);//offsuit hands get downward order
-	  hands_13[1] = (uint8_t)RANK(i);
-     }
+    if (SUIT(i) == SUIT(j) || RANK(i) == RANK(j)) {
+	hands_13[0] = (uint8_t)RANK(i); //suited hands get upward order
+	hands_13[1] = (uint8_t)RANK(j);
+    } else {
+	hands_13[0] = (uint8_t)RANK(j);//offsuit hands get downward order
+	hands_13[1] = (uint8_t)RANK(i);
+    }
 
-     if (SUIT(k) == SUIT(q) || RANK(k) == RANK(q)) {
-	  hands_13[2] = (uint8_t)RANK(k);
-	  hands_13[3] = (uint8_t)RANK(q);
-     } else {
-	  hands_13[2] = (uint8_t)RANK(q);
-	  hands_13[3] = (uint8_t)RANK(k);
-     }
+    if (SUIT(k) == SUIT(q) || RANK(k) == RANK(q)) {
+	hands_13[2] = (uint8_t)RANK(k);
+	hands_13[3] = (uint8_t)RANK(q);
+    } else {
+	hands_13[2] = (uint8_t)RANK(q);
+	hands_13[3] = (uint8_t)RANK(k);
+    }
 
-     if (k == 50 && q == 51) {
-	  fprintf (stderr, "%d %d\n", i, j);
-     }
-     loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
-		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
+    if (k == 50 && q == 51) {
+	fprintf (stderr, "%d %d\n", i, j);
+    }
+    BitCards forbid = {0};
+    
+    loop_card_combo_bit(5, UINT64_C(1) << i | UINT64_C(1) << j | 
+			UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
 }
-
-
-void loop_hands_all_flops_bit (int i, int j, int k, int q) {
-     hands[0] = (uint8_t) i;
-     hands[1] = (uint8_t) j;
-     hands[2] = (uint8_t) k;
-     hands[3] = (uint8_t) q;
-
-     if (SUIT(i) == SUIT(j) || RANK(i) == RANK(j)) {
-	  hands_13[0] = (uint8_t)RANK(i); //suited hands get upward order
-	  hands_13[1] = (uint8_t)RANK(j);
-     } else {
-	  hands_13[0] = (uint8_t)RANK(j);//offsuit hands get downward order
-	  hands_13[1] = (uint8_t)RANK(i);
-     }
-
-     if (SUIT(k) == SUIT(q) || RANK(k) == RANK(q)) {
-	  hands_13[2] = (uint8_t)RANK(k);
-	  hands_13[3] = (uint8_t)RANK(q);
-     } else {
-	  hands_13[2] = (uint8_t)RANK(q);
-	  hands_13[3] = (uint8_t)RANK(k);
-     }
-
-     if (k == 50 && q == 51) {
-	  fprintf (stderr, "%d %d\n", i, j);
-     }
-     loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
-		     UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
-}
-
 
 void loop_hands() {
      for(int i=0; i<51; i++) {
@@ -192,7 +160,8 @@ void display_data(void) {
 }
 
 int main(void) {
-     loop_hands();
-     display_data();
-     return 0;
+    //     loop_hands();
+    loop_hands_all_flops(0, 0, 12, 12);
+    display_data();
+    return 0;
 }

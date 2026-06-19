@@ -6,7 +6,6 @@
 #include <time.h>
 
 #include "bitworks.h"
-#include "bitscore.h"
 #include "poker.h"
 
 BitCards CG_to_BC (const CardGroup * g) {
@@ -22,6 +21,7 @@ int test_count = 0;
 void test(uint8_t* cards, int n) {
     assert(n == 7);
     CardGroup c;
+
     c.count = n;
     for (int i=0; i<n; i++) {
 	c.cards[i] = cards[i];
@@ -55,9 +55,7 @@ void test_old(uint8_t* cards, int n) {
     if(test_count % 1000000 == 0) {
 	printf("%d\n", test_count /  1000000);
     }
-
 }
-
 
 void test_new(BitCards b) {
     int score2 = bs_score(b);
@@ -73,27 +71,6 @@ double now(void)
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return ts.tv_sec + ts.tv_nsec * 1e-9;
-}
-
-void loop_card_combo_bit (int n, uint64_t forbid_bitmask, void (*f) (BitCards)) {
-    int nallow = 52 - bitcount(forbid_bitmask);
-    if (nallow < n) {
-	return;
-    }
-    uint64_t start = (UINT64_C(1) << n) - 1;
-    uint64_t stop = UINT64_C(1) << nallow;
-    while (start > 0 && start<stop) {
-	if (!(start & forbid_bitmask)) {
-	    BitCards b;
-	    uint64_t x = start;
-	    for (int i=0 ; i<4; i++) {
-		b.suits[i] = x & ((UINT64_C(1) << 13) - 1);
-		x >>= 13;
-	    }
-	    f(b);
-	}
-	start = (long int) gospers_hack(start);
-    }
 }
 
 int main (void) {
