@@ -1,6 +1,6 @@
 from turtle import * 
 from random import random
-
+from math import sin
 
 def make_push_pop():
     pos_stack = [];
@@ -16,40 +16,37 @@ def make_push_pop():
 
 push, pop = make_push_pop()
     
-def tree (lv):
-    if not lv:
-        return;
-    branch, angle, length = lv[0];
-    lv = lv[1:];
-    push();
-    rt((branch - 1) * angle * 0.5);
-    for i in range (branch):
-        push();
-        fd(length);
-        tree(lv);
-        pop();
-        lt(angle);
-    pop();
-
-def zig (n, length):
-    n = max (1, n);
-    d = length / (n * 2 + 2);
-    fd (d);
-    for i in range (n):
-        rt (90);
-        fd (d);
-        lt (90);
-        fd (d);
-        lt (90);
-        fd (d * 2);
-        rt (90);
-        fd (d);
-        rt (90);
-        fd (d);
-        lt (90);
-    fd (d);
 
 def zig_gon(d, n):
     for i in range(n):
         zig(d // 15 + 2, d);
         rt(360/n);
+
+def go():
+    reset()
+    shape("turtle")
+    speed(2)
+    width(5)
+    turtlesize(5.0, 5.0, 3.0)
+    a = 10
+    d = 80
+    dd = d * sin(a * 6.28 / 360)
+    pu()
+    goto(0, 500)
+    for i in range(36):
+        pd()
+        fd(d)
+        left(90-a)
+        fd(d)
+        left(90+a)
+        fd(d+2*dd)
+        left(90+a)
+        fd(d)
+        left(90-a)
+        pu()
+        fd(d)
+        right(a)
+    pu()
+    fd(600)
+
+

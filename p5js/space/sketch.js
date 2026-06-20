@@ -10,6 +10,11 @@ function setup() {
 }
 
 function mouseMoved() {
+    if ((mouseX < 0) || (mouseX > width) || (mouseX < 0) || (mouseX > width)) {
+	cursor(ARROW);
+    } else {
+	noCursor();
+    }
 }
 
 function draw() {
@@ -42,4 +47,3 @@ function draw() {
     triangle(0, -10, -10, 0, 10, 0);
     pop();
 }
-
