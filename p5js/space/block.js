@@ -1,6 +1,4 @@
 class Generator {
-
-
     constructor(type, entry_time, parameter_array) {
 	this.type = type;
 	this.entry_time = entry_time;
