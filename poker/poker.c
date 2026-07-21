@@ -45,7 +45,6 @@ int cg_same_cards (const CardGroup *src, const CardGroup *dst) {
     return 1;
 }
 
-
 int cg_same_cards_sorted(const CardGroup *sorted_src, const CardGroup *sorted_dst) {
     if (sorted_src == sorted_dst) {
 	return 1;
@@ -232,7 +231,6 @@ void cg_filter_quads(const CardGroup *sorted, CardGroup *dest) {
     cg_filter_tuple (sorted, dest, 4);
 }
 
-
 int cg_pair_score (const CardGroup *sorted) {
     CardGroup p=CG(0), h=CG(0);
     cg_filter_pair(sorted, &p);
@@ -346,9 +344,6 @@ int cg_score (const CardGroup *g) {
     return rank_score;
 }
 
-
-
-
 void print_card (uint8_t card) {
     static const char *suit[] = {
 	"♣", "♦", "♥", "♠"
@@ -441,12 +436,10 @@ void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int))
     }
 }
 
-
-
-
-void loop_card_combo_bit (int n, uint64_t forbid_bitmask, void (*f) (BitCards)) {
+void loop_card_combo_bit (int n, PackedCards forbid_bitmask, void (*f) (BitCards)) {
     uint64_t start = (UINT64_C(1) << n) - 1;
     uint64_t stop = UINT64_C(1) << NCARDS;
+
     while (start > 0 && start<stop) {
 	if (!(start & forbid_bitmask)) {
 	    BitCards b;

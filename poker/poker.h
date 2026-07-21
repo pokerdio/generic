@@ -5,6 +5,7 @@
 
 #define SUIT(x) ((x) % 4)
 #define RANK(x) (((x) / 4))
+
 typedef union {
     struct {
         uint16_t clubs;
@@ -16,25 +17,29 @@ typedef union {
     uint64_t all;
 } BitCards;
 
-#define BS_CARD(rank, suit) (UINT64_C(1)<<((rank) + 16 * (suit)))
+#define BIT_CARD(rank, suit) (UINT64_C(1)<<((rank) + 16 * (suit)))
 
-#define bs_twos (BS_CARD(0, 0) | BS_CARD(0, 1) | BS_CARD(0, 2) | BS_CARD(0, 3))
-#define bs_threes (BS_CARD(1, 0) | BS_CARD(1, 1) | BS_CARD(1, 2) | BS_CARD(1, 3))
-#define bs_fours (BS_CARD(2, 0) | BS_CARD(2, 1) | BS_CARD(2, 2) | BS_CARD(2, 3))
-#define bs_fives (BS_CARD(3, 0) | BS_CARD(3, 1) | BS_CARD(3, 2) | BS_CARD(3, 3))
-#define bs_sixes (BS_CARD(4, 0) | BS_CARD(4, 1) | BS_CARD(4, 2) | BS_CARD(4, 3))
-#define bs_sevens (BS_CARD(5, 0) | BS_CARD(5, 1) | BS_CARD(5, 2) | BS_CARD(5, 3))
-#define bs_eights (BS_CARD(6, 0) | BS_CARD(6, 1) | BS_CARD(6, 2) | BS_CARD(6, 3))
-#define bs_nines (BS_CARD(7, 0) | BS_CARD(7, 1) | BS_CARD(7, 2) | BS_CARD(7, 3))
-#define bs_tens (BS_CARD(8, 0) | BS_CARD(8, 1) | BS_CARD(8, 2) | BS_CARD(8, 3))
-#define bs_jacks (BS_CARD(9, 0) | BS_CARD(9, 1) | BS_CARD(9, 2) | BS_CARD(9, 3))
-#define bs_queens (BS_CARD(10, 0) | BS_CARD(10, 1) | BS_CARD(10, 2) | BS_CARD(10, 3))
-#define bs_kings (BS_CARD(11, 0) | BS_CARD(11, 1) | BS_CARD(11, 2) | BS_CARD(11, 3))
-#define bs_aces (BS_CARD(12, 0) | BS_CARD(12, 1) | BS_CARD(12, 2) | BS_CARD(12, 3))
+typedef uint64_t PackedCards;
 
-extern const uint64_t bs_ranks[];
+#define PACKED_CARD(rank, suit) (UINT64_C(1) << ((rank) + 13 * (suit)))
 
-int bs_score(BitCards hand);
+#define bit_twos (BIT_CARD(0, 0) | BIT_CARD(0, 1) | BIT_CARD(0, 2) | BIT_CARD(0, 3))
+#define bit_threes (BIT_CARD(1, 0) | BIT_CARD(1, 1) | BIT_CARD(1, 2) | BIT_CARD(1, 3))
+#define bit_fours (BIT_CARD(2, 0) | BIT_CARD(2, 1) | BIT_CARD(2, 2) | BIT_CARD(2, 3))
+#define bit_fives (BIT_CARD(3, 0) | BIT_CARD(3, 1) | BIT_CARD(3, 2) | BIT_CARD(3, 3))
+#define bit_sixes (BIT_CARD(4, 0) | BIT_CARD(4, 1) | BIT_CARD(4, 2) | BIT_CARD(4, 3))
+#define bit_sevens (BIT_CARD(5, 0) | BIT_CARD(5, 1) | BIT_CARD(5, 2) | BIT_CARD(5, 3))
+#define bit_eights (BIT_CARD(6, 0) | BIT_CARD(6, 1) | BIT_CARD(6, 2) | BIT_CARD(6, 3))
+#define bit_nines (BIT_CARD(7, 0) | BIT_CARD(7, 1) | BIT_CARD(7, 2) | BIT_CARD(7, 3))
+#define bit_tens (BIT_CARD(8, 0) | BIT_CARD(8, 1) | BIT_CARD(8, 2) | BIT_CARD(8, 3))
+#define bit_jacks (BIT_CARD(9, 0) | BIT_CARD(9, 1) | BIT_CARD(9, 2) | BIT_CARD(9, 3))
+#define bit_queens (BIT_CARD(10, 0) | BIT_CARD(10, 1) | BIT_CARD(10, 2) | BIT_CARD(10, 3))
+#define bit_kings (BIT_CARD(11, 0) | BIT_CARD(11, 1) | BIT_CARD(11, 2) | BIT_CARD(11, 3))
+#define bit_aces (BIT_CARD(12, 0) | BIT_CARD(12, 1) | BIT_CARD(12, 2) | BIT_CARD(12, 3))
+
+extern const uint64_t bit_ranks[];
+
+int bit_score(BitCards hand);
 
 typedef enum {
     SCORE_HIGHCARD = 0,
@@ -123,23 +128,23 @@ void print_card (uint8_t card);
 void print_cards_ascii (uint8_t * cards, int n);
 void print_card_ascii (uint8_t card);
 void loop_card_combo (int n, uint64_t forbid_bitmask, void (*f) (uint8_t*, int));
-void loop_card_combo_bit (int n, uint64_t forbid_bitmask, void (*f) (BitCards));
+void loop_card_combo_bit (int n, PackedCards forbid_bitmask, void (*f) (BitCards));
 uint64_t gospers_hack(const uint64_t n);
 
 
-static inline uint64_t bs_13bit_contract(BitCards hand) {
+static inline PackedCards bit_13bit_contract(BitCards hand) {
     return hand.all & (((UINT64_C(1) << 13) - 1) |
 	(hand.all & (((UINT64_C(1) << 13) - 1) << 16)) >> 3 |
 	(hand.all & (((UINT64_C(1) << 13) - 1) << 32)) >> 6 | 
 	(hand.all & (((UINT64_C(1) << 13) - 1) << 48)) >> 9);
 }
 
-static inline BitCards bs_13bit_expand(uint64_t x) {
+static inline BitCards bit_13bit_expand(PackedCards x) {
     BitCards ret = {0};
     ret.clubs = x & ((UINT64_C(1) << 13) - 1);
     ret.diamonds = (x & (((UINT64_C(1) << 13) - 1) << 16)) >> 16;
-    ret.hearts = (x & (((UINT64_C(1) << 13) - 1) << 32)) >> 16;
-    ret.spades = (x & (((UINT64_C(1) << 13) - 1) << 48)) >> 16;
+    ret.hearts = (x & (((UINT64_C(1) << 13) - 1) << 32)) >> 32;
+    ret.spades = (x & (((UINT64_C(1) << 13) - 1) << 48)) >> 48;
     return ret;
 }
 

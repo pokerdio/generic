@@ -337,4 +337,9 @@ If already in the work buffer, bury it (toggle away)."
   (when (file-exists-p local-config)
     (load-file local-config)))
 
-;; (set-face-attribute 'default nil :height 120)  <<-- for your font setting needs, update .emacs.local.el
+;; (set-face-attribute 'default nil :height 120)  <<-- for your font setting needs, update .emacs.d/init.el
+(setq case-fold-search nil)
+
+(require 'ibuffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
+

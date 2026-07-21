@@ -21,7 +21,7 @@ BitCards CG_to_BC (const CardGroup * g) {
     return ret;
 }
 
-void hu_win_test_bit(uint8_t* cards, int n) {
+void hu_win_test_bit(BitCards c) {
     if (n != 5) {
 	printf("BAD CARD NUMBER %d - needs FLOP TURN RIVER\n", n);
 	exit(-1);
@@ -121,11 +121,45 @@ void loop_hands_all_flops (int i, int j, int k, int q) {
     }
     BitCards forbid = {0};
     
-    loop_card_combo_bit(5, UINT64_C(1) << i | UINT64_C(1) << j | 
+    loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
 			UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
 }
 
-void loop_hands() {
+void loop_hands_all_flops_bit (int i, int j, int k, int q) {
+    hands[0] = (uint8_t) i;
+    hands[1] = (uint8_t) j;
+    hands[2] = (uint8_t) k;
+    hands[3] = (uint8_t) q;
+
+    if (SUIT(i) == SUIT(j) || RANK(i) == RANK(j)) {
+	hands_13[0] = (uint8_t)RANK(i); //suited hands get upward order
+	hands_13[1] = (uint8_t)RANK(j);
+    } else {
+	hands_13[0] = (uint8_t)RANK(j);//offsuit hands get downward order
+	hands_13[1] = (uint8_t)RANK(i);
+    }
+
+    if (SUIT(k) == SUIT(q) || RANK(k) == RANK(q)) {
+	hands_13[2] = (uint8_t)RANK(k);
+	hands_13[3] = (uint8_t)RANK(q);
+    } else {
+	hands_13[2] = (uint8_t)RANK(q);
+	hands_13[3] = (uint8_t)RANK(k);
+    }
+
+    if (k == 50 && q == 51) {
+	fprintf (stderr, "%d %d\n", i, j);
+    }
+    BitCards forbid = {0};
+    
+    loop_card_combo_bit(5, PACKED_CARD(RANK(i), SUIT(i)) |
+			PACKED_CARD(RANK(j), SUIT(j)) |
+			PACKED_CARD(RANK(k), SUIT(k)) |
+			PACKED_CARD(RANK(q), SUIT(q)), hu_win_test_bit);
+}
+
+
+void loop_hands(void (*flop_looper) (int, int, int, int)) {
      for(int i=0; i<51; i++) {
 	  for(int j=i+1; j<52; j++) {
 	       for(int k=i+1; k<51; k++) {
@@ -136,7 +170,7 @@ void loop_hands() {
 			 if (i == q || j == q) {
 			      continue;
 			 }
-			 loop_hands_all_flops(i, j, k, q);
+			 flop_looper(i, j, k, q);
 		    }
 	       }
 	  }
@@ -160,8 +194,8 @@ void display_data(void) {
 }
 
 int main(void) {
-    //     loop_hands();
-    loop_hands_all_flops(0, 0, 12, 12);
+    //     loop_hands(loop_hands_all_flops);
+    loop_hands_all_flops(0, 1, 48, 49);
     display_data();
     return 0;
 }
