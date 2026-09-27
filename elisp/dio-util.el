@@ -1,4 +1,5 @@
 
+;oooo
 (defmacro global-set-keys (&rest args)
   "Bind multiple keys globally.
 Takes a flat list of key-function or key-file-path pairs"
