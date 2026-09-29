@@ -1,4 +1,4 @@
-;; Minimal for Lisp development
+;;; -*- lexical-binding: t; -*-
 
 (setq inhibit-startup-message t)        ;; No splash screen
 (menu-bar-mode -1)
