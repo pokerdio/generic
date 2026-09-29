@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 
 ;oooo
 (defmacro global-set-keys (&rest args)
