@@ -1,0 +1,147 @@
+FIVE-KEY KEYBOARD: EXPANDED IMPLEMENTATION
+
+Deliverable: keymap-expanded.c, a replacement QMK keymap built from the supplied
+05-keymap.c. The original files have not been edited. Install by copying this
+new file to the keyboard's keymap directory as keymap.c. keyboard.json needs
+no change. A full QMK/AVR compilation and hardware test remain necessary.
+
+GESTURE RULES
+Physical keys are numbered 1 through 5. Only key-down events advance a gesture.
+All keys released ends it. Repeated digits in a gesture require releasing and
+repressing that physical key while another key remains down. FAIL rejects all
+subsequent presses until all-up. Modes and active modifiers survive gesture
+termination; transient recognition state does not.
+
+Ordinary letter roots, overrides and continuation tables are preserved from
+the supplied source, including 313 -> li and 343 -> wi. Source comments about
+some older letter mappings were stale; the actual tables are authoritative.
+In particular the supplied E continuation is n,r,s,t,l; it is not silently
+changed to match an earlier discussion.
+
+SINGLE-KEY ACTIONS AND REPEAT
+In default mode: 1 is the layered reset/Escape, 2 Tab, 3 Space, 4 Backspace,
+5 Enter. A short single-key gesture outputs on release. Holding 2-5 emits
+its first output at 500 ms, then repeats every 50 ms. These values can be
+changed with GESTURE_REPEAT_DELAY and GESTURE_REPEAT_INTERVAL.
+A second key-down before the threshold converts the pending single action
+into a combination and cancels its repeat opportunity. Once repetition
+starts, combinations are rejected. Releasing the original repeating key
+enters FAIL, then all-up resets the gesture; no extra output on release.
+Repeat applies to every 2-5 single-key mapping, including symbols. Key 1
+never repeats. Temporary modifiers apply to the first repeat output only.
+A slow combination begun after the threshold is necessarily rejected.
+
+PUNCTUATION (ORDINARY TYPING MODE ONLY)
+45 -> period on all-up; 54 -> comma on all-up.
+451 ?   452 !   453 -   454 ~
+541 ;   542 :   543 _   544 double quote   545 apostrophe
+Three-key punctuation outputs immediately and enters FAIL.
+Decision: 455 is invalid and outputs nothing, because its repeat feature
+was withdrawn. Further presses after it are ignored. No punctuation repeat
+exists inside an extended gesture.
+
+MODIFIERS: 12...
+Recognizing 12 immediately unregisters all modifiers owned by this engine.
+Exact 12 registers temporary Shift at all-up.
+After the prefix: 2 toggles Shift, 3 Alt, 4 Control, 5 GUI/Super, immediately
+sending each press or release report. Key 1 toggles permanence.
+122 -> temporary Shift; 1222 -> Shift down/up and no remaining modifiers;
+1233 -> Alt down/up; 1221 -> permanent Shift.
+The implicit Shift is exclusive to exact 12. 121 leaves no active modifiers.
+Empty permanence is discarded at all-up. Within the gesture the permanence
+flag is retained even with an empty mask so later modifier toggles can still
+use it. This never leaves an empty persistent reset layer.
+Temporary modifiers expire after the next actual output tap, including
+navigation, punctuation or the first letter of a multi-letter output.
+Invalid gestures and mode selectors do not consume them.
+Permanent modifiers survive output until replaced or cleared by key 1.
+Left-side modifier keycodes are used.
+
+SINGLE-KEY MODES: 13...
+Commit at all-up. Only future single-key actions 2-5 change; letter gestures
+and typing modes are independent. Modes persist until reset.
+Selector   key 2     key 3     key 4       key 5
+13         Left      Up        Down        Right
+131        (         )         [           ]
+132        {         }         <           >
+133        Home      PageUp    PageDown    End
+134        /         backslash vertical bar underscore
+135        Tab       Space     Backspace   Enter (default)
+Decision: a completed three-key selector enters FAIL but retains its pending
+selection. Thus 1345 selects 134 and ignores the trailing 5. Exact 13 waits
+for all-up so its possible third key can select a different mode.
+
+TYPING MODES: 14...
+14 selects persistent numbers. 142 selects persistent numbers and replaces
+all existing modifiers with temporary Shift. 143 selects persistent F keys.
+Both mode selection and the 142 modifier replacement happen at all-up.
+This follows the finalized all-up commitment rule, rather than changing
+modifiers partway through a mode-selector gesture.
+Decision: 141, 144 and 145 are invalid and leave the previous typing mode
+and modifier configuration unchanged. After valid 142/143, extra presses
+are ignored and the selection still commits.
+Prefixes starting with key 1 remain available in every typing mode.
+All other two-key gestures use the selected number/F table and enter FAIL
+immediately, whether valid or invalid. There is no continuation.
+
+Gesture   Number   Function
+21        1        F1
+23        2        F2
+24        3        F3
+25        4        F4
+31        5        F5
+32        6        F6
+34        7        F7
+35        8        F8
+41        9        F9
+42        0        F10
+43        -        F11
+44        +        none
+45        .        F12
+51        *        none
+52        /        none
+53        ^        none
+54        =        none
+Other pairs output nothing. Number/F modes replace punctuation recognition.
+142 Shift is consumed by the next actual output, even a single-key action;
+number mode remains afterward. An invalid pair does not consume Shift.
+
+PHYSICAL LIMITATION: 44
+With the current all-up delimiter, a pure 44 gesture cannot be physically
+entered: releasing the first and only held 4 ends the gesture. Holding another
+key to bridge that release introduces an intervening key-down and fails the
+two-key number grammar. The specified plus mapping is retained in the table
+but is inaccessible through the current physical grammar. No unrequested
+alias or timing rule was added. A later specification should assign plus to
+an unused distinct-key pair (for example 22 has the same problem, whereas
+55 also has the same problem; a distinct-key reassignment requires moving
+an existing mapping), or add an explicit longer gesture.
+
+KEY 1: ONE RESET ACTION PER SINGLE-KEY GESTURE
+On all-up, perform only the first applicable action:
+1. Active modifiers: unregister them and stop.
+2. Nondefault single-key mode (13): restore default and stop.
+3. Nondefault typing mode (14): restore ordinary letters and stop.
+4. Otherwise emit Escape.
+No reset action outputs a HID key or consumes another reset layer.
+135 restores only the single-key mode. There is no separate typing-default
+selector; key 1 supplies it.
+
+HOST AND OUTPUT ASSUMPTIONS
+Punctuation and symbols use QMK US-layout keycodes and synthetic Shift.
+The host keyboard layout must interpret these accordingly. Permanent user
+modifiers also affect punctuation/symbol output; no attempt is made to
+force a literal character irrespective of modifiers or host layout.
+The output helper restores engine-owned modifiers after tap_code16 so a
+synthetic Shift tap does not accidentally discard a permanent Shift.
+Only engine-owned modifier bits are cleared by the reset operation.
+
+VALIDATION
+Compiled with a minimal QMK interface stub using gcc C11, -Wall -Wextra
+-Werror, AddressSanitizer and UndefinedBehaviorSanitizer. Simulated tests
+cover modifier lifetimes, multi-letter output, layered reset, selectors with
+trailing presses, shifted numbers, F keys, punctuation, repeat cancellation,
+repeat release behavior and all number/F table pairs. Tests passed with leak
+detection disabled because LeakSanitizer cannot inspect processes in this
+execution environment. This is host-side logic validation, not a real QMK
+firmware build, USB report capture, or hardware test.
