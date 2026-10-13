@@ -70,7 +70,7 @@
  '(doom-modeline-enable-word-count t)
  '(doom-modeline-total-line-number t)
  '(package-selected-packages
-   '(multiple-cursors sclang-extensions sclang-snippets devdocs elpy vundo auctex magit treemacs-projectile which-key consult-projectile embark-consult embark marginalia orderless vertico doom-modeline projectile browse-kill-ring catppuccin-theme doom-themes sly-mrepl sly rainbow-delimiters paredit helpful company)))
+   '(lua-mode multiple-cursors sclang-extensions sclang-snippets devdocs elpy vundo auctex magit treemacs-projectile which-key consult-projectile embark-consult embark marginalia orderless vertico doom-modeline projectile browse-kill-ring catppuccin-theme doom-themes sly-mrepl sly rainbow-delimiters paredit helpful company)))
 
 
 (use-package doom-themes
@@ -233,6 +233,7 @@ FMT should contain a %d placeholder for the index."
          ("C-c k" . consult-kmacro)
          ("C-c r" . consult-ripgrep)
          ("C-c f" . consult-find)
+	 ("C-c s" . redraw-display)
          ("C-M-l" . consult-imenu)))
 
 (use-package embark-consult
@@ -343,3 +344,13 @@ If already in the work buffer, bury it (toggle away)."
 (require 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer-other-window)
 
+(setq ring-bell-function #'ignore)
+(setq visible-bell t)
+
+
+(defun dio-toggle-selective-display ()
+  (interactive)
+  (if selective-display
+      (set-selective-display nil)
+    (set-selective-display (+ (current-column) 1))))
+(global-set-key (kbd "C-x $") 'dio-toggle-selective-display)

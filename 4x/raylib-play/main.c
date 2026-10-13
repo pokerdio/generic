@@ -2,12 +2,15 @@
 #include "rlgl.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define PI2 6.28318530718f
 #define LEVELS 6
-#define X 10
-#define Y 5
+#define X 20
+#define Y 10
 #define N 10
+
+#define SPEED_MULTI 1.05
 
 #define COUNT ((X) * (Y) * (N))
 
@@ -19,7 +22,7 @@ typedef struct {
     int level;
 } Triangle;
 
-static Triangle tri[COUNT];
+static Triangle tri[COUNT + 66];
 
 static float randomf(float a, float b)
 {
@@ -57,21 +60,25 @@ int main(void)
 	    if (k + N > COUNT) {
 		break;
 	    }
-            Triangle *t = &triangles[k];
+            Triangle *t = &tri[k];
 	    t->center = (Vector2){ (0.5 + x) / X, (y + 0.5) / Y };
 	    t->radius = randomf(0.045f, 0.125f);
 	    t->angle = randomf(0, PI2);
 
-            float direction = (i & 1) ? 1.0f : -1.0f;
-            t->speed = direction * randomf(0.155f, 0.165f) * (2.0f + level * 2.6f);
-
-	    for (i=1 ; i<N ; i++) {
+            float direction = 1.0;
+	    t->level = GetRandomValue (0, LEVELS - 1);
+            t->speed = direction * randomf(0.155f, 0.165f) * (2.0f + t->level * 2.6f);
+	    for (int i=1 ; i<N ; i++) {
 		*(t+i) = *(t+i-1);
-		t->speed *= 1.01;
-		k++;
+		(t+i)->speed *= SPEED_MULTI;
+		if (++k >= COUNT) {
+		    break;
+		}
 	    }
-        }
+	}
     }
+
+    printf ("k=%d", k);
 
     while (!WindowShouldClose()) {
         float dt = GetFrameTime();
@@ -80,7 +87,7 @@ int main(void)
         float scale = fminf(w, h);
 
 	for (int i = 0; i < k; i++)
-	    triangles[i].angle += triangles[i].speed * dt;
+	    tri[i].angle += tri[i].speed * dt;
 
         BeginDrawing();
         ClearBackground((Color){5, 9, 20, 255});
@@ -95,8 +102,8 @@ int main(void)
 				  );
 
         // Draw distant blue layers first, foreground orange last.
-	for (int i = 0; i < COUNT; i++) {
-	    Triangle t = triangles[i];
+	for (int i = 0; i < k; i++) {
+	    Triangle t = tri[i];
 	    int level = t.level;
             float shrink = powf(0.75f, (float)level);
             float radius = scale * 0.72f * shrink;
@@ -109,15 +116,11 @@ int main(void)
 	    t.center.x *= w;
 	    t.center.y *= h;
 	    draw_triangle(t, thickness, color);
-            }
-        }
-
-        EndBlendMode();
-
-        DrawFPS(10, 10);
-        EndDrawing();
+	}
+	EndBlendMode();
+	DrawFPS(10, 10);
+	EndDrawing();
     }
-
     CloseWindow();
     return 0;
 }

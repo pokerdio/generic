@@ -555,3 +555,4 @@ int bit_score(BitCards hand) {
     int top_trips = msb_index(tripped);
     return SCORE_FULL_HOUSE + top_trips * 13 + msb_index(paired & ~(1 << top_trips));
 }
+
