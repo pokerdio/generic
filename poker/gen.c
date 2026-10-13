@@ -6,6 +6,8 @@
 #include "poker.h"
 #include "bitworks.h"
 
+#define DEBUG
+
 int win[13][13][13][13] = {0};
 int lose[13][13][13][13] = {0};
 int tie[13][13][13][13] = {0};
@@ -22,24 +24,22 @@ BitCards CG_to_BC (const CardGroup * g) {
 }
 
 void hu_win_test_bit(BitCards c) {
+#ifdef DEBUG
+    int n = bitcount(c.all);
     if (n != 5) {
 	printf("BAD CARD NUMBER %d - needs FLOP TURN RIVER\n", n);
 	exit(-1);
     }
-    CardGroup c;
-
+#endif
+    BitCards d = c;
+    c.all |= (BIT_CARD(RANK(hands[0]), SUIT(hands[0])))  | 
+	(BIT_CARD(RANK(hands[1]), SUIT(hands[1])));
+    d.all |= (BIT_CARD(RANK(hands[2]), SUIT(hands[2])))  | 
+	(BIT_CARD(RANK(hands[3]), SUIT(hands[3])));
     int score1, score2;
 
-    memcpy(c.cards, cards, 5);
-    c.count = 7;
-    
-    c.cards[5] = hands[0];
-    c.cards[6] = hands[1];
-    score1 = bs_score (CG_to_BC(&c));
-
-    c.cards[5] = hands[2];
-    c.cards[6] = hands[3];
-    score2 = bs_score (CG_to_BC(&c));
+    score1 = bit_score (c);
+    score2 = bit_score (d);
 
     if (score1 > score2) {
 	 win[hands_13[0]][hands_13[1]][hands_13[2]][hands_13[3]]++;
@@ -52,7 +52,6 @@ void hu_win_test_bit(BitCards c) {
 	 lose[hands_13[0]][hands_13[1]][hands_13[2]][hands_13[3]]++;
     }
 }
-
 
 void hu_win_test(uint8_t* cards, int n) {
     if (n != 5) {
@@ -119,10 +118,8 @@ void loop_hands_all_flops (int i, int j, int k, int q) {
     if (k == 50 && q == 51) {
 	fprintf (stderr, "%d %d\n", i, j);
     }
-    BitCards forbid = {0};
-    
     loop_card_combo(5, UINT64_C(1) << i | UINT64_C(1) << j | 
-			UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test_bit);
+			UINT64_C(1) << k | UINT64_C(1) << q, hu_win_test);
 }
 
 void loop_hands_all_flops_bit (int i, int j, int k, int q) {
@@ -150,12 +147,12 @@ void loop_hands_all_flops_bit (int i, int j, int k, int q) {
     if (k == 50 && q == 51) {
 	fprintf (stderr, "%d %d\n", i, j);
     }
-    BitCards forbid = {0};
-    
-    loop_card_combo_bit(5, PACKED_CARD(RANK(i), SUIT(i)) |
-			PACKED_CARD(RANK(j), SUIT(j)) |
-			PACKED_CARD(RANK(k), SUIT(k)) |
-			PACKED_CARD(RANK(q), SUIT(q)), hu_win_test_bit);
+    PackedCards forbid = PACKED_CARD(RANK(i), SUIT(i)) |
+	PACKED_CARD(RANK(j), SUIT(j)) |
+	PACKED_CARD(RANK(k), SUIT(k)) |
+	PACKED_CARD(RANK(q), SUIT(q));
+
+    loop_card_combo_bit(5, forbid, hu_win_test_bit);
 }
 
 
@@ -183,10 +180,13 @@ void display_data(void) {
 	  for (int j=0; j<13; j++) {
 	       for (int k=0; k<13; k++) {
 		    for (int q=0; q<13; q++) {
-			 printf("%c%c%s %c%c%s %d %d %d\n",
-				(i>j?s[i]:s[j]), (i>j?s[j]:s[i]), (i>j?"o":(i==j?"":"s")), 
-				(k>q?s[k]:s[q]), (k>q?s[q]:s[k]), (k>q?"o":(k==q?"":"s")), 
-				win[i][j][k][q], lose[i][j][k][q], tie[i][j][k][q]);
+			if (!win[i][j][k][q] && !lose[i][j][k][q] && !tie[i][j][k][q]) {
+			    continue;
+			}
+			printf("%c%c%s %c%c%s %d %d %d\n",
+			       (i>j?s[i]:s[j]), (i>j?s[j]:s[i]), (i>j?"o":(i==j?"":"s")), 
+			       (k>q?s[k]:s[q]), (k>q?s[q]:s[k]), (k>q?"o":(k==q?"":"s")), 
+			       win[i][j][k][q], lose[i][j][k][q], tie[i][j][k][q]);
 		    }
 	       }
 	  }
@@ -195,7 +195,7 @@ void display_data(void) {
 
 int main(void) {
     //     loop_hands(loop_hands_all_flops);
-    loop_hands_all_flops(0, 1, 48, 49);
+    loop_hands_all_flops_bit(0, 1, 50, 51);
     display_data();
     return 0;
 }

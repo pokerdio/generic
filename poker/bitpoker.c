@@ -30,7 +30,7 @@ void test(uint8_t* cards, int n) {
     BitCards b = CG_to_BC(&c);
 
     int score1 = (cg_score(&c));
-    int score2 = bs_score(CG_to_BC(&c));
+    int score2 = bit_score(CG_to_BC(&c));
     if (score1 != score2) {
 	print_cards(c.cards, c.count);
 	printf(" %d ", (bitcount(b.all)));
@@ -58,7 +58,7 @@ void test_old(uint8_t* cards, int n) {
 }
 
 void test_new(BitCards b) {
-    int score2 = bs_score(b);
+    int score2 = bit_score(b);
     global_test_sum += score2;
     test_count++;
     if(test_count % 1000000 == 0) {

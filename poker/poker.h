@@ -132,19 +132,19 @@ void loop_card_combo_bit (int n, PackedCards forbid_bitmask, void (*f) (BitCards
 uint64_t gospers_hack(const uint64_t n);
 
 
-static inline PackedCards bit_13bit_contract(BitCards hand) {
-    return hand.all & (((UINT64_C(1) << 13) - 1) |
-	(hand.all & (((UINT64_C(1) << 13) - 1) << 16)) >> 3 |
-	(hand.all & (((UINT64_C(1) << 13) - 1) << 32)) >> 6 | 
-	(hand.all & (((UINT64_C(1) << 13) - 1) << 48)) >> 9);
+static inline PackedCards bitcards_to_packed(BitCards hand) {
+    return ((PackedCards)hand.clubs) | 
+	(((PackedCards)hand.diamonds)  << 13) |
+	(((PackedCards)hand.hearts)  << 26) | 
+	(((PackedCards)hand.spades)  << 39);
 }
 
-static inline BitCards bit_13bit_expand(PackedCards x) {
+static inline BitCards packed_to_bitcards(PackedCards x) {
     BitCards ret = {0};
-    ret.clubs = x & ((UINT64_C(1) << 13) - 1);
-    ret.diamonds = (x & (((UINT64_C(1) << 13) - 1) << 16)) >> 16;
-    ret.hearts = (x & (((UINT64_C(1) << 13) - 1) << 32)) >> 32;
-    ret.spades = (x & (((UINT64_C(1) << 13) - 1) << 48)) >> 48;
+    ret.clubs = x & 0x1fff;
+    ret.diamonds = (x >> 13) & 0x1fff;
+    ret.hearts = (x >> 26) & 0x1fff;
+    ret.spades = (x >> 39) & 0x1fff;
     return ret;
 }
 
